@@ -1,0 +1,72 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  category    String // phone | laptop | macbook | console | ghd | data-recovery
+  description String
+  icon        String // lucide icon name
+  priceFrom   Int // stored in pence (£ * 100)
+  priceTo     Int
+  turnaround  String
+  popular     Boolean  @default(false)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Booking {
+  id              String   @id @default(cuid())
+  ticketId        String   @unique // GD-XXXX
+  customerName    String
+  email           String
+  phone           String
+  deviceType      String
+  deviceModel     String
+  issue           String
+  needsCollection Boolean  @default(false)
+  collectionAddr  String?
+  status          String   @default("Pending") // Pending | In Progress | Ready | Completed | Cancelled
+  technicianNotes String?
+  quotedPrice     Int?
+  finalPrice      Int?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  author    String
+  rating    Int // 1-5
+  comment   String
+  device    String?
+  source    String   @default("Google")
+  approved  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model AdminUser {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+}
+
+model SiteSettings {
+  id                     String  @id @default("singleton")
+  collectionBannerEnabled Boolean @default(true)
+  announcementEnabled    Boolean @default(false)
+  announcementText       String?
+}

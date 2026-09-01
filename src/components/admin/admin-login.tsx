@@ -1,0 +1,165 @@
+"use client";
+
+import { useState } from "react";
+import { Wrench, ArrowLeft, Mail, Lock, Loader2, AlertCircle, Zap } from "lucide-react";
+import { useAppStore } from "@/lib/store";
+import { useAdminLogin } from "@/lib/api-hooks";
+import { ADMIN_DEMO, BRAND } from "@/lib/brand";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+
+export function AdminLogin() {
+  const setView = useAppStore((s) => s.setView);
+  const login = useAdminLogin();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) return;
+    login.mutate({ email, password });
+  };
+
+  const autofill = () => {
+    setEmail(ADMIN_DEMO.email);
+    setPassword(ADMIN_DEMO.password);
+  };
+
+  return (
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background p-4">
+      {/* Background layers */}
+      <div className="bg-grid absolute inset-0 opacity-60" />
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(circle at 50% 35%, oklch(0.72 0.15 200 / 0.18), transparent 55%)",
+        }}
+      />
+      <div
+        className="pointer-events-none absolute -top-24 left-1/2 h-72 w-[36rem] -translate-x-1/2 rounded-full opacity-40 blur-3xl"
+        style={{ background: "oklch(0.72 0.15 200 / 0.25)" }}
+      />
+
+      <div className="relative z-10 w-full max-w-md">
+        {/* Back link */}
+        <button
+          onClick={() => setView("public")}
+          className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="size-4" />
+          Back to website
+        </button>
+
+        <div className="glass-strong rounded-2xl p-7 shadow-2xl shadow-black/40 sm:p-8">
+          {/* Brand */}
+          <div className="mb-7 flex flex-col items-center text-center">
+            <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30">
+              <Wrench className="size-7" />
+            </div>
+            <h1 className="text-xl font-semibold tracking-tight text-foreground">
+              Gadget Doctor <span className="text-gradient-cyan">Admin</span>
+            </h1>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              {BRAND.fullName} · Control Center
+            </p>
+          </div>
+
+          <form onSubmit={onSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="admin-email">Email address</Label>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="admin-email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="admin@gadgetdoctor.co.uk"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="pl-9"
+                  disabled={login.isPending}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="admin-password">Password</Label>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="admin-password"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="pl-9"
+                  disabled={login.isPending}
+                />
+              </div>
+            </div>
+
+            {login.isError && (
+              <div
+                role="alert"
+                className="flex items-center gap-2 rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300"
+              >
+                <AlertCircle className="size-4 shrink-0" />
+                <span>
+                  {login.error?.message ?? "Invalid credentials. Please try again."}
+                </span>
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              disabled={login.isPending || !email || !password}
+              className="w-full"
+            >
+              {login.isPending ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  Signing in…
+                </>
+              ) : (
+                "Sign In"
+              )}
+            </Button>
+          </form>
+
+          {/* Demo creds hint */}
+          <div className="mt-6 rounded-lg border border-primary/20 bg-primary/5 p-3.5">
+            <div className="flex items-center gap-2 text-xs font-medium text-primary">
+              <Zap className="size-3.5" />
+              Demo credentials
+            </div>
+            <div className="mt-1.5 flex items-center justify-between gap-3">
+              <code className="font-mono text-xs text-muted-foreground">
+                {ADMIN_DEMO.email} / {ADMIN_DEMO.password}
+              </code>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={autofill}
+                disabled={login.isPending}
+                className={cn("h-7 shrink-0 px-2.5 text-xs")}
+              >
+                Autofill
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          Authorized personnel only · {BRAND.fullName}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+export default AdminLogin;
