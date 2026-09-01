@@ -204,11 +204,11 @@ export function ReviewForm({ onClose }: { onClose?: () => void }) {
       <Button
         type="submit"
         disabled={mutation.isPending || !author.trim() || !comment.trim()}
-        className="mt-2 w-full bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold shadow-lg shadow-amber-500/20"
+        className="mt-2 w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/20"
       >
         {mutation.isPending ? (
           <>
-            <span className="size-4 animate-spin rounded-full border-2 border-slate-950/30 border-t-slate-950" />
+            <span className="size-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
             Submitting…
           </>
         ) : (

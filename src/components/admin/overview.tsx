@@ -24,24 +24,15 @@ import {
 } from "recharts";
 import { useStats, useBookings } from "@/lib/api-hooks";
 import { useAppStore } from "@/lib/store";
-import { formatPrice, relativeTime, STATUS_COLORS } from "@/lib/format";
+import { formatPrice, relativeTime, STATUS_COLORS, deviceLabel } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const DEVICE_LABELS: Record<string, string> = {
-  phone: "Phones",
-  laptop: "Laptops",
-  macbook: "MacBooks",
-  console: "Consoles",
-  ghd: "GHDs",
-  "data-recovery": "Data Recovery",
-};
-
 const CHART = {
-  cyan: "oklch(0.72 0.15 200)",
+  cyan: "oklch(0.62 0.24 27)",
   amber: "oklch(0.82 0.16 80)",
   emerald: "oklch(0.7 0.19 150)",
   violet: "oklch(0.65 0.22 300)",
@@ -86,7 +77,7 @@ export function Overview() {
       <div className="flex flex-wrap items-center gap-2.5">
         <Button
           onClick={() => setAdminModule("bookings")}
-          className="bg-amber-400 text-slate-950 hover:bg-amber-300"
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
         >
           <Wrench className="size-4" />
           Add New Repair Ticket
@@ -222,7 +213,7 @@ export function Overview() {
                   <Pie
                     data={stats.deviceBreakdown.map((d) => ({
                       ...d,
-                      label: DEVICE_LABELS[d.deviceType] ?? d.deviceType,
+                      label: deviceLabel(d.deviceType),
                     }))}
                     dataKey="count"
                     nameKey="label"
@@ -255,7 +246,7 @@ export function Overview() {
                     style={{ background: PIE_COLORS[i % PIE_COLORS.length] }}
                   />
                   <span className="truncate text-muted-foreground">
-                    {DEVICE_LABELS[d.deviceType] ?? d.deviceType}
+                    {deviceLabel(d.deviceType)}
                   </span>
                   <span className="ml-auto font-medium text-foreground">{d.count}</span>
                 </div>
@@ -358,7 +349,7 @@ export function Overview() {
                       {b.customerName}
                     </div>
                     <div className="truncate text-xs text-muted-foreground">
-                      {DEVICE_LABELS[b.deviceType] ?? b.deviceType} · {b.deviceModel}
+                      {deviceLabel(b.deviceType)} · {b.deviceModel}
                     </div>
                   </div>
                   <Badge

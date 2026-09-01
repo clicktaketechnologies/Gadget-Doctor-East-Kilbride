@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useBookings } from "@/lib/api-hooks";
 import { SERVICE_CATEGORIES } from "@/lib/brand";
-import { STATUS_COLORS, relativeTime } from "@/lib/format";
+import { STATUS_COLORS, relativeTime, deviceLabel } from "@/lib/format";
 import type { Booking, BookingStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
@@ -36,15 +36,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BookingDetailModal } from "./booking-detail-modal";
-
-const DEVICE_LABELS: Record<string, string> = {
-  phone: "Phones",
-  laptop: "Laptops",
-  macbook: "MacBooks",
-  console: "Consoles",
-  ghd: "GHDs",
-  "data-recovery": "Data Recovery",
-};
 
 const STATUS_FILTERS: (BookingStatus | "All")[] = [
   "All",
@@ -233,7 +224,7 @@ export function BookingsManager({ search, onSearchChange }: BookingsManagerProps
                     <TableCell>
                       <div className="flex flex-col">
                         <span className="text-sm text-foreground">
-                          {DEVICE_LABELS[b.deviceType] ?? b.deviceType}
+                          {deviceLabel(b.deviceType)}
                         </span>
                         <span className="text-xs text-muted-foreground">
                           {b.deviceModel}

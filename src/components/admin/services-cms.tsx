@@ -65,7 +65,7 @@ export function ServicesCMS() {
         </div>
         <Button
           onClick={openCreate}
-          className="bg-amber-400 text-slate-950 hover:bg-amber-300"
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
         >
           <Plus className="size-4" />
           Add Service

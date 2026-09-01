@@ -8,6 +8,7 @@ export type AppView = "public" | "admin";
 export type PublicPage =
   | "home"
   | "services"
+  | "service-detail"
   | "collection"
   | "reviews"
   | "contact";
@@ -17,7 +18,8 @@ export type AdminModule =
   | "bookings"
   | "services"
   | "reviews"
-  | "content";
+  | "content"
+  | "branding";
 
 interface AppState {
   view: AppView;
@@ -25,6 +27,10 @@ interface AppState {
 
   publicPage: PublicPage;
   setPublicPage: (p: PublicPage) => void;
+
+  // active service category for the service-detail page
+  activeServiceCategory: string | null;
+  openServiceDetail: (category: string) => void;
 
   adminToken: string | null;
   adminName: string | null;
@@ -51,6 +57,10 @@ export const useAppStore = create<AppState>()(
       publicPage: "home",
       setPublicPage: (publicPage) => set({ publicPage }),
 
+      activeServiceCategory: null,
+      openServiceDetail: (category) =>
+        set({ publicPage: "service-detail", activeServiceCategory: category }),
+
       adminToken: null,
       adminName: null,
       setAdminAuth: (adminToken, adminName) => set({ adminToken, adminName }),
@@ -71,6 +81,7 @@ export const useAppStore = create<AppState>()(
       partialize: (s) => ({
         view: s.view,
         publicPage: s.publicPage,
+        activeServiceCategory: s.activeServiceCategory,
         adminToken: s.adminToken,
         adminName: s.adminName,
         adminModule: s.adminModule,

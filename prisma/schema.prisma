@@ -14,7 +14,7 @@ model Service {
   id          String   @id @default(cuid())
   slug        String   @unique
   name        String
-  category    String // phone | laptop | macbook | console | ghd | data-recovery
+  category    String // mobile | tablet | laptop | macbook | computer | custom-computer | console | apple-watch
   description String
   icon        String // lucide icon name
   priceFrom   Int // stored in pence (£ * 100)
@@ -69,4 +69,28 @@ model SiteSettings {
   collectionBannerEnabled Boolean @default(true)
   announcementEnabled    Boolean @default(false)
   announcementText       String?
+}
+
+model Branding {
+  id              String  @id @default("singleton")
+  businessName    String  @default("Gadget Doctor East Kilbride")
+  tagline         String  @default("Fast & Reliable Electronics Repair in East Kilbride")
+  about           String  @default("")
+  logoUrl         String  @default("/gadget-doctor-logo.jpg")
+  primaryColor    String  @default("#E31E24")
+  secondaryColor  String  @default("#4A90E2")
+  phone           String  @default("+44 1355 458135")
+  whatsapp        String  @default("+44 1355 458135")
+  email           String  @default("info@gadgetdoctorscotland.co.uk")
+  website         String  @default("https://www.gadgetdoctoreastkilbride.co.uk")
+  gmbProfile      String  @default("https://g.co/kgs/bRysLQB")
+  mapLink         String  @default("https://maps.app.goo.gl/vsvyX7oc9MFpnEDS6")
+  mapEmbed        String  @default("https://www.google.com/maps?q=14+Stroud+Rd+East+Kilbride+G75+0YA&output=embed")
+  address         String  @default("14 Stroud Rd, East Kilbride, G75 0YA, Scotland")
+  hoursJson       String  @default("[]") // JSON: [{day,time}]
+  socialsJson     String  @default("{}") // JSON: {facebook,instagram,tiktok,youtube,pinterest,linkedin,blog}
+  targetAreasJson String  @default("[]") // JSON: string[]
+  rating          Float   @default(4.6)
+  reviewCount     Int     @default(92)
+  yearsExperience Int     @default(12)
 }

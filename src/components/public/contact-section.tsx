@@ -8,16 +8,46 @@ import {
   CalendarCheck,
   Navigation,
   MessageCircle,
+  Globe,
+  ExternalLink,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/lib/store";
-import { BRAND } from "@/lib/brand";
+import { useBranding } from "@/lib/api-hooks";
+import { BRAND, SOCIAL_LINKS } from "@/lib/brand";
+import { Icon } from "@/components/icon";
 import { cn } from "@/lib/utils";
 
 export function ContactSection() {
   const openBooking = useAppStore((s) => s.openBooking);
+  const { data: branding } = useBranding();
+
+  const businessName = branding?.businessName ?? BRAND.fullName;
+  const shortName = branding?.businessName ?? BRAND.name;
+  const logoUrl = branding?.logoUrl ?? BRAND.logoUrl;
+  const phone = branding?.phone ?? BRAND.phones[0];
+  const whatsapp = branding?.whatsapp ?? BRAND.whatsapp;
+  const email = branding?.email ?? BRAND.email;
+  const website = branding?.website ?? BRAND.website;
+  const gmbProfile = branding?.gmbProfile ?? BRAND.gmbProfile;
+  const address = branding?.address ?? BRAND.address;
+  const addressShort = branding?.address ?? BRAND.addressShort;
+  const hours = branding?.hours ?? BRAND.hours;
+  const socials = branding?.socials ?? BRAND.socials;
+  const targetAreas = branding?.targetAreas ?? BRAND.targetAreas;
+  const mapLink = branding?.mapLink ?? BRAND.mapLink;
+  const mapEmbed = branding?.mapEmbed ?? BRAND.mapEmbed;
+  const rating = branding?.rating ?? BRAND.rating;
+  const reviewCount = branding?.reviewCount ?? BRAND.reviewCount;
+
+  const phoneDigits = phone.replace(/\s+/g, "");
+  const whatsappDigits = whatsapp.replace(/[^\d+]/g, "");
+  const activeSocials = SOCIAL_LINKS.filter((s) => {
+    const url = socials?.[s.key];
+    return !!url && url !== "#";
+  });
 
   return (
     <section className="relative py-12 sm:py-16">
@@ -64,10 +94,10 @@ export function ContactSection() {
                     Workshop Address
                   </p>
                   <p className="mt-0.5 text-sm font-medium text-foreground">
-                    {BRAND.address}
+                    {address}
                   </p>
                   <a
-                    href={BRAND.mapLink}
+                    href={mapLink}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
@@ -78,7 +108,7 @@ export function ContactSection() {
                 </div>
               </li>
 
-              {/* Phones */}
+              {/* Phone */}
               <li className="flex items-start gap-3">
                 <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
                   <Phone className="size-5" />
@@ -87,22 +117,23 @@ export function ContactSection() {
                   <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     Call Us
                   </p>
-                  <div className="mt-1 flex flex-col gap-1 sm:flex-row sm:gap-4">
-                    {BRAND.phones.map((p, i) => (
-                      <a
-                        key={p}
-                        href={`tel:${p.replace(/\s+/g, "")}`}
-                        className="text-sm font-medium text-foreground transition-colors hover:text-primary"
-                      >
-                        {p}
-                        {i === 0 && (
-                          <span className="ml-1.5 text-xs text-muted-foreground">
-                            (mobile)
-                          </span>
-                        )}
-                      </a>
-                    ))}
-                  </div>
+                  <a
+                    href={`tel:${phoneDigits}`}
+                    className="mt-0.5 block text-sm font-medium text-foreground transition-colors hover:text-primary"
+                  >
+                    {phone}
+                  </a>
+                  {whatsapp && whatsapp !== phone && (
+                    <a
+                      href={`https://wa.me/${whatsappDigits.replace(/^\+/, "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                    >
+                      <MessageCircle className="size-3" />
+                      WhatsApp · {whatsapp}
+                    </a>
+                  )}
                 </div>
               </li>
 
@@ -116,13 +147,51 @@ export function ContactSection() {
                     Email
                   </p>
                   <a
-                    href={`mailto:${BRAND.email}`}
+                    href={`mailto:${email}`}
                     className="mt-0.5 block text-sm font-medium text-foreground transition-colors hover:text-primary"
                   >
-                    {BRAND.email}
+                    {email}
                   </a>
                 </div>
               </li>
+
+              {/* Website + GMB */}
+              {(website || gmbProfile) && (
+                <li className="flex items-start gap-3">
+                  <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                    <Globe className="size-5" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      Online
+                    </p>
+                    <div className="mt-0.5 flex flex-col gap-1 text-sm">
+                      {website && (
+                        <a
+                          href={website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 font-medium text-foreground transition-colors hover:text-primary"
+                        >
+                          {website.replace(/^https?:\/\//, "")}
+                          <ExternalLink className="size-3" />
+                        </a>
+                      )}
+                      {gmbProfile && (
+                        <a
+                          href={gmbProfile}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                        >
+                          View on Google Business Profile
+                          <ExternalLink className="size-3" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </li>
+              )}
 
               {/* Hours */}
               <li className="flex items-start gap-3">
@@ -143,7 +212,7 @@ export function ContactSection() {
                     </Badge>
                   </div>
                   <ul className="mt-2 space-y-1.5">
-                    {BRAND.hours.map((h) => (
+                    {hours.map((h) => (
                       <li
                         key={h.day}
                         className="flex items-center justify-between gap-3 rounded-md border border-border bg-background/40 px-3 py-1.5 text-sm"
@@ -170,7 +239,7 @@ export function ContactSection() {
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Button
                 onClick={() => openBooking()}
-                className="flex-1 bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold shadow-lg shadow-amber-500/20"
+                className="flex-1 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/20"
               >
                 <CalendarCheck className="size-4" />
                 Book a Repair
@@ -180,12 +249,58 @@ export function ContactSection() {
                 variant="outline"
                 className="flex-1 border-primary/30 bg-background/40 text-foreground hover:border-primary/60 hover:bg-primary/10"
               >
-                <a href={`tel:${BRAND.phones[1].replace(/\s+/g, "")}`}>
+                <a href={`tel:${phoneDigits}`}>
                   <Phone className="size-4 text-primary" />
                   Call Now
                 </a>
               </Button>
             </div>
+
+            {/* Socials */}
+            {activeSocials.length > 0 && (
+              <div className="mt-6">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Follow us
+                </p>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  {activeSocials.map((s) => {
+                    const url = socials?.[s.key] ?? "";
+                    return (
+                      <a
+                        key={s.key}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${businessName} on ${s.label}`}
+                        className="grid size-9 place-items-center rounded-lg border border-border bg-background/50 text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                      >
+                        <Icon name={s.icon} className="size-4" />
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Target areas */}
+            {targetAreas.length > 0 && (
+              <div className="mt-6">
+                <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  <Navigation className="size-3.5 text-primary" />
+                  Areas We Cover
+                </p>
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {targetAreas.map((area) => (
+                    <span
+                      key={area}
+                      className="inline-flex items-center rounded-full border border-border bg-background/40 px-2 py-0.5 text-[11px] text-muted-foreground"
+                    >
+                      {area}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </motion.div>
 
           {/* Right: map */}
@@ -198,31 +313,44 @@ export function ContactSection() {
           >
             <div className="flex items-center justify-between gap-2 px-4 py-3">
               <div className="flex items-center gap-2">
-                <span className="grid size-8 place-items-center rounded-md bg-primary/10 text-primary">
-                  <MapPin className="size-4" />
+                <span className="grid size-8 shrink-0 place-items-center rounded-md bg-white p-1">
+                  <img
+                    src={logoUrl}
+                    alt="Gadget Doctor East Kilbride logo"
+                    className="h-full w-full rounded-sm object-contain"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.visibility =
+                        "hidden";
+                    }}
+                  />
                 </span>
                 <div>
                   <p className="text-sm font-semibold text-foreground">
-                    {BRAND.name} — East Kilbride
+                    {shortName} — East Kilbride
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    {BRAND.addressShort}
+                    {addressShort}
                   </p>
                 </div>
               </div>
-              <a
-                href={BRAND.mapLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 rounded-md border border-border bg-background/60 px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:border-primary/40 hover:text-primary"
-              >
-                <Navigation className="size-3" />
-                Open in Maps
-              </a>
+              <div className="flex flex-col items-end gap-1">
+                <span className="inline-flex items-center gap-1 text-xs font-medium text-amber-300">
+                  ★ {rating} ({reviewCount}+)
+                </span>
+                <a
+                  href={mapLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 rounded-md border border-border bg-background/60 px-2.5 py-1 text-xs font-medium text-foreground transition-colors hover:border-primary/40 hover:text-primary"
+                >
+                  <Navigation className="size-3" />
+                  Open in Maps
+                </a>
+              </div>
             </div>
             <iframe
-              src={BRAND.mapEmbed}
-              title={`Map showing ${BRAND.fullName} location`}
+              src={mapEmbed}
+              title={`Map showing ${businessName} location`}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               className="h-[400px] w-full rounded-xl border border-border sm:h-[500px] lg:h-[560px]"

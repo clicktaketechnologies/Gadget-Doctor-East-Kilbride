@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Wrench, Phone, Menu, CalendarCheck } from "lucide-react";
+import { Phone, Menu, CalendarCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useAppStore, type PublicPage } from "@/lib/store";
+import { useBranding } from "@/lib/api-hooks";
 import { BRAND } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
@@ -20,7 +21,14 @@ export function Header() {
   const publicPage = useAppStore((s) => s.publicPage);
   const setPublicPage = useAppStore((s) => s.setPublicPage);
   const openBooking = useAppStore((s) => s.openBooking);
+  const { data: branding } = useBranding();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  const businessName = branding?.businessName ?? BRAND.fullName;
+  const shortName = branding?.businessName ?? BRAND.name;
+  const logoUrl = branding?.logoUrl ?? BRAND.logoUrl;
+  const phone = branding?.phone ?? BRAND.phones[0];
+  const phoneDigits = phone.replace(/\s+/g, "");
 
   const go = (p: PublicPage) => {
     setPublicPage(p);
@@ -37,15 +45,29 @@ export function Header() {
         <button
           onClick={() => go("home")}
           className="group flex items-center gap-2.5 outline-none"
-          aria-label={`${BRAND.fullName} — Home`}
+          aria-label={`${businessName} — Home`}
         >
-          <span className="relative grid size-10 place-items-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/30 transition-transform group-hover:scale-105">
-            <Wrench className="size-5" />
-            <span className="absolute -right-0.5 -top-0.5 size-2.5 rounded-full bg-amber-400 ring-2 ring-background" />
+          <span className="relative grid size-10 shrink-0 place-items-center rounded-xl bg-white p-1 shadow-lg shadow-primary/30 transition-transform group-hover:scale-105">
+            <img
+              src={logoUrl}
+              alt="Gadget Doctor East Kilbride logo"
+              className="h-full w-full rounded-md object-contain"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = "none";
+                const parent = e.currentTarget.parentElement;
+                if (parent && !parent.querySelector(".logo-fallback")) {
+                  const fb = document.createElement("span");
+                  fb.className =
+                    "logo-fallback grid place-items-center text-primary font-bold";
+                  fb.innerHTML = "GD";
+                  parent.appendChild(fb);
+                }
+              }}
+            />
           </span>
           <span className="flex flex-col leading-none">
             <span className="text-base font-bold tracking-tight text-foreground">
-              {BRAND.name}
+              {shortName}
             </span>
             <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
               East Kilbride
@@ -85,16 +107,16 @@ export function Header() {
             size="sm"
             className="text-muted-foreground hover:text-foreground"
           >
-            <a href={`tel:${BRAND.phones[1].replace(/\s+/g, "")}`} aria-label="Call the shop">
+            <a href={`tel:${phoneDigits}`} aria-label="Call the shop">
               <Phone className="size-4 text-primary" />
-              <span className="hidden lg:inline">{BRAND.phones[1]}</span>
+              <span className="hidden lg:inline">{phone}</span>
               <span className="lg:hidden">Call</span>
             </a>
           </Button>
           <Button
             onClick={() => openBooking()}
             size="sm"
-            className="bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold shadow-lg shadow-amber-500/20"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/20"
           >
             <CalendarCheck className="size-4" />
             Book Repair
@@ -110,14 +132,14 @@ export function Header() {
             className="text-muted-foreground"
             aria-label="Call the shop"
           >
-            <a href={`tel:${BRAND.phones[1].replace(/\s+/g, "")}`}>
+            <a href={`tel:${phoneDigits}`}>
               <Phone className="size-5" />
             </a>
           </Button>
           <Button
             onClick={() => openBooking()}
             size="sm"
-            className="bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold shadow-lg shadow-amber-500/20"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/20"
           >
             Book
           </Button>
@@ -135,10 +157,14 @@ export function Header() {
             <SheetContent side="right" className="glass-strong w-80 border-l-border">
               <SheetTitle className="px-4 pt-4 text-left text-base font-bold">
                 <span className="flex items-center gap-2.5">
-                  <span className="grid size-9 place-items-center rounded-lg bg-primary text-primary-foreground">
-                    <Wrench className="size-4" />
+                  <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-white p-1">
+                    <img
+                      src={logoUrl}
+                      alt="Gadget Doctor East Kilbride logo"
+                      className="h-full w-full rounded-sm object-contain"
+                    />
                   </span>
-                  {BRAND.name}
+                  {shortName}
                 </span>
               </SheetTitle>
               <nav className="flex flex-col gap-1 px-2 pt-4">
@@ -167,9 +193,9 @@ export function Header() {
                   variant="outline"
                   className="w-full justify-center"
                 >
-                  <a href={`tel:${BRAND.phones[1].replace(/\s+/g, "")}`}>
+                  <a href={`tel:${phoneDigits}`}>
                     <Phone className="size-4 text-primary" />
-                    {BRAND.phones[1]}
+                    {phone}
                   </a>
                 </Button>
                 <Button
@@ -177,7 +203,7 @@ export function Header() {
                     setMobileOpen(false);
                     openBooking();
                   }}
-                  className="w-full justify-center bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold shadow-lg shadow-amber-500/20"
+                  className="w-full justify-center bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/20"
                 >
                   <CalendarCheck className="size-4" />
                   Book a Repair

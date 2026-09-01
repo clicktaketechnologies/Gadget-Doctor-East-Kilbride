@@ -1,17 +1,20 @@
 "use client";
 
 import {
-  Smartphone, Laptop, Gamepad2, Wind, DatabaseBackup, BatteryCharging,
+  Smartphone, Laptop, Gamepad2, DatabaseBackup, BatteryCharging,
   Droplets, Keyboard, MonitorCog, Fan, Truck, Wrench, Settings, Zap,
   Tv, HardDrive, Wifi, Camera, Volume2, Power, Thermometer, Cpu, Plug,
-  ShieldCheck, Clock, Star, Phone, Mail, MapPin, type LucideIcon,
+  ShieldCheck, Clock, Star, Phone, Mail, MapPin, Tablet, Monitor, Watch,
+  Facebook, Instagram, Youtube, Linkedin, Rss, Image as ImageIcon, Music2,
+  type LucideIcon,
 } from "lucide-react";
 
 const MAP: Record<string, LucideIcon> = {
-  Smartphone, Laptop, Gamepad2, Wind, DatabaseBackup, BatteryCharging,
+  Smartphone, Laptop, Gamepad2, DatabaseBackup, BatteryCharging,
   Droplets, Keyboard, MonitorCog, Fan, Truck, Wrench, Settings, Zap,
   Tv, HardDrive, Wifi, Camera, Volume2, Power, Thermometer, Cpu, Plug,
-  ShieldCheck, Clock, Star, Phone, Mail, MapPin,
+  ShieldCheck, Clock, Star, Phone, Mail, MapPin, Tablet, Monitor, Watch,
+  Facebook, Instagram, Youtube, Linkedin, Rss, Image: ImageIcon, Music2,
 };
 
 export function Icon({

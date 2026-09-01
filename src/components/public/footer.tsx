@@ -1,18 +1,16 @@
 "use client";
 
 import {
-  Wrench,
   Phone,
   Mail,
   MapPin,
   Clock,
-  Facebook,
-  Instagram,
-  Twitter,
   ArrowRight,
+  Navigation,
 } from "lucide-react";
 import { useAppStore, type PublicPage } from "@/lib/store";
-import { BRAND, SERVICE_CATEGORIES } from "@/lib/brand";
+import { useBranding } from "@/lib/api-hooks";
+import { BRAND, SERVICE_CATEGORIES, SOCIAL_LINKS } from "@/lib/brand";
 import { Icon } from "@/components/icon";
 import { cn } from "@/lib/utils";
 
@@ -27,12 +25,38 @@ const NAV: { label: string; page: PublicPage }[] = [
 export function Footer() {
   const setPublicPage = useAppStore((s) => s.setPublicPage);
   const openBooking = useAppStore((s) => s.openBooking);
+  const openServiceDetail = useAppStore((s) => s.openServiceDetail);
+  const { data: branding } = useBranding();
+
+  const businessName = branding?.businessName ?? BRAND.fullName;
+  const shortName = branding?.businessName ?? BRAND.name;
+  const logoUrl = branding?.logoUrl ?? BRAND.logoUrl;
+  const phone = branding?.phone ?? BRAND.phones[0];
+  const whatsapp = branding?.whatsapp ?? BRAND.whatsapp;
+  const email = branding?.email ?? BRAND.email;
+  const address = branding?.address ?? BRAND.address;
+  const hours = branding?.hours ?? BRAND.hours;
+  const socials = branding?.socials ?? BRAND.socials;
+  const targetAreas = branding?.targetAreas ?? BRAND.targetAreas;
+  const tagline = branding?.tagline ?? BRAND.tagline;
+  const mapLink = branding?.mapLink ?? BRAND.mapLink;
+  const website = branding?.website ?? BRAND.website;
+
   const go = (p: PublicPage) => {
     setPublicPage(p);
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
+
+  const whatsappDigits = whatsapp.replace(/[^\d+]/g, "");
+  const phoneDigits = phone.replace(/\s+/g, "");
+
+  // Build list of active social links
+  const activeSocials = SOCIAL_LINKS.filter((s) => {
+    const url = socials?.[s.key];
+    return !!url && url !== "#";
+  });
 
   return (
     <footer className="mt-auto border-t border-border bg-card/50">
@@ -41,12 +65,20 @@ export function Footer() {
           {/* Brand */}
           <div className="lg:col-span-4">
             <div className="flex items-center gap-2.5">
-              <span className="grid size-10 place-items-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/30">
-                <Wrench className="size-5" />
+              <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-white p-1 shadow-lg shadow-primary/30">
+                <img
+                  src={logoUrl}
+                  alt="Gadget Doctor East Kilbride logo"
+                  className="h-full w-full rounded-md object-contain"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).style.visibility =
+                      "hidden";
+                  }}
+                />
               </span>
               <div className="flex flex-col leading-none">
                 <span className="text-base font-bold text-foreground">
-                  {BRAND.name}
+                  {shortName}
                 </span>
                 <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-primary">
                   East Kilbride
@@ -54,23 +86,32 @@ export function Footer() {
               </div>
             </div>
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
-              {BRAND.fullName} — your trusted local specialist for phone,
-              laptop, console, MacBook, GHD and data recovery repairs. Fast
-              turnaround, honest pricing and free doorstep collection across
-              East Kilbride.
+              {tagline}. Your trusted local specialist for phone, tablet,
+              laptop, MacBook, computer, custom PC, console and Apple Watch
+              repairs. Fast turnaround, honest pricing and free doorstep
+              collection across East Kilbride.
             </p>
-            <div className="mt-5 flex items-center gap-2">
-              {[Facebook, Instagram, Twitter].map((IconCmp, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  aria-label="Social media"
-                  className="grid size-9 place-items-center rounded-lg border border-border bg-background/50 text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary"
-                >
-                  <IconCmp className="size-4" />
-                </a>
-              ))}
-            </div>
+
+            {/* Social links */}
+            {activeSocials.length > 0 && (
+              <div className="mt-5 flex flex-wrap items-center gap-2">
+                {activeSocials.map((s) => {
+                  const url = socials?.[s.key] ?? "";
+                  return (
+                    <a
+                      key={s.key}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`${businessName} on ${s.label}`}
+                      className="grid size-9 place-items-center rounded-lg border border-border bg-background/50 text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                    >
+                      <Icon name={s.icon} className="size-4" />
+                    </a>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Quick links */}
@@ -101,7 +142,12 @@ export function Footer() {
               {SERVICE_CATEGORIES.map((c) => (
                 <li key={c.value}>
                   <button
-                    onClick={() => go("services")}
+                    onClick={() => {
+                      openServiceDetail(c.value);
+                      if (typeof window !== "undefined") {
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }
+                    }}
                     className="flex items-center gap-2 text-left text-sm text-muted-foreground transition-colors hover:text-primary"
                   >
                     <Icon
@@ -121,28 +167,46 @@ export function Footer() {
               Get In Touch
             </h3>
             <ul className="mt-4 space-y-3 text-sm">
-              <li className="flex items-start gap-2.5 text-muted-foreground">
-                <MapPin className="mt-0.5 size-4 shrink-0 text-primary" />
-                <span>{BRAND.address}</span>
+              <li>
+                <a
+                  href={mapLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-2.5 text-muted-foreground transition-colors hover:text-primary"
+                >
+                  <MapPin className="mt-0.5 size-4 shrink-0 text-primary" />
+                  <span>{address}</span>
+                </a>
               </li>
-              {BRAND.phones.map((p) => (
-                <li key={p}>
+              <li>
+                <a
+                  href={`tel:${phoneDigits}`}
+                  className="flex items-center gap-2.5 text-muted-foreground transition-colors hover:text-primary"
+                >
+                  <Phone className="size-4 shrink-0 text-primary" />
+                  {phone}
+                </a>
+              </li>
+              {whatsapp && whatsapp !== phone && (
+                <li>
                   <a
-                    href={`tel:${p.replace(/\s+/g, "")}`}
+                    href={`https://wa.me/${whatsappDigits.replace(/^\+/, "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="flex items-center gap-2.5 text-muted-foreground transition-colors hover:text-primary"
                   >
                     <Phone className="size-4 shrink-0 text-primary" />
-                    {p}
+                    WhatsApp · {whatsapp}
                   </a>
                 </li>
-              ))}
+              )}
               <li>
                 <a
-                  href={`mailto:${BRAND.email}`}
+                  href={`mailto:${email}`}
                   className="flex items-center gap-2.5 text-muted-foreground transition-colors hover:text-primary"
                 >
                   <Mail className="size-4 shrink-0 text-primary" />
-                  {BRAND.email}
+                  {email}
                 </a>
               </li>
             </ul>
@@ -152,7 +216,7 @@ export function Footer() {
               Opening Hours
             </h3>
             <ul className="mt-3 space-y-1.5 text-sm">
-              {BRAND.hours.map((h) => (
+              {hours.map((h) => (
                 <li
                   key={h.day}
                   className="flex justify-between gap-2 text-muted-foreground"
@@ -169,6 +233,26 @@ export function Footer() {
                 </li>
               ))}
             </ul>
+
+            {/* Target areas */}
+            {targetAreas.length > 0 && (
+              <div className="mt-6">
+                <h3 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.15em] text-foreground">
+                  <Navigation className="size-3.5 text-primary" />
+                  Areas We Cover
+                </h3>
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {targetAreas.map((area) => (
+                    <span
+                      key={area}
+                      className="inline-flex items-center rounded-full border border-border bg-background/40 px-2 py-0.5 text-[11px] text-muted-foreground"
+                    >
+                      {area}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -184,7 +268,7 @@ export function Footer() {
           </div>
           <button
             onClick={() => openBooking()}
-            className="group inline-flex items-center gap-2 rounded-md bg-amber-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-lg shadow-amber-500/20 transition-colors hover:bg-amber-300"
+            className="group inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-lg shadow-primary/20 transition-colors hover:bg-primary/90"
           >
             Book a Repair
             <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
@@ -194,9 +278,19 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row">
           <p>
-            © {new Date().getFullYear()} {BRAND.fullName}. All rights reserved.
+            © {new Date().getFullYear()} {businessName}. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
+            {website && (
+              <a
+                href={website}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-primary"
+              >
+                {website.replace(/^https?:\/\//, "")}
+              </a>
+            )}
             <span className="hidden sm:inline">Registered in Scotland</span>
             <span className="flex items-center gap-1.5">
               <span className="size-1.5 rounded-full bg-emerald-400" />

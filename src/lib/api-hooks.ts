@@ -9,6 +9,8 @@ import type {
   Review,
   SiteSettings,
   DashboardStats,
+  Branding,
+  UpdateBrandingInput,
   CreateBookingInput,
   CreateServiceInput,
   UpdateServiceInput,
@@ -222,6 +224,28 @@ export function useSeed() {
     mutationFn: () => api<{ ok: true }>("/api/seed", { method: "POST" }),
     onSuccess: () => {
       qc.invalidateQueries();
+    },
+  });
+}
+
+// ---------- Branding ----------
+export function useBranding() {
+  return useQuery<Branding>({
+    queryKey: ["branding"],
+    queryFn: () => api("/api/branding"),
+    staleTime: 60_000,
+  });
+}
+
+export function useUpdateBranding() {
+  const qc = useQueryClient();
+  const { toast } = useToast();
+  return useMutation({
+    mutationFn: (input: UpdateBrandingInput) =>
+      api<Branding>("/api/branding", { method: "PATCH", body: JSON.stringify(input) }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["branding"] });
+      toast({ title: "Branding saved", description: "Your changes are now live on the website." });
     },
   });
 }

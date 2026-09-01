@@ -14,7 +14,7 @@ import {
 import { useUpdateBooking, useDeleteBooking } from "@/lib/api-hooks";
 import { useToast } from "@/hooks/use-toast";
 import type { Booking, BookingStatus } from "@/lib/types";
-import { STATUS_COLORS, formatDateTime, formatPrice } from "@/lib/format";
+import { STATUS_COLORS, formatDateTime, formatPrice, deviceLabel } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import {
   Dialog,
@@ -48,15 +48,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-const DEVICE_LABELS: Record<string, string> = {
-  phone: "Phones",
-  laptop: "Laptops",
-  macbook: "MacBooks",
-  console: "Consoles",
-  ghd: "GHDs",
-  "data-recovery": "Data Recovery",
-};
 
 const ALL_STATUSES: BookingStatus[] = [
   "Pending",
@@ -158,7 +149,7 @@ function BookingDetailBody({
         </div>
         <DialogDescription className="text-sm">
           <span className="font-medium text-foreground">{booking.customerName}</span>{" "}
-          · {DEVICE_LABELS[booking.deviceType] ?? booking.deviceType} ·{" "}
+          · {deviceLabel(booking.deviceType)} ·{" "}
           {booking.deviceModel}
         </DialogDescription>
       </DialogHeader>
@@ -199,7 +190,7 @@ function BookingDetailBody({
           <div className="space-y-2.5">
             <InfoRow
               label="Device"
-              value={`${DEVICE_LABELS[booking.deviceType] ?? booking.deviceType} · ${booking.deviceModel}`}
+              value={`${deviceLabel(booking.deviceType)} · ${booking.deviceModel}`}
             />
             <div>
               <div className="mb-1 text-xs uppercase tracking-wider text-muted-foreground">

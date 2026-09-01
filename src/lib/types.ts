@@ -1,12 +1,14 @@
 // Shared domain types for Gadget Doctor
 
 export type ServiceCategory =
-  | "phone"
+  | "mobile"
+  | "tablet"
   | "laptop"
   | "macbook"
+  | "computer"
+  | "custom-computer"
   | "console"
-  | "ghd"
-  | "data-recovery";
+  | "apple-watch";
 
 export interface Service {
   id: string;
@@ -68,6 +70,46 @@ export interface SiteSettings {
   announcementText: string | null;
 }
 
+export interface BusinessHours {
+  day: string;
+  time: string;
+}
+
+export interface SocialLinks {
+  facebook?: string;
+  instagram?: string;
+  tiktok?: string;
+  youtube?: string;
+  pinterest?: string;
+  linkedin?: string;
+  blog?: string;
+  [k: string]: string | undefined;
+}
+
+export interface Branding {
+  id: string;
+  businessName: string;
+  tagline: string;
+  about: string;
+  logoUrl: string;
+  primaryColor: string;
+  secondaryColor: string;
+  phone: string;
+  whatsapp: string;
+  email: string;
+  website: string;
+  gmbProfile: string;
+  mapLink: string;
+  mapEmbed: string;
+  address: string;
+  hours: BusinessHours[];
+  socials: SocialLinks;
+  targetAreas: string[];
+  rating: number;
+  reviewCount: number;
+  yearsExperience: number;
+}
+
 export interface AdminUser {
   id: string;
   email: string;
@@ -125,6 +167,29 @@ export interface CreateReviewInput {
   rating: number;
   comment: string;
   device?: string;
+}
+
+export interface UpdateBrandingInput {
+  businessName?: string;
+  tagline?: string;
+  about?: string;
+  logoUrl?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
+  phone?: string;
+  whatsapp?: string;
+  email?: string;
+  website?: string;
+  gmbProfile?: string;
+  mapLink?: string;
+  mapEmbed?: string;
+  address?: string;
+  hours?: BusinessHours[];
+  socials?: SocialLinks;
+  targetAreas?: string[];
+  rating?: number;
+  reviewCount?: number;
+  yearsExperience?: number;
 }
 
 export interface AdminLoginInput {

@@ -337,8 +337,8 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
                 className={cn(
                   "flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all",
                   collection === "collection"
-                    ? "border-amber-500/60 bg-amber-500/10 shadow-md shadow-amber-500/20"
-                    : "border-border bg-card hover:border-amber-500/30"
+                    ? "border-accent/60 bg-accent/10 shadow-md shadow-accent/20"
+                    : "border-border bg-card hover:border-accent/30"
                 )}
               >
                 <RadioGroupItem
@@ -348,13 +348,13 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
                 />
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <Truck className="size-4 text-amber-400" />
+                    <Truck className="size-4 text-accent" />
                     <span className="text-sm font-semibold text-foreground">
                       Doorstep collection
                     </span>
                     <Badge
                       variant="outline"
-                      className="border-amber-500/40 bg-amber-500/10 text-[10px] text-amber-300"
+                      className="border-accent/40 bg-accent/10 text-[10px] text-accent-foreground"
                     >
                       FREE
                     </Badge>
@@ -368,12 +368,12 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
             </RadioGroup>
 
             {collection === "collection" && (
-              <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
+              <div className="rounded-xl border border-accent/30 bg-accent/5 p-4">
                 <Label
                   htmlFor="bk-addr"
                   className="mb-1.5 flex items-center gap-1.5"
                 >
-                  <MapPin className="size-3.5 text-amber-400" />
+                  <MapPin className="size-3.5 text-accent" />
                   Collection Address
                 </Label>
                 <Textarea
@@ -384,7 +384,7 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
                   maxLength={300}
                   className="min-h-20"
                 />
-                <p className="mt-1.5 text-[11px] text-amber-300/80">
+                <p className="mt-1.5 text-[11px] text-accent-foreground/80">
                   We&apos;ll call to confirm a pickup time within the hour.
                 </p>
               </div>
@@ -434,7 +434,7 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
                   <dd className="font-medium text-foreground">
                     {collection === "collection" ? (
                       <span className="inline-flex items-center gap-1">
-                        <Truck className="size-3.5 text-amber-400" />
+                        <Truck className="size-3.5 text-accent" />
                         Doorstep (free)
                       </span>
                     ) : (
@@ -531,7 +531,7 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
             type="button"
             onClick={next}
             disabled={!canNext}
-            className="bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold shadow-lg shadow-amber-500/20"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/20"
           >
             Continue
             <ChevronRight className="size-4" />
@@ -541,7 +541,7 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
             type="button"
             onClick={handleSubmit}
             disabled={!canNext || mutation.isPending}
-            className="bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold shadow-lg shadow-amber-500/20"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/20"
           >
             {mutation.isPending ? (
               <>
@@ -610,14 +610,14 @@ function SuccessView({
           variant="outline"
           className="border-primary/30 bg-background/40 text-foreground hover:border-primary/60"
         >
-          <a href={`tel:${BRAND.phones[1].replace(/\s+/g, "")}`}>
+          <a href={`tel:${BRAND.phones[0].replace(/\s+/g, "")}`}>
             <Phone className="size-4 text-primary" />
             Call the shop
           </a>
         </Button>
         <Button
           onClick={onClose}
-          className="bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold shadow-lg shadow-amber-500/20"
+          className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/20"
         >
           Done
         </Button>

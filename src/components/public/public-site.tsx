@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Icon } from "@/components/icon";
 import { useAppStore, type PublicPage } from "@/lib/store";
-import { useSettings, useReviews } from "@/lib/api-hooks";
+import { useSettings, useReviews, useBranding } from "@/lib/api-hooks";
 import { BRAND, SERVICE_CATEGORIES } from "@/lib/brand";
 import { relativeTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -32,6 +32,7 @@ import { Footer } from "./footer";
 import { Hero } from "./hero";
 import { FeaturedServices } from "./featured-services";
 import { ServicesSection } from "./services-section";
+import { ServiceDetail } from "./service-detail";
 import { CollectionSection } from "./collection-section";
 import { ReviewsSection } from "./reviews-section";
 import { ContactSection } from "./contact-section";
@@ -46,7 +47,7 @@ function AnnouncementBanner() {
     return null;
   }
   return (
-    <div className="relative z-50 bg-gradient-to-r from-amber-500/90 via-amber-400 to-primary text-slate-950">
+    <div className="relative z-50 bg-gradient-to-r from-primary via-primary to-accent text-primary-foreground">
       <div className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center text-xs font-semibold sm:text-sm">
         <Sparkles className="hidden size-3.5 shrink-0 sm:inline" />
         <span className="line-clamp-1">{settings.announcementText}</span>
@@ -59,6 +60,7 @@ function AnnouncementBanner() {
 
 function CategoryStrip() {
   const setPublicPage = useAppStore((s) => s.setPublicPage);
+  const openServiceDetail = useAppStore((s) => s.openServiceDetail);
   const go = (p: PublicPage) => {
     setPublicPage(p);
     if (typeof window !== "undefined") {
@@ -76,14 +78,19 @@ function CategoryStrip() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.3, delay: i * 0.05 }}
-              onClick={() => go("services")}
+              onClick={() => {
+                openServiceDetail(c.value);
+                if (typeof window !== "undefined") {
+                  window.scrollTo({ top: 0, behavior: "smooth" });
+                }
+              }}
               className="group flex flex-col items-center gap-2 rounded-xl border border-border bg-card/40 p-4 text-center transition-all hover:-translate-y-1 hover:border-primary/40 hover:bg-card"
             >
               <span className="grid size-11 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/20 transition-transform group-hover:scale-105">
                 <Icon name={c.icon} className="size-5" />
               </span>
               <span className="text-xs font-semibold text-foreground sm:text-sm">
-                {c.label}
+                {c.shortLabel}
               </span>
             </motion.button>
           ))}
@@ -180,13 +187,13 @@ function CollectionPreview() {
   return (
     <section className="relative overflow-hidden py-16 sm:py-20">
       <div className="bg-grid pointer-events-none absolute inset-0 opacity-40" />
-      <div className="pointer-events-none absolute -left-32 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-amber-500/15 blur-[100px]" />
+      <div className="pointer-events-none absolute -left-32 top-1/2 h-72 w-72 -translate-y-1/2 rounded-full bg-primary/15 blur-[100px]" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-card to-card p-8 sm:p-12">
-          <div className="pointer-events-none absolute -right-12 -top-12 size-64 rounded-full bg-amber-500/10 blur-3xl" />
+        <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/10 via-card to-card p-8 sm:p-12">
+          <div className="pointer-events-none absolute -right-12 -top-12 size-64 rounded-full bg-accent/10 blur-3xl" />
           <div className="relative grid items-center gap-8 lg:grid-cols-2">
             <div>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-300">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
                 <Truck className="size-3.5" />
                 Free Doorstep Collection
               </span>
@@ -202,7 +209,7 @@ function CollectionPreview() {
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Button
                   onClick={() => openBooking()}
-                  className="bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold shadow-lg shadow-amber-500/25"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/25"
                 >
                   <Truck className="size-4" />
                   Book Free Collection
@@ -210,7 +217,7 @@ function CollectionPreview() {
                 <Button
                   variant="outline"
                   onClick={() => setPublicPage("collection")}
-                  className="border-amber-500/30 bg-background/40 text-foreground hover:border-amber-500/60"
+                  className="border-primary/30 bg-background/40 text-foreground hover:border-primary/60"
                 >
                   Learn More
                   <ArrowRight className="size-4" />
@@ -229,7 +236,7 @@ function CollectionPreview() {
                   className="relative overflow-hidden rounded-xl border border-border bg-background/50 p-4"
                 >
                   <div className="flex items-center justify-between">
-                    <s.icon className="size-5 text-amber-400" />
+                    <s.icon className="size-5 text-primary" />
                     <span className="font-mono text-xs font-bold text-foreground/20">
                       {s.n}
                     </span>
@@ -252,6 +259,9 @@ function CollectionPreview() {
 function ReviewsPreview() {
   const setPublicPage = useAppStore((s) => s.setPublicPage);
   const { data: reviews } = useReviews(true);
+  const { data: branding } = useBranding();
+  const rating = branding?.rating ?? BRAND.rating;
+  const reviewCount = branding?.reviewCount ?? BRAND.reviewCount;
   const list = (reviews ?? []).slice(0, 3);
 
   return (
@@ -261,7 +271,7 @@ function ReviewsPreview() {
           <div>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-300">
               <Star className="size-3.5 fill-amber-400 text-amber-400" />
-              {BRAND.rating}★ from {BRAND.reviewCount}+ reviews
+              {rating}★ from {reviewCount}+ reviews
             </span>
             <h2 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Loved by East Kilbride
@@ -383,12 +393,15 @@ function ReviewPreviewCard({
 function ContactCTA() {
   const openBooking = useAppStore((s) => s.openBooking);
   const setPublicPage = useAppStore((s) => s.setPublicPage);
+  const { data: branding } = useBranding();
+  const phone = branding?.phone ?? BRAND.phones[0];
+  const address = branding?.address ?? BRAND.addressShort;
   return (
     <section className="relative py-16 sm:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-card p-8 sm:p-12">
           <div className="pointer-events-none absolute -left-16 -top-16 size-72 rounded-full bg-primary/15 blur-[100px]" />
-          <div className="pointer-events-none absolute -bottom-16 -right-16 size-72 rounded-full bg-amber-500/10 blur-[100px]" />
+          <div className="pointer-events-none absolute -bottom-16 -right-16 size-72 rounded-full bg-accent/10 blur-[100px]" />
           <div className="relative grid items-center gap-8 lg:grid-cols-2">
             <div>
               <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
@@ -403,7 +416,7 @@ function ContactCTA() {
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Button
                   onClick={() => openBooking()}
-                  className="bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold shadow-lg shadow-amber-500/25"
+                  className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/25"
                 >
                   <Wrench className="size-4" />
                   Book Your Repair
@@ -413,9 +426,9 @@ function ContactCTA() {
                   variant="outline"
                   className="border-primary/30 bg-background/40 text-foreground hover:border-primary/60"
                 >
-                  <a href={`tel:${BRAND.phones[1].replace(/\s+/g, "")}`}>
+                  <a href={`tel:${phone.replace(/\s+/g, "")}`}>
                     <Phone className="size-4 text-primary" />
-                    {BRAND.phones[1]}
+                    {phone}
                   </a>
                 </Button>
               </div>
@@ -424,7 +437,7 @@ function ContactCTA() {
               <ContactInfoItem
                 icon={MapPin}
                 label="Visit our workshop"
-                value={BRAND.addressShort}
+                value={address}
                 onClick={() => setPublicPage("contact")}
               />
               <ContactInfoItem
@@ -511,6 +524,7 @@ export function PublicSite() {
       <main className="flex-1" key={page}>
         {page === "home" && <HomePage />}
         {page === "services" && <ServicesSection />}
+        {page === "service-detail" && <ServiceDetail />}
         {page === "collection" && <CollectionSection />}
         {page === "reviews" && <ReviewsSection />}
         {page === "contact" && <ContactSection />}

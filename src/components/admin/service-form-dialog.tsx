@@ -66,7 +66,7 @@ function ServiceFormBody({
 
   const [name, setName] = useState(service?.name ?? "");
   const [category, setCategory] = useState<ServiceCategory>(
-    (service?.category as ServiceCategory) ?? "phone"
+    (service?.category as ServiceCategory) ?? "mobile"
   );
   const [description, setDescription] = useState(service?.description ?? "");
   const [icon, setIcon] = useState(service?.icon ?? "Smartphone");

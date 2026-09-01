@@ -19,6 +19,7 @@ const MODULE_META: Record<AdminModule, { title: string; subtitle: string }> = {
   services: { title: "Services & Pricing", subtitle: "Catalog & price management" },
   reviews: { title: "Reviews", subtitle: "Moderate customer testimonials" },
   content: { title: "Content", subtitle: "Banners & site messaging" },
+  branding: { title: "Branding", subtitle: "Business identity, contact & hours" },
 };
 
 export function AdminTopbar({ onMenuClick, search, onSearchChange }: AdminTopbarProps) {
@@ -98,7 +99,7 @@ export function AdminTopbar({ onMenuClick, search, onSearchChange }: AdminTopbar
           <Bell className="size-5" />
           <span
             className={cn(
-              "absolute right-2 top-2 size-2 rounded-full bg-amber-400 ring-2 ring-background"
+              "absolute right-2 top-2 size-2 rounded-full bg-primary ring-2 ring-background"
             )}
           />
         </Button>

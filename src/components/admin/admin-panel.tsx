@@ -10,6 +10,7 @@ import { BookingsManager } from "./bookings-manager";
 import { ServicesCMS } from "./services-cms";
 import { ReviewsManager } from "./reviews-manager";
 import { ContentManager } from "./content-manager";
+import { BrandingManager } from "./branding-manager";
 
 export function AdminPanel() {
   const adminToken = useAppStore((s) => s.adminToken);
@@ -55,6 +56,7 @@ export function AdminPanel() {
           {adminModule === "services" && <ServicesCMS />}
           {adminModule === "reviews" && <ReviewsManager />}
           {adminModule === "content" && <ContentManager />}
+          {adminModule === "branding" && <BrandingManager />}
         </main>
       </div>
     </div>

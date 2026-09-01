@@ -8,6 +8,7 @@ import {
   MessageSquare,
   LogOut,
   Globe,
+  Palette,
   type LucideIcon,
 } from "lucide-react";
 import { useAppStore, type AdminModule } from "@/lib/store";
@@ -33,6 +34,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: "services", label: "Services & Pricing", icon: Settings },
   { id: "reviews", label: "Reviews", icon: Star },
   { id: "content", label: "Content", icon: MessageSquare },
+  { id: "branding", label: "Branding", icon: Palette },
 ];
 
 interface AdminSidebarProps {

@@ -8,7 +8,6 @@ import {
   CalendarCheck,
   Truck,
   ShieldCheck,
-  Clock,
   Award,
   Zap,
   Wrench,
@@ -20,53 +19,25 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Icon } from "@/components/icon";
 import { useAppStore } from "@/lib/store";
-import { useServices } from "@/lib/api-hooks";
-import { BRAND } from "@/lib/brand";
+import { useBranding, useServices } from "@/lib/api-hooks";
+import { BRAND, SERVICE_CATEGORIES } from "@/lib/brand";
 import { formatPriceRange } from "@/lib/format";
-import { cn } from "@/lib/utils";
-
-function StarRating({
-  value,
-  className,
-}: {
-  value: number;
-  className?: string;
-}) {
-  return (
-    <div className={cn("flex items-center gap-0.5", className)}>
-      {Array.from({ length: 5 }).map((_, i) => (
-        <Star
-          key={i}
-          className={cn(
-            "size-4",
-            i < Math.round(value)
-              ? "fill-amber-400 text-amber-400"
-              : "fill-transparent text-slate-600"
-          )}
-        />
-      ))}
-    </div>
-  );
-}
-
-const TRUST_BADGES = [
-  { icon: Star, label: `${BRAND.rating}★ Rating`, sub: "Verified" },
-  { icon: ShieldCheck, label: `${BRAND.reviewCount}+ Reviews`, sub: "On Google" },
-  { icon: Award, label: "12+ Years", sub: "Experience" },
-  { icon: Truck, label: "Free Collection", sub: "Doorstep" },
-];
-
-const STATS = [
-  { icon: Wrench, value: "10,000+", label: "Devices Repaired" },
-  { icon: Star, value: `${BRAND.rating}★`, label: "Average Rating" },
-  { icon: Zap, value: "30 min", label: "Avg. Turnaround" },
-  { icon: TrendingUp, value: `${BRAND.reviewCount}+`, label: "Google Reviews" },
-];
 
 export function Hero() {
   const openBooking = useAppStore((s) => s.openBooking);
   const setPublicPage = useAppStore((s) => s.setPublicPage);
+  const openServiceDetail = useAppStore((s) => s.openServiceDetail);
   const { data: services, isLoading } = useServices(true);
+  const { data: branding } = useBranding();
+
+  const phone = branding?.phone ?? BRAND.phones[0];
+  const phoneDigits = phone.replace(/\s+/g, "");
+  const rating = branding?.rating ?? BRAND.rating;
+  const reviewCount = branding?.reviewCount ?? BRAND.reviewCount;
+  const businessName = branding?.businessName ?? BRAND.fullName;
+
+  // Build category quick-links from branding categories
+  const categoryLinks = SERVICE_CATEGORIES;
 
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -101,7 +72,7 @@ export function Hero() {
       {/* Background decoration */}
       <div className="bg-grid pointer-events-none absolute inset-0 opacity-60" />
       <div className="pointer-events-none absolute -top-32 left-1/2 h-[480px] w-[680px] -translate-x-1/2 rounded-full bg-primary/20 blur-[120px]" />
-      <div className="pointer-events-none absolute -right-32 top-40 h-72 w-72 rounded-full bg-amber-500/10 blur-[100px]" />
+      <div className="pointer-events-none absolute -right-32 top-40 h-72 w-72 rounded-full bg-accent/10 blur-[100px]" />
 
       <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-12 sm:px-6 sm:pt-16 lg:px-8 lg:pb-24 lg:pt-20">
         <div className="grid items-center gap-10 lg:grid-cols-12 lg:gap-12">
@@ -126,8 +97,9 @@ export function Hero() {
             </h1>
 
             <p className="mt-5 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Phones, laptops, MacBooks, consoles, GHDs &amp; data recovery —
-              fixed by certified technicians with honest pricing and a{" "}
+              Phones, tablets, laptops, MacBooks, computers, custom PCs,
+              consoles &amp; Apple Watch — fixed by certified technicians with
+              honest pricing and a{" "}
               <span className="font-semibold text-foreground">
                 12-month warranty
               </span>{" "}
@@ -139,7 +111,7 @@ export function Hero() {
               <Button
                 onClick={() => openBooking()}
                 size="lg"
-                className="bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold shadow-lg shadow-amber-500/25"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/25"
               >
                 <CalendarCheck className="size-5" />
                 Book Your Repair
@@ -150,7 +122,7 @@ export function Hero() {
                 size="lg"
                 className="border-primary/30 bg-background/40 text-foreground hover:border-primary/60 hover:bg-primary/10"
               >
-                <a href={`tel:${BRAND.phones[1].replace(/\s+/g, "")}`}>
+                <a href={`tel:${phoneDigits}`}>
                   <Phone className="size-5 text-primary" />
                   Call Now
                 </a>
@@ -159,7 +131,12 @@ export function Hero() {
 
             {/* Trust badges */}
             <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {TRUST_BADGES.map((b) => (
+              {[
+                { icon: Star, label: `${rating}★ Rating`, sub: "Verified" },
+                { icon: ShieldCheck, label: `${reviewCount}+ Reviews`, sub: "On Google" },
+                { icon: Award, label: "12+ Years", sub: "Experience" },
+                { icon: Truck, label: "Free Collection", sub: "Doorstep" },
+              ].map((b) => (
                 <div
                   key={b.label}
                   className="flex items-center gap-2.5 rounded-lg border border-border bg-card/40 p-2.5"
@@ -189,7 +166,7 @@ export function Hero() {
           >
             <div className="glass-strong glow-cyan relative rounded-2xl p-6 shadow-2xl shadow-black/40">
               {/* Floating badge */}
-              <div className="absolute -top-3 right-5 inline-flex items-center gap-1.5 rounded-full bg-amber-400 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-slate-950 shadow-lg">
+              <div className="absolute -top-3 right-5 inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-primary-foreground shadow-lg shadow-primary/30">
                 <Zap className="size-3" />
                 60-sec quote
               </div>
@@ -229,7 +206,10 @@ export function Hero() {
                         onClick={() => {
                           setOpen(false);
                           setQuery("");
-                          openBooking({ serviceSlug: s.slug });
+                          openServiceDetail(s.category);
+                          if (typeof window !== "undefined") {
+                            window.scrollTo({ top: 0, behavior: "smooth" });
+                          }
                         }}
                         className="flex w-full items-center gap-3 rounded-lg p-2.5 text-left transition-colors hover:bg-primary/10"
                       >
@@ -270,7 +250,12 @@ export function Hero() {
 
               {/* Stats grid */}
               <div className="mt-5 grid grid-cols-2 gap-2.5">
-                {STATS.map((s) => (
+                {[
+                  { icon: Wrench, value: "10,000+", label: "Devices Repaired" },
+                  { icon: Star, value: `${rating}★`, label: "Average Rating" },
+                  { icon: Zap, value: "30 min", label: "Avg. Turnaround" },
+                  { icon: TrendingUp, value: `${reviewCount}+`, label: "Google Reviews" },
+                ].map((s) => (
                   <div
                     key={s.label}
                     className="rounded-lg border border-border bg-background/40 p-3"
@@ -286,6 +271,30 @@ export function Hero() {
                 ))}
               </div>
 
+              {/* Category quick-links */}
+              <div className="mt-5">
+                <p className="mb-2 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                  Popular categories
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {categoryLinks.slice(0, 6).map((c) => (
+                    <button
+                      key={c.value}
+                      onClick={() => {
+                        openServiceDetail(c.value);
+                        if (typeof window !== "undefined") {
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/40 px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:bg-primary/10 hover:text-primary"
+                    >
+                      <Icon name={c.icon} className="size-3" />
+                      {c.shortLabel}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <button
                 onClick={() => setPublicPage("services")}
                 className="mt-4 flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-primary/30 bg-primary/5 px-4 py-2.5 text-sm font-medium text-primary transition-colors hover:bg-primary/10"
@@ -293,6 +302,8 @@ export function Hero() {
                 Browse all services
                 <ChevronRight className="size-4" />
               </button>
+              {/* Hidden helper: businessName is rendered in the page title elsewhere; keep reference for SEO/screen readers */}
+              <span className="sr-only">{businessName}</span>
             </div>
           </motion.div>
         </div>

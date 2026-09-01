@@ -15,6 +15,7 @@ import {
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/lib/store";
+import { useBranding } from "@/lib/api-hooks";
 import { BRAND } from "@/lib/brand";
 
 const STEPS = [
@@ -23,14 +24,14 @@ const STEPS = [
     icon: CalendarCheck,
     title: "Book Online",
     desc: "Pick a time slot that suits you. Tell us what needs fixing.",
-    color: "from-cyan-500/20 to-cyan-500/5",
+    color: "from-primary/20 to-primary/5",
   },
   {
     n: 2,
     icon: Truck,
     title: "We Collect",
     desc: "Our driver arrives at your door — anywhere in East Kilbride — for free.",
-    color: "from-amber-500/20 to-amber-500/5",
+    color: "from-accent/20 to-accent/5",
   },
   {
     n: 3,
@@ -48,15 +49,6 @@ const STEPS = [
   },
 ];
 
-const COVERAGE = [
-  "East Kilbride town centre",
-  "Kelvin & The Murray",
-  "Westwood & St Leonards",
-  "Hairmyres & Nerston",
-  "Thorntonhall & Jackton",
-  "Strathaven & Chapelton",
-];
-
 const TRUST = [
   { icon: ShieldCheck, label: "Fully insured collection" },
   { icon: Clock, label: "Same-day pickup available" },
@@ -65,18 +57,23 @@ const TRUST = [
 
 export function CollectionSection() {
   const openBooking = useAppStore((s) => s.openBooking);
+  const { data: branding } = useBranding();
+  const phone = branding?.phone ?? BRAND.phones[0];
+  const phoneDigits = phone.replace(/\s+/g, "");
+  const targetAreas =
+    branding?.targetAreas ?? BRAND.targetAreas;
 
   return (
     <section className="relative overflow-hidden py-12 sm:py-16">
       {/* BG */}
       <div className="bg-grid pointer-events-none absolute inset-0 opacity-40" />
-      <div className="pointer-events-none absolute -top-24 right-0 h-72 w-72 rounded-full bg-amber-500/10 blur-[100px]" />
-      <div className="pointer-events-none absolute bottom-0 left-0 h-72 w-72 rounded-full bg-primary/15 blur-[100px]" />
+      <div className="pointer-events-none absolute -top-24 right-0 h-72 w-72 rounded-full bg-primary/10 blur-[100px]" />
+      <div className="pointer-events-none absolute bottom-0 left-0 h-72 w-72 rounded-full bg-accent/15 blur-[100px]" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Hero */}
         <div className="mx-auto max-w-3xl text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-xs font-medium text-amber-300">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
             <Truck className="size-3.5" />
             Free Doorstep Collection
           </span>
@@ -92,7 +89,7 @@ export function CollectionSection() {
             <Button
               onClick={() => openBooking()}
               size="lg"
-              className="bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold shadow-lg shadow-amber-500/25"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/25"
             >
               <Truck className="size-5" />
               Book Free Collection
@@ -103,9 +100,9 @@ export function CollectionSection() {
               size="lg"
               className="border-primary/30 bg-background/40 text-foreground hover:border-primary/60 hover:bg-primary/10"
             >
-              <a href={`tel:${BRAND.phones[1].replace(/\s+/g, "")}`}>
+              <a href={`tel:${phoneDigits}`}>
                 <Phone className="size-5 text-primary" />
-                {BRAND.phones[1]}
+                {phone}
               </a>
             </Button>
           </div>
@@ -171,7 +168,7 @@ export function CollectionSection() {
               </div>
             </div>
             <div className="mt-5 grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {COVERAGE.map((c) => (
+              {targetAreas.map((c) => (
                 <div
                   key={c}
                   className="flex items-center gap-2 rounded-lg border border-border bg-background/40 px-3 py-2 text-sm text-muted-foreground"
@@ -184,7 +181,7 @@ export function CollectionSection() {
             <p className="mt-4 text-xs text-muted-foreground">
               Not sure if we cover your area?{" "}
               <a
-                href={`tel:${BRAND.phones[1].replace(/\s+/g, "")}`}
+                href={`tel:${phoneDigits}`}
                 className="font-medium text-primary hover:underline"
               >
                 Call us
@@ -193,9 +190,9 @@ export function CollectionSection() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-6">
+          <div className="rounded-2xl border border-primary/30 bg-primary/5 p-6">
             <div className="flex items-center gap-2.5">
-              <span className="grid size-10 place-items-center rounded-lg bg-amber-400/15 text-amber-300">
+              <span className="grid size-10 place-items-center rounded-lg bg-primary/15 text-primary">
                 <ShieldCheck className="size-5" />
               </span>
               <div>
@@ -232,7 +229,7 @@ export function CollectionSection() {
             </div>
             <Button
               onClick={() => openBooking()}
-              className="mt-5 w-full bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold shadow-lg shadow-amber-500/20"
+              className="mt-5 w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/20"
             >
               <Truck className="size-4" />
               Schedule My Collection

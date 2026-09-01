@@ -35,7 +35,7 @@ export default function Home() {
             className={cn(
               "flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all",
               view === "admin"
-                ? "bg-amber-400 text-slate-950 shadow-md shadow-amber-500/30"
+                ? "bg-accent text-accent-foreground shadow-md shadow-accent/30"
                 : "text-muted-foreground hover:text-foreground"
             )}
             aria-label="View admin dashboard"

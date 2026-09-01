@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Wrench, ArrowLeft, Mail, Lock, Loader2, AlertCircle, Zap } from "lucide-react";
+import { ArrowLeft, Mail, Lock, Loader2, AlertCircle, Zap } from "lucide-react";
 import { useAppStore } from "@/lib/store";
 import { useAdminLogin } from "@/lib/api-hooks";
 import { ADMIN_DEMO, BRAND } from "@/lib/brand";
@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+
+const LOGO_URL = "/gadget-doctor-logo.jpg";
 
 export function AdminLogin() {
   const setView = useAppStore((s) => s.setView);
@@ -35,12 +37,12 @@ export function AdminLogin() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(circle at 50% 35%, oklch(0.72 0.15 200 / 0.18), transparent 55%)",
+            "radial-gradient(circle at 50% 35%, oklch(0.62 0.24 27 / 0.20), transparent 55%)",
         }}
       />
       <div
         className="pointer-events-none absolute -top-24 left-1/2 h-72 w-[36rem] -translate-x-1/2 rounded-full opacity-40 blur-3xl"
-        style={{ background: "oklch(0.72 0.15 200 / 0.25)" }}
+        style={{ background: "oklch(0.62 0.24 27 / 0.28)" }}
       />
 
       <div className="relative z-10 w-full max-w-md">
@@ -56,8 +58,21 @@ export function AdminLogin() {
         <div className="glass-strong rounded-2xl p-7 shadow-2xl shadow-black/40 sm:p-8">
           {/* Brand */}
           <div className="mb-7 flex flex-col items-center text-center">
-            <div className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30">
-              <Wrench className="size-7" />
+            <div className="mb-4 flex size-16 items-center justify-center overflow-hidden rounded-2xl bg-white p-2 shadow-lg shadow-primary/30 ring-1 ring-border/60">
+              <img
+                src={LOGO_URL}
+                alt="Gadget Doctor East Kilbride logo"
+                className="h-full w-full object-contain"
+                onError={(e) => {
+                  const t = e.currentTarget as HTMLImageElement;
+                  t.style.display = "none";
+                  const parent = t.parentElement;
+                  if (parent) {
+                    parent.classList.remove("bg-white");
+                    parent.classList.add("bg-primary", "text-primary-foreground");
+                  }
+                }}
+              />
             </div>
             <h1 className="text-xl font-semibold tracking-tight text-foreground">
               Gadget Doctor <span className="text-gradient-cyan">Admin</span>

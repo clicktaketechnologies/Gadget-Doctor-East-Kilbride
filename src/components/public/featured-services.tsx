@@ -17,6 +17,7 @@ import type { Service } from "@/lib/types";
 
 function ServiceCard({ service, index }: { service: Service; index: number }) {
   const openBooking = useAppStore((s) => s.openBooking);
+  const openServiceDetail = useAppStore((s) => s.openServiceDetail);
   return (
     <motion.article
       initial={{ opacity: 0, y: 18 }}
@@ -26,9 +27,18 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
       className="group relative flex flex-col rounded-xl border border-border bg-card p-5 transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5"
     >
       <div className="flex items-start justify-between gap-3">
-        <span className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/20 transition-transform group-hover:scale-105">
+        <button
+          onClick={() => {
+            openServiceDetail(service.category);
+            if (typeof window !== "undefined") {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+          className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/20 transition-transform group-hover:scale-105"
+          aria-label={`View ${service.name} category details`}
+        >
           <Icon name={service.icon} className="size-6" />
-        </span>
+        </button>
         {service.popular && (
           <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-300">
             <Star className="size-3 fill-amber-400 text-amber-400" />
@@ -54,14 +64,29 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
         </span>
       </div>
 
-      <Button
-        onClick={() => openBooking({ serviceSlug: service.slug })}
-        size="sm"
-        className="mt-4 w-full justify-center bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold shadow-md shadow-amber-500/15"
-      >
-        <CalendarCheck className="size-4" />
-        Book Fix
-      </Button>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <Button
+          onClick={() => openBooking({ serviceSlug: service.slug })}
+          size="sm"
+          className="justify-center bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-md shadow-primary/15"
+        >
+          <CalendarCheck className="size-4" />
+          Book Fix
+        </Button>
+        <Button
+          onClick={() => {
+            openServiceDetail(service.category);
+            if (typeof window !== "undefined") {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+          variant="outline"
+          size="sm"
+          className="justify-center border-primary/30 bg-background/40 text-foreground hover:border-primary/60 hover:bg-primary/10"
+        >
+          Details
+        </Button>
+      </div>
     </motion.article>
   );
 }
@@ -130,7 +155,7 @@ export function FeaturedServices() {
             </p>
             <Button
               onClick={() => openBooking()}
-              className="mt-4 bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold"
+              className="mt-4 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
             >
               Book a custom repair
             </Button>

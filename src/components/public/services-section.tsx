@@ -18,6 +18,7 @@ const ALL = "all";
 
 function ServiceCard({ service }: { service: Service }) {
   const openBooking = useAppStore((s) => s.openBooking);
+  const openServiceDetail = useAppStore((s) => s.openServiceDetail);
   return (
     <motion.article
       layout
@@ -27,9 +28,18 @@ function ServiceCard({ service }: { service: Service }) {
       className="group relative flex flex-col rounded-xl border border-border bg-card p-5 transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5"
     >
       <div className="flex items-start justify-between gap-3">
-        <span className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/20 transition-transform group-hover:scale-105">
+        <button
+          onClick={() => {
+            openServiceDetail(service.category);
+            if (typeof window !== "undefined") {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+          className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/20 transition-transform group-hover:scale-105"
+          aria-label={`View ${service.name} category details`}
+        >
           <Icon name={service.icon} className="size-6" />
-        </span>
+        </button>
         {service.popular && (
           <Badge
             variant="outline"
@@ -58,14 +68,29 @@ function ServiceCard({ service }: { service: Service }) {
         </span>
       </div>
 
-      <Button
-        onClick={() => openBooking({ serviceSlug: service.slug })}
-        size="sm"
-        className="mt-4 w-full justify-center bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold shadow-md shadow-amber-500/15"
-      >
-        <CalendarCheck className="size-4" />
-        Book Fix
-      </Button>
+      <div className="mt-4 grid grid-cols-2 gap-2">
+        <Button
+          onClick={() => openBooking({ serviceSlug: service.slug })}
+          size="sm"
+          className="justify-center bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-md shadow-primary/15"
+        >
+          <CalendarCheck className="size-4" />
+          Book Fix
+        </Button>
+        <Button
+          onClick={() => {
+            openServiceDetail(service.category);
+            if (typeof window !== "undefined") {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }
+          }}
+          variant="outline"
+          size="sm"
+          className="justify-center border-primary/30 bg-background/40 text-foreground hover:border-primary/60 hover:bg-primary/10"
+        >
+          Details
+        </Button>
+      </div>
     </motion.article>
   );
 }
@@ -85,6 +110,7 @@ function CardSkeleton() {
 
 export function ServicesSection() {
   const openBooking = useAppStore((s) => s.openBooking);
+  const openServiceDetail = useAppStore((s) => s.openServiceDetail);
   const { data: services, isLoading } = useServices(true);
   const [category, setCategory] = useState<string>(ALL);
   const [q, setQ] = useState("");
@@ -141,10 +167,20 @@ export function ServicesSection() {
         <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
           {tabs.map((t) => {
             const active = category === t.value;
+            const isAll = t.value === ALL;
             return (
               <button
                 key={t.value}
-                onClick={() => setCategory(t.value)}
+                onClick={() => {
+                  if (isAll) {
+                    setCategory(ALL);
+                  } else {
+                    openServiceDetail(t.value);
+                    if (typeof window !== "undefined") {
+                      window.scrollTo({ top: 0, behavior: "smooth" });
+                    }
+                  }
+                }}
                 className={cn(
                   "inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-all",
                   active
@@ -187,7 +223,7 @@ export function ServicesSection() {
             </p>
             <Button
               onClick={() => openBooking()}
-              className="mt-5 bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold"
+              className="mt-5 bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
             >
               Book a custom repair
             </Button>
