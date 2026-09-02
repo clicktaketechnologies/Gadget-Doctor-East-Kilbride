@@ -21,6 +21,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppStore } from "@/lib/store";
+import { useRouter } from "next/navigation";
 
 export function ContentManager() {
   const settingsQ = useSettings();
@@ -135,7 +136,7 @@ function CollectionMasterToggle({ settings }: { settings: SiteSettings }) {
 
 function CollectionBannerCard({ settings }: { settings: SiteSettings }) {
   const updateMutation = useUpdateSettings();
-  const setView = useAppStore((s) => s.setView);
+  const router = useRouter();
   const enabled = settings.collectionBannerEnabled;
 
   return (
@@ -192,7 +193,7 @@ function CollectionBannerCard({ settings }: { settings: SiteSettings }) {
       <Button
         variant="outline"
         size="sm"
-        onClick={() => setView("public")}
+        onClick={() => router.push("/")}
         className="mt-4 w-fit gap-1.5"
       >
         Preview on site
@@ -204,7 +205,7 @@ function CollectionBannerCard({ settings }: { settings: SiteSettings }) {
 
 function AnnouncementBannerCard({ settings }: { settings: SiteSettings }) {
   const updateMutation = useUpdateSettings();
-  const setView = useAppStore((s) => s.setView);
+  const router = useRouter();
 
   const [enabled, setEnabled] = useState(settings.announcementEnabled);
   const [text, setText] = useState(settings.announcementText ?? "");
@@ -305,7 +306,7 @@ function AnnouncementBannerCard({ settings }: { settings: SiteSettings }) {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setView("public")}
+          onClick={() => router.push("/")}
           className="gap-1.5"
         >
           Preview on site

@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Mail, Lock, Loader2, AlertCircle, Zap } from "lucide-react";
-import { useAppStore } from "@/lib/store";
 import { useAdminLogin } from "@/lib/api-hooks";
 import { ADMIN_DEMO, BRAND } from "@/lib/brand";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 const LOGO_URL = "/gadget-doctor-logo.jpg";
 
 export function AdminLogin() {
-  const setView = useAppStore((s) => s.setView);
+  const router = useRouter();
   const login = useAdminLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -48,7 +48,7 @@ export function AdminLogin() {
       <div className="relative z-10 w-full max-w-md">
         {/* Back link */}
         <button
-          onClick={() => setView("public")}
+          onClick={() => router.push("/")}
           className="mb-6 inline-flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-4" />

@@ -1,6 +1,7 @@
 "use client";
 
 import { Menu, Bell, Search, Globe } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useAppStore, type AdminModule } from "@/lib/store";
 import { ADMIN_DEMO } from "@/lib/brand";
 import { cn } from "@/lib/utils";
@@ -26,8 +27,8 @@ const MODULE_META: Record<AdminModule, { title: string; subtitle: string }> = {
 };
 
 export function AdminTopbar({ onMenuClick, search, onSearchChange }: AdminTopbarProps) {
+  const router = useRouter();
   const adminModule = useAppStore((s) => s.adminModule);
-  const setView = useAppStore((s) => s.setView);
   const setAdminModule = useAppStore((s) => s.setAdminModule);
   const adminName = useAppStore((s) => s.adminName);
   const meta = MODULE_META[adminModule];
@@ -84,7 +85,7 @@ export function AdminTopbar({ onMenuClick, search, onSearchChange }: AdminTopbar
         <Button
           variant="outline"
           size="sm"
-          onClick={() => setView("public")}
+          onClick={() => router.push("/")}
           className="hidden gap-2 sm:inline-flex"
         >
           <Globe className="size-4" />

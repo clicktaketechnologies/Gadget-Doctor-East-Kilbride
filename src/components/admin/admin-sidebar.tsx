@@ -14,6 +14,7 @@ import {
   Mail,
   type LucideIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useAppStore, type AdminModule } from "@/lib/store";
 import { ADMIN_DEMO } from "@/lib/brand";
 import { cn } from "@/lib/utils";
@@ -71,9 +72,9 @@ export function AdminSidebar({ mobileOpen, onMobileOpenChange }: AdminSidebarPro
 }
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
+  const router = useRouter();
   const adminModule = useAppStore((s) => s.adminModule);
   const setAdminModule = useAppStore((s) => s.setAdminModule);
-  const setView = useAppStore((s) => s.setView);
   const clearAdminAuth = useAppStore((s) => s.clearAdminAuth);
   const adminName = useAppStore((s) => s.adminName);
 
@@ -160,7 +161,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           size="sm"
           onClick={() => {
             onNavigate?.();
-            setView("public");
+            router.push("/");
           }}
           className="w-full justify-start text-muted-foreground hover:text-foreground"
         >

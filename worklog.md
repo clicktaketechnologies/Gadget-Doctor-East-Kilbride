@@ -444,3 +444,35 @@ Stage Summary:
   8. ✅ Admin can edit page content via Pages module (CMS for 6 pages).
   9. ✅ SMTP/email setup (Email module) + Reply-to-Customer action in bookings (sends + logs emails).
 - Admin: 9 modules total. Demo: admin@gadgetdoctor.co.uk / admin123.
+
+---
+Task ID: 12
+Agent: Main (Full-Stack Architect)
+Task: Split public site and admin onto separate URLs. `/` = public only (no switcher, no admin access). `/admin` and `/superadmin` = admin login + dashboard only.
+
+Work Log:
+- Rewrote `src/app/page.tsx` → renders `<PublicSite />` only. Removed floating tab switcher, AdminPanel, store view dependency, LayoutDashboard/Globe/cn imports.
+- Created `src/app/admin/page.tsx` → renders `<AdminPanel />` (shows login if not authed, dashboard if authed).
+- Created `src/app/superadmin/page.tsx` → client redirect to `/admin` via `router.replace("/admin")`.
+- Replaced all `setView("public")` calls in admin components with Next.js `router.push("/")` (from `next/navigation`):
+  - `admin-login.tsx` — "Back to website" button.
+  - `admin-sidebar.tsx` — "View Public Site" button (SidebarContent).
+  - `admin-topbar.tsx` — "View Public Site" button.
+  - `content-manager.tsx` — 2× "Preview on site" buttons (CollectionBannerCard, AnnouncementBannerCard).
+- Removed now-unused `useAppStore` setView imports where applicable; added `useRouter` imports.
+- The store's `view`/`setView` fields remain (backward compat) but are no longer used for routing — routing is now URL-based.
+
+Agent Browser verification:
+- `/` → public site only, NO floating switcher, NO link to /admin anywhere on the public site. ✓
+- `/admin` → admin login screen (logo, email/password, Autofill, "Back to website"). No public content. ✓
+- Logged in (admin@gadgetdoctor.co.uk / admin123) → full admin dashboard with all 9 modules (Overview, Bookings, Services & Pricing, Reviews, Content, Branding, Blog, Pages, Email). ✓
+- "View Public Site" button (sidebar + topbar) → navigates to `/` (URL changes to http://localhost:3000/). ✓
+- "Back to website" on login → navigates to `/`. ✓
+- `/superadmin` → redirects to `/admin`. ✓
+- Lint clean. Dev server stable.
+
+Stage Summary:
+- Admin is now on its own dedicated URL: **/admin** (also **/superadmin** redirects there).
+- The public site at **/** has NO admin access and NO floating switcher — completely separate.
+- Admin demo: admin@gadgetdoctor.co.uk / admin123 (login at /admin or /superadmin).
+- "View Public Site" / "Back to website" buttons in admin navigate to `/` via Next.js router.
