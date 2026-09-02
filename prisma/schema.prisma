@@ -65,10 +65,11 @@ model AdminUser {
 }
 
 model SiteSettings {
-  id                     String  @id @default("singleton")
+  id                      String  @id @default("singleton")
+  collectionEnabled       Boolean @default(true) // master toggle — hides collection everywhere when off
   collectionBannerEnabled Boolean @default(true)
-  announcementEnabled    Boolean @default(false)
-  announcementText       String?
+  announcementEnabled     Boolean @default(false)
+  announcementText        String?
 }
 
 model Branding {
@@ -93,4 +94,54 @@ model Branding {
   rating          Float   @default(4.6)
   reviewCount     Int     @default(92)
   yearsExperience Int     @default(12)
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  excerpt     String
+  content     String // markdown / plain text
+  coverImage  String?
+  category    String   @default("General") // e.g. Tips, News, Repairs, Guides
+  tags        String   @default("") // comma-separated
+  author      String   @default("Gadget Doctor")
+  published   Boolean  @default(false)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// Editable page-section content (CMS for public pages)
+model PageContent {
+  id        String   @id @default(cuid())
+  page      String   // home | services | collection | reviews | contact | blog | service-detail
+  section   String   // e.g. "hero-headline", "why-choose-1-title", "cta-band-text"
+  key       String   // field key within the section: title | subtitle | body | image | ctaLabel
+  value     String   // the content value (text or image URL)
+  updatedAt DateTime @updatedAt
+
+  @@unique([page, section, key])
+}
+
+model EmailSettings {
+  id        String  @id @default("singleton")
+  enabled   Boolean @default(false)
+  host      String  @default("")
+  port      Int     @default(587)
+  secure    Boolean @default(false)
+  user      String  @default("")
+  password  String  @default("")
+  fromEmail String  @default("")
+  fromName  String  @default("Gadget Doctor East Kilbride")
+}
+
+model SentEmail {
+  id         String   @id @default(cuid())
+  toEmail    String
+  subject    String
+  body       String
+  status     String   @default("sent") // sent | failed | queued
+  relatedBookingId String?
+  createdAt  DateTime @default(now())
 }

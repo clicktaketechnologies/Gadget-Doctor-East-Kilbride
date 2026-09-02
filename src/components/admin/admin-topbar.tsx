@@ -20,6 +20,9 @@ const MODULE_META: Record<AdminModule, { title: string; subtitle: string }> = {
   reviews: { title: "Reviews", subtitle: "Moderate customer testimonials" },
   content: { title: "Content", subtitle: "Banners & site messaging" },
   branding: { title: "Branding", subtitle: "Business identity, contact & hours" },
+  blog: { title: "Blog", subtitle: "Write & manage articles" },
+  pages: { title: "Pages", subtitle: "Edit text & images on public pages" },
+  email: { title: "Email", subtitle: "SMTP config & sent email log" },
 };
 
 export function AdminTopbar({ onMenuClick, search, onSearchChange }: AdminTopbarProps) {

@@ -8,6 +8,7 @@ import {
   Loader2,
   Check,
   ExternalLink,
+  Power,
 } from "lucide-react";
 import { useSettings, useUpdateSettings } from "@/lib/api-hooks";
 import type { SiteSettings } from "@/lib/types";
@@ -44,6 +45,9 @@ export function ContentManager() {
         </p>
       </div>
 
+      {/* Collection service master toggle (site-wide) */}
+      <CollectionMasterToggle settings={settings} />
+
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* Collection banner */}
         <CollectionBannerCard settings={settings} />
@@ -55,6 +59,77 @@ export function ContentManager() {
         />
       </div>
     </div>
+  );
+}
+
+function CollectionMasterToggle({ settings }: { settings: SiteSettings }) {
+  const updateMutation = useUpdateSettings();
+  const enabled = settings.collectionEnabled;
+
+  return (
+    <Card
+      className={cn(
+        "glass relative overflow-hidden p-5 transition-colors",
+        enabled
+          ? "border-primary/40"
+          : "border-rose-500/30"
+      )}
+    >
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-0 transition-opacity",
+          enabled ? "opacity-100" : "opacity-60"
+        )}
+        style={{
+          background: enabled
+            ? "radial-gradient(circle at top right, oklch(0.62 0.24 27 / 0.08), transparent 60%)"
+            : "radial-gradient(circle at top right, oklch(0.65 0.2 15 / 0.08), transparent 60%)",
+        }}
+      />
+      <div className="relative flex flex-wrap items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <div
+            className={cn(
+              "flex size-11 shrink-0 items-center justify-center rounded-xl ring-1",
+              enabled
+                ? "bg-primary/10 text-primary ring-primary/30"
+                : "bg-rose-500/10 text-rose-300 ring-rose-500/30"
+            )}
+          >
+            {enabled ? <Truck className="size-5" /> : <Power className="size-5" />}
+          </div>
+          <div className="max-w-2xl">
+            <h3 className="text-sm font-semibold text-foreground">
+              Collection Service — Site-wide Toggle
+            </h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              When enabled, the collection service (doorstep pickup &amp; return)
+              is shown across the public website. When disabled, ALL collection
+              options are hidden — the nav link, the collection page, collection
+              sections on home, and the collection option in the booking form.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2.5">
+          <span
+            className={cn(
+              "text-xs font-medium uppercase tracking-wider",
+              enabled ? "text-primary" : "text-rose-300"
+            )}
+          >
+            {enabled ? "Live" : "Hidden site-wide"}
+          </span>
+          <Switch
+            checked={enabled}
+            disabled={updateMutation.isPending}
+            onCheckedChange={(v) =>
+              updateMutation.mutate({ collectionEnabled: v })
+            }
+            aria-label="Toggle collection service site-wide"
+          />
+        </div>
+      </div>
+    </Card>
   );
 }
 
@@ -75,7 +150,7 @@ function CollectionBannerCard({ settings }: { settings: SiteSettings }) {
               Collection Service Banner
             </h3>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Highlight the free collection section on the home page.
+              Highlight the collection section on the home page.
             </p>
           </div>
         </div>

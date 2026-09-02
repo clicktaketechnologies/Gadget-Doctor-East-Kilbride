@@ -1,0 +1,294 @@
+     1→     1→# Gadget Doctor East Kilbride — Worklog
+     2→     2→
+     3→     3→---
+     4→     4→Task ID: 1
+     5→     5→Agent: Main (Full-Stack Architect)
+     6→     6→Task: Foundation rebuilt (after sandbox reset). Prisma schema, seed data, API routes, design system, shared types, Zustand store, TanStack Query provider, shared Icon helper, next.config allowedDevOrigins fix for preview.
+     7→     7→
+     8→     8→Work Log:
+     9→     9→- Defined Prisma schema (Service, Booking, Review, AdminUser, SiteSettings) and pushed to SQLite (`bun run db:push`).
+    10→    10→- Built idempotent `/api/seed` route: admin user, site settings, 20 services, 12 reviews, 12 sample bookings (GD-1000..GD-1011).
+    11→    11→- Built API routes: services (GET/POST/PATCH/DELETE), bookings (GET/POST/PATCH/DELETE), reviews, settings, stats, admin/login. Admin routes gated via `isAdminAuthorized` (mock base64 JWT, 12h expiry, `Authorization: Bearer` header).
+    12→    12→- Design system in globals.css: dark-first Tech Cyan / Dark Slate. Utilities: `.glass`, `.glass-strong`, `.glow-cyan`, `.text-gradient-cyan`, `.bg-grid`, `.custom-scroll`, `.animate-shimmer`, `.animate-float`.
+    13→    13→- Layout with metadata + TanStack QueryProvider.
+    14→    14→- Shared types (`src/lib/types.ts`), brand data (`src/lib/brand.ts`), format helpers (`src/lib/format.ts`), auth (`src/lib/auth.ts`), Zustand store (`src/lib/store.ts`), API hooks (`src/lib/api-hooks.ts`), `<Icon>` helper (`src/components/icon.tsx`).
+    15→    15→- **next.config.ts**: added `allowedDevOrigins: ["*.space-z.ai", "*.chatglm.cn", "*.z.ai"]` to fix blank preview iframe (Next.js 16 blocks cross-origin /_next/* dev resources from preview-chat-*.space-z.ai otherwise).
+    16→    16→- Dev server relaunched via double-fork daemon `( setsid next dev ... & ) &` so it persists across tool calls.
+    17→    17→- DB seeded, all endpoints verified.
+    18→    18→
+    19→    19→Stage Summary:
+    20→    20→- Foundation complete. Admin demo creds: **admin@gadgetdoctor.co.uk / admin123**.
+    21→    21→- Shared interfaces for subagents:
+    22→    22→  - `useAppStore` (`@/lib/store`): `view`, `publicPage`, `adminToken/adminName`, `adminModule`, `bookingOpen/bookingPreset` + `openBooking()/closeBooking()`.
+    23→    23→  - `use*` hooks (`@/lib/api-hooks.ts`): `useServices(activeOnly?)`, `useBookings`, `useReviews(approvedOnly?)`, `useSettings`, `useStats`, `useCreateBooking`, `useUpdateBooking(id)`, `useDeleteBooking`, `useCreateService`, `useUpdateService(id)`, `useDeleteService`, `useCreateReview`, `useUpdateReview(id)`, `useDeleteReview`, `useUpdateSettings`, `useAdminLogin`, `useSeed`.
+    24→    24→  - `<Icon name="..." />` (`@/components/icon`), `ICON_NAMES`.
+    25→    25→  - `BRAND` (`@/lib/brand`), `SERVICE_CATEGORIES`, `DEVICE_MODELS`, `COMMON_ISSUES`, `ADMIN_DEMO`.
+    26→    26→  - `formatPrice/formatPriceRange/relativeTime/STATUS_COLORS` (`@/lib/format`).
+    27→    27→  - Theme: dark-first. `bg-background`=slate-950, `bg-card`=slate-900, `text-primary`=cyan, `text-accent`=amber. Amber CTA: `bg-amber-400 text-slate-950 hover:bg-amber-300 font-semibold`.
+    28→    28→  - Sticky footer: root `min-h-screen flex flex-col`, footer `mt-auto`.
+    29→    29→- shadcn/ui components in `src/components/ui/`. `cn()` from `@/lib/utils`. framer-motion, recharts, lucide-react available.
+    30→    30→- Next: Task 2-a (public site) + Task 2-b (admin) in parallel.
+    31→    31→
+    32→    32→---
+    33→    33→Task ID: 2-b
+    34→    34→Agent: Admin Dashboard Builder
+    35→    35→Task: Built the complete admin dashboard frontend (11 components under src/components/admin/) — login, sidebar/topbar shell, overview analytics with charts, bookings manager + detail modal, services CMS + form dialog, reviews manager, content manager, and the AdminPanel orchestrator.
+    36→    36→
+    37→    37→Work Log:
+    38→    38→- Read foundation (types, store, api-hooks, brand, format, icon, ui components) to confirm shared interfaces.
+    39→    39→- admin-login.tsx: centered glass-strong card, brand logo, email/password, demo-creds hint with Autofill button, error/loading states, bg-grid + cyan radial glow, "Back to website" link via setView('public').
+    40→    40→- admin-sidebar.tsx: desktop fixed aside (260px, hidden <lg) + mobile Sheet; nav items (Overview/Bookings/Services/Reviews/Content) with active state bg-primary/10 + border-l-2; footer with admin avatar+name, "View Public Site", "Sign out".
+    41→    41→- admin-topbar.tsx: sticky glass header; module title+subtitle; global search (switches to bookings module on type); View Public Site button; bell with amber dot; admin avatar chip; mobile hamburger.
+    42→    42→- overview.tsx: 4 metric cards (total/collections/completed/revenue) with tinted icon squares; quick-action buttons; recharts AreaChart (14-day trend, cyan gradient fill), PieChart (device breakdown, 5-color palette + legend), status breakdown bars (Pending/In-Progress/Ready/Completed with % bars + completed revenue); recent bookings preview (last 5) with "View all" → bookings; skeletons throughout.
+    43→    43→- bookings-manager.tsx: filter bar (status Select, device Select, search Input, Reset); shadcn Table with ticket/customer/device/issue/collection/status/created/actions columns; client-side filter+sort; empty state; loading skeletons; row click + Eye button opens modal; overflow-x-auto custom-scroll for mobile.
+    44→    44→- booking-detail-modal.tsx: Dialog with key-remount per booking.id (fresh local state); customer info (mailto/tel links), device & issue, collection address; edit controls (status Select, quoted/final £ inputs → pence on save, technician notes textarea, notify checkbox → toast); Save via useUpdateBooking; Delete via AlertDialog + useDeleteBooking.
+    45→    45→- service-form-dialog.tsx: Dialog with key-remount (new vs edit); live icon preview; name/category/icon-select(description/priceFrom/priceTo/turnaround (£ → pence)/popular switch; create vs update mutation; pending+error states.
+    46→    46→- services-cms.tsx: table with icon+name, category badge, price range, turnaround, popular star, Active Switch (per-row ActiveToggle component calling useUpdateService), edit (Pencil→dialog) + delete (AlertDialog); "Add Service" amber CTA; skeletons.
+    47→    47→- reviews-manager.tsx: table with author avatar, star rating, comment, device, source badge, Approved Switch (per-row ApproveToggle → useUpdateReview), edit dialog (star picker 1-5, author/comment/device) + delete AlertDialog; skeletons.
+    48→    48→- content-manager.tsx: CollectionBannerCard (immediate Switch toggle via useUpdateSettings) + AnnouncementBannerCard (local state for enabled+text, key-remount on server change, Save button, live gradient preview); "Preview on site" buttons.
+    49→    49→- admin-panel.tsx: default export AdminPanel; if no adminToken → AdminLogin; else sidebar+topbar+main with module switching; lifted mobileNavOpen + globalSearch state; passes search to both topbar (with module-switch) and bookings manager.
+    50→    50→- Removed unused cn imports in services-cms + service-form-dialog for cleanliness.
+    51→    51→- Fixed non-standard size-4.5 → size-5 in services-cms icon.
+    52→    52→- Ran `bun run lint` (clean) and `npx tsc --noEmit` (no errors in admin files). Only remaining dev.log error is missing @/components/public/public-site (Task 2-a scope).
+    53→    53→
+    54→    54→Stage Summary:
+    55→    55→- Files created (all under src/components/admin/): admin-login.tsx, admin-sidebar.tsx, admin-topbar.tsx, overview.tsx, bookings-manager.tsx, booking-detail-modal.tsx, services-cms.tsx, service-form-dialog.tsx, reviews-manager.tsx, content-manager.tsx, admin-panel.tsx.
+    56→    56→- Key decisions: key-remount pattern for modal/dialog local-state sync (avoids set-state-in-effect); per-row toggle subcomponents (ActiveToggle/ApproveToggle) to keep mutation hooks at top level; lifted globalSearch to AdminPanel for topbar↔bookings sync; DEVICE_LABELS map inlined in overview + bookings-manager + booking-detail-modal; recharts dark theme with oklch colors per spec; £ inputs stored in pounds, converted to pence (*100) on save.
+    57→    57→- Design: cohesive "command center" dark aesthetic — glass panels, cyan accents, amber CTAs, STATUS_COLORS badges, bg-grid login, custom-scroll tables.
+    58→    58→- Responsive: sidebar → Sheet on mobile, tables scroll horizontally, grids collapse 4→2→1 cols.
+    59→    59→- AdminPanel is a self-contained default export ready for page.tsx wiring (already imported there).
+    60→    60→- Lint + type-check clean for all admin files.
+    61→    61→
+    62→    62→---
+    63→    63→Task ID: 2-a
+    64→    64→Agent: Public Site Builder
+    65→    65→Task: Built the complete public website frontend (11 components under src/components/public/) — sticky glass header, hero with quick repair search, featured services, full interactive services grid with category tabs + search, doorstep collection page, live reviews display + review submission form, contact page with Google Maps embed, sticky footer, multi-step booking modal, and the PublicSite orchestrator composing it all.
+    66→    66→
+    67→    67→Work Log:
+    68→    68→- Read foundation (types, store, api-hooks, brand, format, icon, ui components) and the admin builder's worklog to confirm shared interfaces and conventions (key-remount pattern, per-row hooks in subcomponents, dark Tech-Cyan theme, amber primary CTAs).
+    69→    69→- header.tsx: sticky top-0 z-50 glass navbar; cyan rounded-square logo with Wrench icon + amber status dot, brand name + "East Kilbride" tagline; desktop inline nav (Home/Services/Collection Service/Reviews/Contact) with active underline; desktop actions = ghost Phone tel-link + amber "Book Repair" CTA calling openBooking(); mobile = Phone icon button + amber "Book" + hamburger Sheet with full nav + tel + book CTA; smooth scroll-to-top on page change.
+    70→    70→- footer.tsx: mt-auto, bg-card/50 border-t; 4-col grid (brand blurb + socials, Quick Links, Repairs We Offer, Contact + Opening Hours with closed-day red); CTA bar "Got a gadget that needs fixing?"; bottom bar with copyright + status indicator.
+    71→    71→- hero.tsx: bg-grid + cyan/amber radial glow; left column = "Open now" pulse badge, h1 with text-gradient-cyan "Fast & Reliable Electronics Repair in East Kilbride", subhead, amber Book Repair + outline Call Now CTAs, 4 trust badges (4.6★/92+ reviews/12+ years/Free Collection); right column = glass-strong glow-cyan panel with "60-sec quote" badge, search Input filtering services by name/desc/category with dropdown of matches (clicking opens booking with serviceSlug preset), empty-state with custom-repair fallback, 4-cell stats grid (10,000+ / 4.6★ / 30 min / 92+), "Browse all services" link.
+    72→    72→- featured-services.tsx: filters useServices(true) by popular flag, fallback to first 6; motion-animated cards with icon square, Popular badge, name/desc/price-range/turnaround, amber "Book Fix" button calling openBooking({serviceSlug}); animate-shimmer CardSkeleton while loading; empty state with custom-repair CTA.
+    73→    73→- services-section.tsx: full Services page — centered header, search Input, category tabs (All + 6 SERVICE_CATEGORIES as pill buttons with Icon), live count "X repairs available", responsive grid (1/2/3 cols), motion layout cards, custom-scroll + max-h on results; empty state with search-icon and custom-repair CTA; loading skeletons.
+    74→    74→- collection-section.tsx: dedicated Collection page — hero with amber Truck badge + "We Come to You" gradient headline + dual CTAs; 4 numbered step cards (Book → Collect → Repair → Return) with gradient blob backgrounds + connector ArrowRight between steps on lg; coverage area card (6 EK suburbs) + amber "Why choose doorstep" card with trust list, FREE collection fee box, and final CTA.
+    75→    75→- reviews-section.tsx: header with amber Star badge + "Verified Google Reviews" Google badge; aggregate panel showing avg.toFixed(1), stars, count, and 5→1 breakdown bars (amber gradient fill); "Leave a Review" button toggles inline ReviewForm; masonry-style reviews list (columns-1/2/3) inside max-h-[640px] custom-scroll; per-review avatar with stable color per author, stars, Google badge, device badge, Quote icon + comment, relativeTime timestamp; skeleton cards while loading.
+    76→    76→- review-form.tsx: compact card; 5 clickable stars (hover state + click set), name input (required), device input with datalist autocomplete, comment textarea (10–600 chars) with live counter; success state replaces form with green check + thank-you + Close button; pending spinner; uses useCreateReview().mutate.
+    77→    77→- contact-section.tsx: 2-col layout — left card with address (MapPin + Get directions link), two phone tel-links, email mailto, opening hours list with "Open now" badge (Closed days red); right card with map header + Google Maps iframe (BRAND.mapEmbed, lazy loaded, h-[400px]+); CTAs = Book Repair amber + Call Now outline.
+    78→    78→- booking-modal.tsx: 4-step Dialog with key-remount per bookingPreset (so form state resets cleanly when preset changes); step dots indicator (active/done widths); Step 1 = category cards from SERVICE_CATEGORIES (cyan ring on selected); Step 2 = device model Select (DEVICE_MODELS[category]) + multi-select chips (COMMON_ISSUES) + optional details textarea (600 char counter); Step 3 = radio cards for dropoff vs doorstep collection (free badge, amber ring when selected) with conditional address Textarea; Step 4 = summary panel (device/model/issues chips/delivery method) + name/email/phone inputs with leading icons + validation (email regex, phone >= 7 chars); Back/Continue nav with canNext gating; on submit useCreateBooking().mutate; success view with green ping CheckCircle2, ticketId in monospace, ticket-save hint, call + Done buttons. Parent BookingModal uses useServices to look up preset slug → category, falls back to preset.deviceType, passes initialCategory to BookingForm.
+    79→    79→- public-site.tsx: root `min-h-screen flex flex-col bg-background`; AnnouncementBanner (reads useSettings, gradient amber→cyan bar above header if enabled+text); Header; main with key={page} for scroll-reset, switches on publicPage (home → Hero+CategoryStrip+FeaturedServices+WhyChooseUs+CollectionPreview+ReviewsPreview+ContactCTA; services/collection/reviews/contact → dedicated sections); Footer (mt-auto); BookingModal. Inline home-only preview sections (CategoryStrip 6-cat grid, WhyChooseUs 4-feature cards, CollectionPreview gradient panel with 4-step mini grid, ReviewsPreview 3-card grid with static fallback when no API data, ContactCTA gradient panel with 4 quick-info cards linking to other pages).
+    80→    80→- Cleanup pass: removed unused lucide-react imports (Gamepad2/Laptop/Smartphone/DatabaseBackup/Wind) and unused hooks/format helpers from public-site.tsx. Lint clean. TypeScript: no errors in components/public/* (only pre-existing errors in examples/ and skills/ folders).
+    81→    81→
+    82→    82→Stage Summary:
+    83→    83→- Files created (all under src/components/public/): header.tsx, footer.tsx, hero.tsx, featured-services.tsx, services-section.tsx, collection-section.tsx, reviews-section.tsx, review-form.tsx, contact-section.tsx, booking-modal.tsx, public-site.tsx.
+    84→    84→- Key decisions: key-remount pattern for BookingModal (per bookingPreset change → fresh form state, no set-state-in-effect); BookingForm separated from BookingModal so the inner component owns local state and the outer handles preset → category lookup via useServices; StarRating/Stars sub-components reused; per-card motion entrance animations with viewport once + margin; framer-motion kept performant (only opacity+y, no layout thrash on step transitions); stable avatar color per review author via charCodeAt; success state replaces form rather than modal closing immediately (lets user see ticketId); announcement banner lives above header so it doesn't push nav on scroll; sticky header z-50 vs announcement banner also z-50 (banner is first in DOM so header scrolls under it cleanly).
+    85→    85→- Design: cohesive Tech Cyan / Dark Slate aesthetic matching admin — glass panels, glow-cyan hero card, bg-grid backgrounds, amber gradient CTAs, bg-card surfaces, custom-scroll for long lists, animate-shimmer skeletons, motion entrance animations.
+    86→    86→- Responsive: mobile-first throughout — header collapses to hamburger Sheet <md; grids 1→2→3 cols at sm/lg; collection step arrows hidden on mobile; review masonry uses columns utility.
+    87→    87→- Accessibility: aria-labels on icon-only buttons (call/menu/close), sr-only on Sheet close, role badges, semantic header/main/section/nav/footer/article, keyboard-focusable inputs, tel/email input types with autocomplete attributes, alt/title on iframe, star rating aria-labels.
+    88→    88→- Verified: `bun run lint` clean; `npx tsc --noEmit` no errors in components/public/*; dev.log shows successful recompiles and 200s on / + /api/settings + /api/services?active=true + /api/reviews?approved=true; curl of / shows "Gadget Doctor" + "Fast & Reliable" + text-gradient-cyan in SSR output.
+    89→    89→- PublicSite is a self-contained default export already wired into src/app/page.tsx (no changes to page.tsx/layout.tsx/globals.css/api/lib needed).
+    90→    90→
+    91→    91→---
+    92→    92→Task ID: 3
+    93→    93→Agent: Main (Full-Stack Architect)
+    94→    94→Task: Integration + preview fix after sandbox reset. Rebuilt foundation, relaunched subagents, fixed cross-origin preview issue, wired page.tsx, Agent Browser verification.
+    95→    95→
+    96→    96→Work Log:
+    97→    97→- Root cause of "preview not showing": (1) the sandbox had reset the entire project to the initial scaffold (all src/lib, components, api routes, prisma schema, worklog gone); (2) Next.js 16 blocks cross-origin /_next/* dev resources from the preview-chat-*.space-z.ai origin, loading a blank iframe.
+    98→    98→- Rebuilt the full foundation: prisma schema (5 models), 10 API routes (seed, services+crud, bookings+crud, reviews+crud, settings, stats, admin/login), design system (globals.css cyan/slate dark theme + utilities), shared types/brand/format/auth/store/api-hooks, providers, Icon helper, layout metadata.
+    99→    99→- Fixed cross-origin preview: added `allowedDevOrigins: ["*.space-z.ai", "*.chatglm.cn", "*.z.ai"]` to next.config.ts. Verified: cross-origin /_next/* request from preview origin now returns 200 with ZERO "Cross origin" warnings (was 1 before).
+   100→   100→- Dev server relaunched via double-fork daemon `( setsid next dev ... & ) &` so it persists across tool calls (previous nohup/setsid single-fork attempts died between tool calls).
+   101→   101→- Dispatched Task 2-a (public site, 11 components) and Task 2-b (admin dashboard, 11 components) subagents. 2-b succeeded first run; 2-a hit a transient 429 rate limit and was retried successfully.
+   102→   102→- Wired src/app/page.tsx: renders PublicSite or AdminPanel based on useAppStore.view, with a floating glass tab switcher (Public Website cyan / Admin Dashboard amber) at bottom-center for easy previewing.
+   103→   103→- DB pushed + seeded (1 admin, 20 services, 12 reviews, 12 bookings, 1 settings row).
+   104→   104→
+   105→   105→Agent Browser verification (desktop + the preview cross-origin path):
+   106→   106→- Public site: title "Gadget Doctor East Kilbride — Fast & Reliable Electronics Repair", sticky glass header with nav (Home/Services/Collection/Reviews/Contact), Book Repair amber CTA, call link, announcement banner (settings-driven), hero with gradient headline + quick repair search + trust badges (4.6★), featured services, why-choose-us, collection preview, reviews preview, contact CTA, sticky footer. No console errors.
+   107→   107→- Admin: login screen (demo creds + Autofill button) → logged in as Shop Manager → Overview dashboard with all 5 nav modules (Overview/Bookings/Services & Pricing/Reviews/Content), metric cards, quick actions. No console errors.
+   108→   108→- Lint clean. Dev server stable (pid 1843, persists across tool calls, HTTP 200).
+   109→   109→
+   110→   110→Stage Summary:
+   111→   111→- Project FULLY REBUILT and browser-verified after sandbox reset. Preview now renders correctly.
+   112→   112→- Admin demo credentials: admin@gadgetdoctor.co.uk / admin123 (one-click Autofill on login screen).
+   113→   113→- Use the floating bottom-center tab switcher to toggle between Public Website and Admin Dashboard.
+   114→   114→- The preview-fix (allowedDevOrigins in next.config.ts) is the key change that makes the Preview Panel show the site instead of a blank iframe.
+   115→   115→
+   116→   116→---
+   117→   117→Task ID: 4
+   118→   118→Agent: Main (Full-Stack Architect)
+   119→   119→Task: Logo + color rebrand, 8 new service categories, Branding model/API, service detail pages foundation, updated business data.
+   120→   120→
+   121→   121→Work Log:
+   122→   122→- Analyzed logo via VLM CLI. Brand colors: Primary Red #E31E24, Stethoscope Blue #4A90E2, Black + White. Logo = "doctor" running figure with red medical kit. Copied logo to public/gadget-doctor-logo.jpg.
+   123→   123→- Rebranded globals.css: --primary now red (oklch(0.62 0.24 27)), --accent now blue (oklch(0.65 0.16 252)), --ring red, charts red/blue/emerald/amber/violet. Updated .glow-cyan + .text-gradient-cyan literal colors to red/blue (kept class names so components don't break). Body radial gradients now red+blue tinted.
+   124→   124→- Updated brand.ts: new contact (whatsapp +44 1355 458135, single phone, website https://www.gadgetdoctoreastkilbride.co.uk, gmbProfile, mapLink, mapEmbed for 14 Stroud Rd), new hours (Mon-Thu 09:30-15:00, Fri 09:30-14:30, Sat 10:00-14:00, Sun Closed), socials (facebook/instagram/tiktok/youtube/pinterest/linkedin/blog), targetAreas (East Kilbride, Busby, Eaglesham, Cambuslang, Rutherglen, Carmunnock, Giffnock), logoUrl, primaryColor, secondaryColor, rating, reviewCount, yearsExperience.
+   125→   125→- 8 new SERVICE_CATEGORIES: mobile, tablet, laptop, macbook, computer, custom-computer, console, apple-watch (each with label/shortLabel/icon/tagline/description). DEVICE_MODELS updated for all 8. SERVICE_OFFERINGS list added. SOCIAL_LINKS added.
+   126→   126→- Prisma schema: added Branding model (businessName, tagline, about, logoUrl, primaryColor, secondaryColor, phone, whatsapp, email, website, gmbProfile, mapLink, mapEmbed, address, hoursJson, socialsJson, targetAreasJson, rating, reviewCount, yearsExperience). Updated Service.category comment to new 8 categories.
+   127→   127→- types.ts: added Branding, BusinessHours, SocialLinks, UpdateBrandingInput types.
+   128→   128→- store.ts: added publicPage 'service-detail' + activeServiceCategory + openServiceDetail(category). Added adminModule 'branding'.
+   129→   129→- format.ts: added DEVICE_LABELS map + deviceLabel() helper for all 8 new categories (+ legacy phone/ghd/data-recovery). Updated STATUS_COLORS "In Progress" cyan→blue.
+   130→   130→- icon.tsx: added Tablet, Monitor, Watch, Facebook, Instagram, Youtube, Linkedin, Rss, Image, Music2 icons to the map.
+   131→   131→- API: created /api/branding (GET public, PATCH admin) — serializes JSON fields, creates singleton with BRAND defaults if missing.
+   132→   132→- api-hooks.ts: added useBranding() + useUpdateBranding() hooks.
+   133→   133→- Seed rewritten: branding singleton with full about text + new data; 38 services across 8 categories (mobile 8, tablet 4, laptop 5, macbook 4, computer 4, custom-computer 4, console 5, apple-watch 4); 14 reviews (updated devices); 12 sample bookings (updated deviceTypes to new categories).
+   134→   134→- DB reset + reseeded (deleted db file, restarted dev server so Prisma reconnected, re-pushed schema, reseeded). Verified: branding singleton returns, services return 38 across 8 categories.
+   135→   135→- page.tsx tab switcher: public tab = primary (red), admin tab = accent (blue) — uses both logo brand colors.
+   136→   136→
+   137→   137→Stage Summary:
+   138→   138→- Foundation for v2 complete. Logo at /gadget-doctor-logo.jpg. Color scheme = red primary + blue accent (from logo).
+   139→   139→- Branding is now DB-driven: /api/branding GET (public) returns the full branding object (logoUrl, colors, contact, hours[], socials{}, targetAreas[], rating, etc.).
+   140→   140→- Store supports service-detail page (publicPage='service-detail', activeServiceCategory, openServiceDetail) and branding admin module.
+   141→   141→- Next: Task 5 (public site: service detail page + branding integration + amber CTA rebrand) and Task 6 (admin: branding module + amber rebrand + new category labels) in parallel.
+   142→   142→- IMPORTANT for subagents: The `--primary` CSS var is now RED and `--accent` is BLUE. So `bg-primary`/`text-primary` = red, `bg-accent`/`text-accent` = blue — automatic. The remaining manual rebrand: replace CTA classes `bg-amber-400 text-slate-950 hover:bg-amber-300` → `bg-primary text-primary-foreground hover:bg-primary/90` and `shadow-amber-500/*` → `shadow-primary/*`. KEEP amber for star ratings (fill-amber-400) and STATUS_COLORS badges (those are semantic).
+   143→   143→
+   144→   144→---
+   145→   145→Task ID: 6
+   146→   146→Agent: Admin Updater
+   147→   147→Task: Added a Branding management module to the admin dashboard, rebranded amber CTAs to red/blue across all admin components, updated device category labels to the new 8 service categories, and added the logo image to the admin login.
+   148→   148→
+   149→   149→Work Log:
+   150→   150→- Read worklog (Task 4 explained the rebrand: red primary + blue accent, 8 new service categories, Branding model/API, store changes, deviceLabel helper in @/lib/format).
+   151→   151→- Read all 11 existing admin components + lib/types/brand/format/store/api-hooks/icon to confirm shared interfaces and conventions (key-remount pattern, per-row hooks in subcomponents, dark glass theme, £→pence on save).
+   152→   152→- **branding-manager.tsx (NEW)** — comprehensive CMS-style settings page (~940 lines):
+   153→   153→  - `BrandingManager` (named export + default): loading skeletons, error retry state, then mounts `<BrandingForm key={branding.id ?? "none"} />` (key-remount pattern — fresh local state whenever branding loads/changes, no set-state-in-effect).
+   154→   154→  - `BrandingForm` owns local state for every Branding field; builds `currentSnapshot` + `originalSnapshot` and uses `deepEqual` (JSON.stringify) to compute `isDirty`. Save button disabled when not dirty; "Reset" button reverts to loaded values; "Saved" check-flash for 1.8s after success.
+   155→   155→  - Live preview card at the top: white rounded logo container + business name + rating chip (uses `primaryColor` style for tint) + tagline + phone/email/website inline + two color swatches.
+   156→   156→  - 8 section cards (`SectionCard` helper) in a 2-col grid that collapses to 1 col on mobile, with full-width sections (`full` prop) for Hours / Socials / Target Areas / Stats:
+   157→   157→    1. Identity — businessName, tagline, about (Textarea), logoUrl (Input + live 14×14 white-rounded preview with onError fallback to Building2 icon).
+   158→   158→    2. Brand Colors — primaryColor + secondaryColor via `ColorField` helper (color picker swatch overlaid on a 10×10 box + hex Input, side-by-side swatches + helper note that DB storage is for reference/future use).
+   159→   159→    3. Contact — phone, whatsapp, email, website, gmbProfile.
+   160→   160→    4. Location — address (Textarea), mapLink, mapEmbed + live Google Maps iframe preview.
+   161→   161→    5. Opening Hours — list of `{day, time}` rows; add/remove row buttons; hours state is `BusinessHours[]`.
+   162→   162→    6. Social Media — 7 inputs built from `SOCIAL_LINKS` array (facebook/instagram/tiktok/youtube/pinterest/linkedin/blog), each with the platform's icon via `<Icon name={s.icon} />` and the brand primary tint.
+   163→   163→    7. Target Areas — list of area strings; add/remove row buttons.
+   164→   164→    8. Stats — rating (number step 0.1), reviewCount, yearsExperience.
+   165→   165→  - Sticky save bar at bottom (`fixed inset-x-0 bottom-0 lg:left-[260px]` to clear the sidebar): dirty/saved indicator dot + "View live site" link + Reset + Save Changes. `pb-24` on form container prevents content being hidden behind the bar.
+   166→   166→  - All sections use `.glass` cards with primary-tinted icon squares, separators, helper text, aria-labels on icon-only buttons, semantic HTML.
+   167→   167→- **admin-sidebar.tsx** — added `{ id: "branding", label: "Branding", icon: Palette }` to `NAV_ITEMS` (Palette icon from lucide). Existing `border-l-2 border-primary bg-primary/10` active-state styling automatically applies.
+   168→   168→- **admin-panel.tsx** — imported `BrandingManager` and routed `{adminModule === "branding" && <BrandingManager />}`. Default export `AdminPanel` preserved.
+   169→   169→- **admin-topbar.tsx** — added `branding: { title: "Branding", subtitle: "Business identity, contact & hours" }` to `MODULE_META`. Rebranded the notification bell dot from `bg-amber-400` → `bg-primary` (red) to match the new brand.
+   170→   170→- **overview.tsx** — removed the local `DEVICE_LABELS` map (legacy 6-category) and imported `deviceLabel` from `@/lib/format` (handles all 8 new categories + legacy). Replaced 3 inline `DEVICE_LABELS[x] ?? x` references with `deviceLabel(x)` (pie chart, legend, recent bookings row). Rebranded "Add New Repair Ticket" CTA from `bg-amber-400 text-slate-950 hover:bg-amber-300` → `bg-primary text-primary-foreground hover:bg-primary/90`. Updated the literal CHART.cyan color from old cyan oklch(0.72 0.15 200) → new red oklch(0.62 0.24 27) so trend chart stroke matches the new brand. Amber TINTS + CHART.amber kept (semantic for "Pending" status row + Pending Collections metric card).
+   171→   171→- **bookings-manager.tsx** — removed local `DEVICE_LABELS` map; imported `deviceLabel` from `@/lib/format`. Replaced the device cell `DEVICE_LABELS[b.deviceType] ?? b.deviceType` with `deviceLabel(b.deviceType)`. Truck "Yes" collection badge kept amber (semantic indicator, not a CTA).
+   172→   172→- **booking-detail-modal.tsx** — removed local `DEVICE_LABELS` map; imported `deviceLabel` from `@/lib/format`. Replaced 2 inline `DEVICE_LABELS[...]` references in the dialog header description and the Device InfoRow with `deviceLabel(...)`. Truck "Yes" collection badge kept amber.
+   173→   173→- **services-cms.tsx** — rebranded "Add Service" CTA from `bg-amber-400 text-slate-950 hover:bg-amber-300` → `bg-primary text-primary-foreground hover:bg-primary/90`. Popular-star amber kept (semantic). Category badge uses `categoryLabel()` which reads from `SERVICE_CATEGORIES` (auto-updated to 8 categories by Task 4).
+   174→   174→- **service-form-dialog.tsx** — fixed a TypeScript error: default category was `"phone"` which is no longer a valid `ServiceCategory`; changed to `"mobile"` (first of the 8 new categories). Category Select + Icon Select both pull from `SERVICE_CATEGORIES` and `ICON_NAMES` (auto-updated to include new Tablet/Monitor/Watch icons). No amber CTAs in this file.
+   175→   175→- **reviews-manager.tsx** — no amber CTAs (only amber star ratings, kept semantic). No changes needed.
+   176→   176→- **content-manager.tsx** — no amber CTA buttons (Save uses Button component, Preview uses outline variant). Truck icon container + "Live on website" indicator kept amber (semantic state indicators, not CTAs). Announcement banner live-preview gradient kept as-is (matches the actual public banner gradient which Task 5 will rebrand separately).
+   177→   177→- **admin-login.tsx** — replaced the Wrench-in-primary-square brand mark with the actual logo image (`/gadget-doctor-logo.jpg`) inside a white rounded container (`size-16 bg-white p-2 rounded-2xl ring-1`); onError handler hides the img and falls back to a primary-tinted square. Rebranded the cyan radial-gradient backgrounds (`oklch(0.72 0.15 200 / ...)`) → red (`oklch(0.62 0.24 27 / ...)`) so the login glow matches the new red brand. Autofill button (already `variant="outline"`, no amber) and demo creds hint (already `border-primary/20 bg-primary/5`) unchanged.
+   178→   178→- Verification: `bun run lint` clean. `npx tsc --noEmit` shows zero errors in `src/components/admin/*` (remaining errors are all in `examples/`, `skills/`, `src/app/api/branding/route.ts`, and `src/components/public/*` — outside this task's scope). `/api/branding` endpoint verified returning full branding object. Dev log shows clean recompiles with no admin-file errors (the only runtime errors are in `src/components/public/header.tsx` line 88 — `BRAND.phones[1]` is undefined because the rebrand reduced `phones` to a single-item array; that's Task 5's scope).
+   179→   179→
+   180→   180→Stage Summary:
+   181→   181→- Files created: `src/components/admin/branding-manager.tsx` (BrandingManager named + default export).
+   182→   182→- Files updated: `admin-sidebar.tsx`, `admin-panel.tsx`, `admin-topbar.tsx`, `overview.tsx`, `bookings-manager.tsx`, `booking-detail-modal.tsx`, `services-cms.tsx`, `service-form-dialog.tsx`, `admin-login.tsx`. (reviews-manager.tsx + content-manager.tsx reviewed; no changes needed.)
+   183→   183→- Branding module: 8-section CMS form (Identity, Brand Colors, Contact, Location, Opening Hours, Social Media, Target Areas, Stats) + live preview card + sticky save bar with dirty/saved state. Uses key-remount pattern (no set-state-in-effect). Save calls `useUpdateBranding().mutate(snapshot)`; invalidates `branding` query; toast on success. Mobile-responsive (1-col stack, sticky bar spans full width on mobile, `lg:left-[260px]` to clear sidebar on desktop).
+   184→   184→- Amber CTA rebrand: all `bg-amber-400 text-slate-950 hover:bg-amber-300` CTA patterns replaced with `bg-primary text-primary-foreground hover:bg-primary/90` (overview "Add New Repair Ticket" + services-cms "Add Service"). Topbar bell dot rebranded. Login radial gradient rebranded cyan→red. Star ratings, STATUS_COLORS badges, Truck collection badge, "Pending Collections" metric tint all kept amber (semantic).
+   185→   185→- Device labels: removed all local `DEVICE_LABELS` maps from overview/bookings-manager/booking-detail-modal; now import `deviceLabel` from `@/lib/format` which covers all 8 new categories (mobile, tablet, laptop, macbook, computer, custom-computer, console, apple-watch) plus legacy (phone, ghd, data-recovery).
+   186→   186→- Bugfix: `service-form-dialog.tsx` had a TypeScript error — default category `"phone"` is no longer a valid `ServiceCategory` after the rebrand; changed to `"mobile"`.
+   187→   187→- Login: logo image `/gadget-doctor-logo.jpg` now rendered in a white rounded container at the top of the admin login card (with onError fallback to a primary-tinted square).
+   188→   188→- All admin files lint-clean and TypeScript-clean. The only remaining dev.log errors are in `src/components/public/header.tsx` (Task 5's scope — `BRAND.phones[1]` is undefined because the rebrand reduced `phones` to a single-item array).
+   189→   189→
+   190→   190→---
+   191→   191→Task ID: 5
+   192→   192→Agent: Public Site Updater
+   193→   193→Task: Built the new service-detail page, integrated branding data across all public components, fixed the critical `BRAND.phones[1]` undefined bug, and rebranded all amber CTA patterns to the new red/blue logo color scheme.
+   194→   194→
+   195→   195→Work Log:
+   196→   196→- Read worklog (Task 4: rebrand details + Branding API + 8 new service categories + store changes; Task 6: admin done, notes the public-site `BRAND.phones[1]` crash bug to fix).
+   197→   197→- Read every existing public component + lib (store/api-hooks/brand/format/types/icon) to confirm shared interfaces and conventions (key-remount, motion entrance anims, glass theme, formatPrice in pence, Icon helper, cn() helper, custom-scroll, animate-shimmer).
+   198→   198→- **service-detail.tsx (NEW)** — comprehensive dedicated landing page (~670 lines):
+   199→   199→  - Reads `activeServiceCategory` from store; if null, useEffect redirects to `services` page (returns null while redirecting to avoid broken-UI flash).
+   200→   200→  - Finds category object via `SERVICE_CATEGORIES.find(c => c.value === activeServiceCategory)`.
+   201→   201→  - **Hero section**: breadcrumb (Home / Services / {label}) with Home → setPublicPage('home'), Services → setPublicPage('services'); large red-tinted category icon square via `<Icon name={cat.icon} />`; H1 = category label; tagline chip; description; two CTAs ("Book This Repair" → `openBooking({deviceType: cat.value})` primary red; "Call Now" → tel link to branding phone, outline). Background: `.bg-grid` + red primary radial glow + blue accent secondary glow. Right-side `glass-strong glow-cyan` quick-stats card with 12mo warranty / same-day / free collection / 12+ years.
+   202→   202→  - **Sub-services grid**: fetches `useServices(true)`, filters by `service.category === activeServiceCategory`. Card: `<Icon name={service.icon} />` + name + description + `formatPriceRange(service.priceFrom, service.priceTo)` + Clock turnaround + "Book Fix" button → `openBooking({ serviceSlug: service.slug })`. Skeleton via `.animate-shimmer`. Empty-state with CTA when no services for the category.
+   203→   203→  - **Why choose this category**: 4 feature cards (Genuine-grade parts / 12-month warranty / Fast turnaround / Free collection).
+   204→   204→  - **How it works**: 4 numbered process steps (Book online/call → Drop off or collection → We diagnose & fix → Collect/return) with Phone/Truck/Wrench/Check icons and ArrowRight connectors on lg.
+   205→   205→  - **Other services**: horizontal scroll/grid of the OTHER 7 categories (filtered out active) as cards → `openServiceDetail(otherCategory)` with smooth scroll-to-top. "Back to all services" outline button → setPublicPage('services').
+   206→   206→  - **CTA band**: "Ready to get your {shortLabel} fixed?" headline + Book This Repair primary + phone link; right-side 2x2 stats grid (years/devices/rating/warranty) with primary-tinted numbers.
+   207→   207→  - Uses `useBranding()` for businessName/rating/reviewCount/phone (BRAND fallback). Smooth scroll-to-top on category change. Framer-motion entrance animations throughout. Mobile-first responsive. Semantic `<article>` / `<section>` / `<nav aria-label="Breadcrumb">` HTML.
+   208→   208→- **public-site.tsx (UPDATED)** — wired `ServiceDetail` import + render branch `{page === "service-detail" && <ServiceDetail />}`. AnnouncementBanner rebranded from amber gradient (`from-amber-500/90 via-amber-400 to-primary text-slate-950`) → red→blue on-brand gradient (`from-primary via-primary to-accent text-primary-foreground`). CategoryStrip cards now call `openServiceDetail(c.value)` (was: navigate to services list) and show `c.shortLabel` (was: full label, which was too long). CollectionPreview rebranded: amber border/bg/glow → primary, amber CTA → primary, secondary glow → accent. ReviewsPreview pulls `rating`/`reviewCount` from `useBranding()` (was hardcoded BRAND). ContactCTA: pulls `phone` + `address` from branding, fixes `BRAND.phones[1]` crash, rebrands amber CTA → primary, secondary glow → accent.
+   209→   209→- **header.tsx (UPDATED)** — uses `useBranding()` for `businessName` / `shortName` / `logoUrl` / `phone`. Replaced Wrench-in-primary-square brand mark with actual logo image inside a `bg-white p-1` rounded container (logo is a JPG on white background). Logo has onError fallback that hides img + appends a "GD" text fallback. Phone links use `phone.replace(/\s+/g, "")` (was crashing `BRAND.phones[1]`). All CTAs rebranded `bg-amber-400 text-slate-950 hover:bg-amber-300` → `bg-primary text-primary-foreground hover:bg-primary/90` (desktop Book Repair + mobile Book + Sheet Book a Repair + the Sheet phone link). Same logo treatment in the mobile Sheet header. Removed now-unused `Wrench` import.
+   210→   210→- **hero.tsx (UPDATED)** — uses `useBranding()` for `phone` / `rating` / `reviewCount` / `businessName`. Hero copy updated to mention the 8 new categories ("Phones, tablets, laptops, MacBooks, computers, custom PCs, consoles & Apple Watch"). Call Now button links to branding phone (was crashing `BRAND.phones[1]`). Book Your Repair CTA rebranded amber → primary. "60-sec quote" floating badge rebranded amber → primary. Hero secondary background glow rebranded amber → accent (blue). Trust badges + stats grid now derive rating/reviewCount from branding. **Service search dropdown now opens service-detail page** for the matching category (was: directly opened booking with serviceSlug preset) — clicking a search result calls `openServiceDetail(s.category)` + smooth scroll-to-top. Added a "Popular categories" quick-link row (first 6 categories) → each chip opens its service-detail page. Removed unused `StarRating` component, `TRUST_BADGES` and `STATS` constants, and unused `Clock` / `cn` imports.
+   211→   211→- **services-section.tsx (UPDATED)** — service cards now have a 2-column CTA layout: primary "Book Fix" (rebranded amber→primary) + outline "Details" button that opens the service-detail page. The category icon also opens the detail page (clickable). Category tabs: clicking a specific category now opens that category's detail page (the "All Repairs" tab still filters in-page). Rebranded the empty-state CTA amber → primary.
+   212→   212→- **featured-services.tsx (UPDATED)** — same 2-column Book Fix / Details pattern as services-section. Rebranded all amber CTAs → primary. Empty-state CTA amber → primary.
+   213→   213→- **footer.tsx (UPDATED)** — full branding integration: logo image (white rounded container) + businessName + tagline + phone + whatsapp (separate link if different from phone) + email + address (links to mapLink) + hours + website + targetAreas (as chips). Social links now driven by `SOCIAL_LINKS` array from `@/lib/brand` (7 platforms) — only renders links that have a URL. Each service link in "Repairs We Offer" calls `openServiceDetail(c.value)` (was: navigate to services list). CTA bar rebranded amber → primary. Removed unused `Wrench`/`Facebook`/`Instagram`/`Twitter` imports.
+   214→   214→- **contact-section.tsx (UPDATED)** — full branding integration: address, phone, whatsapp, email, website, gmbProfile, hours, mapEmbed, mapLink, socials (SOCIAL_LINKS array), targetAreas (chips), rating, reviewCount. The map card header now shows the logo + businessName + addressShort + rating chip (★ 4.6 (92+)) + "Open in Maps" link. Fixes `BRAND.phones[1]` bug → uses branding `phone` (BRAND.phones[0] fallback). All CTAs rebranded amber → primary.
+   215→   215→- **collection-section.tsx (UPDATED)** — uses `useBranding()` for `phone` + `targetAreas`. Hero CTA amber → primary. Schedule My Collection CTA amber → primary. Coverage Area grid now uses `targetAreas` from branding (was: hardcoded COVERAGE list of 6 areas). "Why choose doorstep collection?" card border/bg/icon-tint rebranded amber → primary. Process step colors rebranded cyan→primary, amber→accent (now uses the two logo brand colors). Fixes `BRAND.phones[1]` bug (was crashing). Removed unused `COVERAGE` constant.
+   216→   216→- **reviews-section.tsx** — reviewed, no changes needed. Only amber usage is on star ratings + star-themed chips + multi-color avatar palette (all semantic per brief). No CTA patterns to rebrand.
+   217→   217→- **review-form.tsx (UPDATED)** — Submit Review button rebranded amber → primary. Spinner border colors rebranded `border-slate-950/30` → `border-primary-foreground/30` so the spinner matches the new primary button background.
+   218→   218→- **booking-modal.tsx (UPDATED)** — fixed `BRAND.phones[1]` crash in SuccessView → `BRAND.phones[0]`. Continue + Submit Booking + Done buttons rebranded amber → primary. Step 3 collection radio rebranded: the radio active state, Truck icon, FREE badge, and collection-address box all changed from amber → accent (blue) — this differentiates "collection" from "dropoff" (which stays primary red) using the new blue accent color from the logo, while staying on-brand. Summary row's Truck icon also rebranded amber → accent.
+   219→   219→- Verification: `bun run lint` clean (0 errors, 0 warnings). `npx tsc --noEmit` shows zero errors in `src/components/public/*` (remaining errors are all in `examples/`, `skills/`, `src/app/api/branding/route.ts` — outside this task's scope). `curl /` returns HTTP 200 with "Gadget Doctor" + "text-gradient-cyan" + "bg-primary" in the SSR output and ZERO `bg-amber-400` instances. Dev log: every API route returns 200 (services, branding, reviews, settings), multiple `✓ Compiled` with no errors after the fix (the last error in dev.log was the pre-fix `BRAND.phones[1]` crash; no errors since my fixes landed).
+   220→   220→
+   221→   221→Stage Summary:
+   222→   222→- Files created: `src/components/public/service-detail.tsx` (ServiceDetail named + default export).
+   223→   223→- Files updated: `public-site.tsx`, `header.tsx`, `hero.tsx`, `services-section.tsx`, `featured-services.tsx`, `footer.tsx`, `contact-section.tsx`, `collection-section.tsx`, `review-form.tsx`, `booking-modal.tsx`. (reviews-section.tsx reviewed; no changes needed — only star-themed amber usage.)
+   224→   224→- **Critical bug fixed**: `BRAND.phones[1]` (undefined after rebrand reduced phones to single-item array) is no longer referenced anywhere in `src/components/public/*`. All phone links use `branding?.phone ?? BRAND.phones[0]`. Grep confirms 0 matches.
+   225→   225→- **Service detail page**: 6-section dedicated landing page per category (Hero with breadcrumb + dual CTAs / Sub-services grid with skeletons + empty state / Why-choose 4-card grid / 4-step How-it-works / Other-services 7-card grid / CTA band with stats). Reads activeServiceCategory from store; redirects to services if null. Uses `useBranding()` + `useServices(true)`. Framer-motion entrance animations, mobile-first, semantic HTML.
+   226→   226→- **Branding integration**: header, footer, hero, contact, collection, service-detail, public-site (reviews preview + contact CTA + announcement banner) all read from `useBranding()` with `BRAND` fallback. Logo rendered as `<img>` inside `bg-white p-1` rounded container (logo is JPG on white bg) in header (desktop + Sheet), footer, contact map card. Socials rendered via `SOCIAL_LINKS` array — only links with URLs are shown. Target areas rendered as chips in footer + contact + collection coverage grid.
+   227→   227→- **Amber CTA rebrand**: every `bg-amber-400 text-slate-950 hover:bg-amber-300` CTA replaced with `bg-primary text-primary-foreground hover:bg-primary/90`. Every `shadow-amber-500/*` → `shadow-primary/*`. Booking-modal collection radio/badge/address-box rebranded amber → accent (blue) so it visually pairs with the dropoff radio's primary red. Grep confirms 0 `bg-amber-400 text-slate-950` and 0 `shadow-amber-500` instances in public components.
+   228→   228→- **Amber kept semantic**: star ratings (`fill-amber-400 text-amber-400`), "Popular"/"Verified Reviews" star-themed badges, review avatar multi-color palette, review breakdown bar gradient, contact rating chip, WhyChooseUs multi-color card tints. All kept amber per brief.
+   229→   229→- **Navigation deep-links**: hero service search results, hero category quick-links, services-section category tabs (non-All), services-section card Details buttons, featured-services card Details buttons, footer service links, and CategoryStrip home cards all navigate to the relevant service-detail page via `openServiceDetail(category)` + smooth scroll-to-top.
+   230→   230→- All public files lint-clean and TypeScript-clean. Public site renders successfully (HTTP 200 on `/`, all API routes 200, no runtime errors in dev.log post-fix). PublicSite remains the default export; ServiceDetail is a named export imported by public-site.tsx.
+   231→   231→
+   232→   232→---
+   233→   233→Task ID: 7
+   234→   234→Agent: Main (Full-Stack Architect)
+   235→   235→Task: Integration + verification. Fixed branding route TS errors, verified service detail pages, branding panel, logo, color rebrand, and all new data with Agent Browser.
+   236→   236→
+   237→   237→Work Log:
+   238→   238→- Fixed /api/branding route TS errors (readonly BRAND arrays → mutable via spread/map). tsc clean for branding route.
+   239→   239→- Agent Browser verification (desktop + iPhone 14 mobile):
+   240→   240→  - Public site: logo image loads (gadget-doctor-logo.jpg, 1280px), primary color is now red (lab(53.5% 75.7 54.8) = #E31E24), header shows logo in white container + business name + call link.
+   241→   241→  - Services page: 8 category tabs (Mobile, Tablet, Laptop, MacBook, Computer, Custom Computer, Console, Apple Watch) + "All Repairs", 38 services, each card has "Book Fix" + "Details" buttons.
+   242→   242→  - Service detail page (Mobile Phone Repair tested): breadcrumb (Home/Services/Mobile Phone Repair), category hero with icon+tagline+description, "Book This Repair" (red) + "Call Now" CTAs, rating 4.6/92+ reviews, "Why choose" section, sub-services grid (8 mobile services with pricing + Book Fix buttons), "How it works" steps, other-services grid, CTA band.
+   243→   243→  - Contact page: all new data — address (14 Stroud Rd, East Kilbride, G75 0YA, Scotland), hours (Mon-Thu 09:30-15:00, Fri 09:30-14:30, Sat 10:00-14:00), 7 social links (Facebook, Instagram, TikTok, YouTube, Pinterest, LinkedIn, Blog), target areas (East Kilbride, Busby, Eaglesham, Cambuslang, Rutherglen, Carmunnock, Giffnock).
+   244→   244→  - Admin Branding Manager: loads with live preview (logo, business name, rating, phone, email, website), 8 sections (Identity, Brand Colors with #E31E24/#4A90E2 color pickers, Contact, Location, Opening Hours editable rows, Social Media 7 inputs, Target Areas editable list, Stats). Edit→Save→API round-trip verified (changed business name, saved, confirmed via API + reflected on public site header/footer). Reverted via API.
+   245→   245→  - Mobile: hamburger "Open navigation menu", responsive layouts.
+   246→   246→  - No console errors, no runtime errors. Lint clean. Dev server stable (HTTP 200).
+   247→   247→
+   248→   248→Stage Summary:
+   249→   249→- All requested features delivered and browser-verified:
+   250→   250→  1. ✅ Logo fetched + displayed (header, footer, admin login, branding preview).
+   251→   251→  2. ✅ Color scheme from logo: red primary (#E31E24) + blue accent (#4A90E2), rebranded across entire site (CTAs, charts, glows, gradients).
+   252→   252→  3. ✅ Branding Panel (admin module): edit business name, tagline, about, logo URL, brand colors, phone, whatsapp, email, website, GMB profile, address, map links, opening hours, 7 social links, target areas, rating/review count/years experience. Changes save to DB and reflect live on the public site.
+   253→   253→  4. ✅ 8 service categories with dedicated detail pages (mobile, tablet, laptop, macbook, computer, custom-computer, console, apple-watch). Each detail page has hero, sub-services grid with pricing, why-choose, process steps, other-services, CTA.
+   254→   254→  5. ✅ Updated business data: WhatsApp +44 1355 458135, address 14 Stroud Rd East Kilbride G75 0YA Scotland, website gadgetdoctoreastkilbride.co.uk, GMB profile, Google Map link, new opening hours, 7 social media links, 7 target areas.
+   255→   255→  6. ✅ 38 services seeded across 8 categories with realistic pricing.
+   256→   256→- Admin demo: admin@gadgetdoctor.co.uk / admin123. Branding module is the 6th nav item (Overview, Bookings, Services & Pricing, Reviews, Content, Branding).
+   257→   257→
+   258→   258→---
+   259→   259→Task ID: 8
+   260→   260→Agent: Main (Full-Stack Architect)
+   261→   261→Task: Foundation for v3 — ticket tracking, collection master toggle, blog system, page content CMS, SMTP email, section images, footer powered-by.
+   262→   262→
+   263→   263→Work Log:
+   264→   264→- Prisma schema: added BlogPost, PageContent (CMS, unique [page,section,key]), EmailSettings, SentEmail models. Added `collectionEnabled` master toggle to SiteSettings (default true) — hides collection everywhere when off. Updated Service.category comment for 8 categories.
+   265→   265→- types.ts: added BlogPost, CreateBlogPostInput, UpdateBlogPostInput (type alias), PageContent, PageContentMap, UpdatePageContentInput, EmailSettings, UpdateEmailSettingsInput, SendEmailInput, SentEmail, TrackResult. Added collectionEnabled to SiteSettings.
+   266→   266→- store.ts: added publicPage 'blog' | 'blog-detail' | 'track'. Added adminModule 'blog' | 'pages' | 'email'. Added activeBlogSlug + openBlogDetail(slug). Updated partialize.
+   267→   267→- API routes created:
+   268→   268→  - /api/blog (GET public/admin, POST admin) + /api/blog/[id] (PATCH/DELETE admin) — full CRUD.
+   269→   269→  - /api/pages (GET returns PageContentMap page→section→key→value, POST upsert single, PATCH bulk upsert) — public GET, admin POST/PATCH.
+   270→   270→  - /api/track/[ticketId] (GET public) — returns TrackResult with found:boolean, customerName, device, status, prices, notes, timestamps.
+   271→   271→  - /api/email/settings (GET/PATCH admin) — SMTP config, password masked on read, only updated if not the mask.
+   272→   272→  - /api/email/send (POST admin) — uses nodemailer if SMTP configured+enabled, else simulates (marks 'sent' so admin sees delivery in sandbox). Logs to SentEmail table.
+   273→   273→  - /api/email/log (GET admin) — recent 50 sent emails.
+   274→   274→- Updated /api/settings to handle collectionEnabled field.
+   275→   275→- api-hooks.ts: added useBlogPosts(publishedOnly?), useCreateBlogPost, useUpdateBlogPost(id), useDeleteBlogPost, usePageContent(page?), useSavePageContent, useTrackTicket(ticketId), useEmailSettings, useUpdateEmailSettings, useSendEmail, useEmailLog.
+   276→   276→- Installed nodemailer + @types/nodemailer.
+   277→   277→- Generated 5 section images via image-generation CLI → public/images/: hero-workshop.jpg, services-grid.jpg, collection-van.jpg, why-choose-tech.jpg, contact-shop.jpg (all 1344x768).
+   278→   278→- Seed updated: collectionEnabled:true in settings (removed "Free" from announcement text), 4 blog posts (iPhone screen guide, PS5 HDMI, MacBook water damage, custom gaming PC — all published, 1 featured), email settings singleton. DB reset + reseeded. Verified: 4 blog posts return, settings has collectionEnabled, track GD-1000 returns Liam Burns found:true.
+   279→   279→- Lint clean (fixed no-empty-object-type by using type alias for UpdateBlogPostInput).
+   280→   280→
+   281→   281→Stage Summary:
+   282→   282→- Foundation for v3 complete. All endpoints verified.
+   283→   283→- New shared interfaces for subagents:
+   284→   284→  - `useTrackTicket(ticketId)` — returns {data: TrackResult, isLoading}; TrackResult.found = boolean. Use for the ticket tracker widget.
+   285→   285→  - `useBlogPosts(publishedOnly=true)` / `useCreateBlogPost` / `useUpdateBlogPost(id)` / `useDeleteBlogPost` — blog CRUD.
+   286→   286→  - `usePageContent(page?)` — returns PageContentMap {page:{section:{key:value}}}. `useSavePageContent` — mutation, pass array of {page,section,key,value}.
+   287→   287→  - `useEmailSettings` / `useUpdateEmailSettings` / `useSendEmail` / `useEmailLog`.
+   288→   288→  - `useSettings()` now returns `collectionEnabled` (master toggle) + `collectionBannerEnabled` + announcement fields. `useUpdateSettings` accepts collectionEnabled.
+   289→   289→  - Store: `publicPage` now 'home'|'services'|'service-detail'|'collection'|'reviews'|'contact'|'blog'|'blog-detail'|'track'. `openBlogDetail(slug)`. `adminModule` now 'overview'|'bookings'|'services'|'reviews'|'content'|'branding'|'blog'|'pages'|'email'.
+   290→   290→  - Images available at /images/hero-workshop.jpg, /images/services-grid.jpg, /images/collection-van.jpg, /images/why-choose-tech.jpg, /images/contact-shop.jpg.
+   291→   291→- Footer requirement: add "Powered by ClickTake Technologies" linking to https://www.clicktaketech.com.
+   292→   292→- Collection service: remove "free"/"Free" wording everywhere. When settings.collectionEnabled === false, hide ALL collection UI from the entire public site (collection nav item, collection page, collection sections/previews, booking modal collection step, announcement if it mentions collection).
+   293→   293→- Next: Task 9 (public site: ticket tracker, blog, collection hide, images, CTAs, services menu, footer powered-by) + Task 10 (admin: blog manager, pages editor, email settings, collection toggle, reply-to-customer) in parallel.
+   294→   294→

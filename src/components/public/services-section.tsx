@@ -13,6 +13,7 @@ import { SERVICE_CATEGORIES } from "@/lib/brand";
 import { formatPriceRange } from "@/lib/format";
 import type { Service } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { CtaBand } from "./cta-band";
 
 const ALL = "all";
 
@@ -131,24 +132,35 @@ export function ServicesSection() {
   const tabs = [{ value: ALL, label: "All Repairs", icon: "Wrench" }, ...SERVICE_CATEGORIES];
 
   return (
+    <>
     <section className="relative py-12 sm:py-16">
-      <div className="bg-grid pointer-events-none absolute inset-0 opacity-40" />
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Heading */}
-        <div className="mx-auto max-w-2xl text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-            <Wrench className="size-3.5" />
-            Repair Menu
-          </span>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-            Our <span className="text-gradient-cyan">Services</span>
-          </h1>
-          <p className="mt-3 text-sm text-muted-foreground sm:text-base">
-            Transparent pricing, certified technicians and a 12-month warranty
-            on every repair. Pick a category to get started.
-          </p>
+      {/* Banner image with heading overlay */}
+      <div className="relative mb-10 overflow-hidden rounded-3xl border border-border">
+        <img
+          src="/images/services-grid.jpg"
+          alt="Gadget Doctor repair services — phones, laptops, consoles and more"
+          loading="lazy"
+          className="h-48 w-full object-cover sm:h-64 lg:h-72"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/20" />
+        <div className="absolute inset-0 flex items-end p-6 sm:p-10">
+          <div className="mx-auto w-full max-w-2xl text-center">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary backdrop-blur">
+              <Wrench className="size-3.5" />
+              Repair Menu
+            </span>
+            <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+              Our <span className="text-gradient-cyan">Services</span>
+            </h1>
+            <p className="mt-2 text-sm text-muted-foreground sm:text-base">
+              Transparent pricing, certified technicians and a 12-month warranty on every repair.
+            </p>
+          </div>
         </div>
+      </div>
 
+      <div className="bg-grid pointer-events-none absolute inset-0 opacity-30" />
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Search */}
         <div className="mx-auto mt-8 max-w-xl">
           <div className="relative">
@@ -231,6 +243,12 @@ export function ServicesSection() {
         )}
       </div>
     </section>
+    <CtaBand
+      title="Can't find what you need?"
+      subtitle="We fix thousands of devices every year — if your problem isn't listed, just book a custom repair and we'll quote you within the hour."
+      bookLabel="Book a Repair"
+    />
+    </>
   );
 }
 

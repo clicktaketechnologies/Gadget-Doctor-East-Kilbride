@@ -9,6 +9,9 @@ import {
   LogOut,
   Globe,
   Palette,
+  FileText,
+  FileEdit,
+  Mail,
   type LucideIcon,
 } from "lucide-react";
 import { useAppStore, type AdminModule } from "@/lib/store";
@@ -35,6 +38,9 @@ const NAV_ITEMS: NavItem[] = [
   { id: "reviews", label: "Reviews", icon: Star },
   { id: "content", label: "Content", icon: MessageSquare },
   { id: "branding", label: "Branding", icon: Palette },
+  { id: "blog", label: "Blog", icon: FileText },
+  { id: "pages", label: "Pages", icon: FileEdit },
+  { id: "email", label: "Email", icon: Mail },
 ];
 
 interface AdminSidebarProps {

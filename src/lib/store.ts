@@ -11,7 +11,10 @@ export type PublicPage =
   | "service-detail"
   | "collection"
   | "reviews"
-  | "contact";
+  | "contact"
+  | "blog"
+  | "blog-detail"
+  | "track";
 
 export type AdminModule =
   | "overview"
@@ -19,7 +22,10 @@ export type AdminModule =
   | "services"
   | "reviews"
   | "content"
-  | "branding";
+  | "branding"
+  | "blog"
+  | "pages"
+  | "email";
 
 interface AppState {
   view: AppView;
@@ -31,6 +37,10 @@ interface AppState {
   // active service category for the service-detail page
   activeServiceCategory: string | null;
   openServiceDetail: (category: string) => void;
+
+  // active blog post slug for the blog-detail page
+  activeBlogSlug: string | null;
+  openBlogDetail: (slug: string) => void;
 
   adminToken: string | null;
   adminName: string | null;
@@ -61,6 +71,10 @@ export const useAppStore = create<AppState>()(
       openServiceDetail: (category) =>
         set({ publicPage: "service-detail", activeServiceCategory: category }),
 
+      activeBlogSlug: null,
+      openBlogDetail: (slug) =>
+        set({ publicPage: "blog-detail", activeBlogSlug: slug }),
+
       adminToken: null,
       adminName: null,
       setAdminAuth: (adminToken, adminName) => set({ adminToken, adminName }),
@@ -82,6 +96,7 @@ export const useAppStore = create<AppState>()(
         view: s.view,
         publicPage: s.publicPage,
         activeServiceCategory: s.activeServiceCategory,
+        activeBlogSlug: s.activeBlogSlug,
         adminToken: s.adminToken,
         adminName: s.adminName,
         adminModule: s.adminModule,

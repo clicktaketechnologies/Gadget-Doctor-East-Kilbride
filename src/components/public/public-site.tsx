@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import {
   ArrowRight,
   Truck,
@@ -37,6 +37,9 @@ import { CollectionSection } from "./collection-section";
 import { ReviewsSection } from "./reviews-section";
 import { ContactSection } from "./contact-section";
 import { BookingModal } from "./booking-modal";
+import { TrackSection } from "./track-section";
+import { BlogSection } from "./blog-section";
+import { BlogDetail } from "./blog-detail";
 
 /* ----------------------------- Announcement ----------------------------- */
 
@@ -44,6 +47,11 @@ function AnnouncementBanner() {
   const { data: settings, isLoading } = useSettings();
   if (isLoading || !settings) return null;
   if (!settings.announcementEnabled || !settings.announcementText?.trim()) {
+    return null;
+  }
+  // Hide announcement if it mentions "collection" but the service is disabled
+  const mentionsCollection = /collection/i.test(settings.announcementText);
+  if (mentionsCollection && settings.collectionEnabled === false) {
     return null;
   }
   return (
@@ -184,6 +192,9 @@ function WhyChooseUs() {
 function CollectionPreview() {
   const openBooking = useAppStore((s) => s.openBooking);
   const setPublicPage = useAppStore((s) => s.setPublicPage);
+  const { data: settings } = useSettings();
+  // Master toggle: hide the entire CollectionPreview when disabled
+  if (settings?.collectionEnabled === false) return null;
   return (
     <section className="relative overflow-hidden py-16 sm:py-20">
       <div className="bg-grid pointer-events-none absolute inset-0 opacity-40" />
@@ -195,16 +206,16 @@ function CollectionPreview() {
             <div>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
                 <Truck className="size-3.5" />
-                Free Doorstep Collection
+                Doorstep Collection Service
               </span>
               <h2 className="mt-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                 Too busy to drop off?{" "}
                 <span className="text-gradient-cyan">We come to you.</span>
               </h2>
               <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground sm:text-base">
-                Book a free pickup anywhere in East Kilbride. Our driver
-                collects, our technicians repair, and we return your device —
-                usually within 24 hours.
+                Book a pickup anywhere in East Kilbride. Our driver collects,
+                our technicians repair, and we return your device — usually
+                within 24 hours.
               </p>
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                 <Button
@@ -212,7 +223,7 @@ function CollectionPreview() {
                   className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/25"
                 >
                   <Truck className="size-4" />
-                  Book Free Collection
+                  Book Collection
                 </Button>
                 <Button
                   variant="outline"
@@ -394,6 +405,8 @@ function ContactCTA() {
   const openBooking = useAppStore((s) => s.openBooking);
   const setPublicPage = useAppStore((s) => s.setPublicPage);
   const { data: branding } = useBranding();
+  const { data: settings } = useSettings();
+  const collectionEnabled = settings?.collectionEnabled ?? true;
   const phone = branding?.phone ?? BRAND.phones[0];
   const address = branding?.address ?? BRAND.addressShort;
   return (
@@ -452,12 +465,14 @@ function ContactCTA() {
                 value="Share your experience"
                 onClick={() => setPublicPage("reviews")}
               />
-              <ContactInfoItem
-                icon={Truck}
-                label="Doorstep collection"
-                value="Free across EK"
-                onClick={() => setPublicPage("collection")}
-              />
+              {collectionEnabled && (
+                <ContactInfoItem
+                  icon={Truck}
+                  label="Doorstep collection"
+                  value="Across East Kilbride"
+                  onClick={() => setPublicPage("collection")}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -514,20 +529,39 @@ function HomePage() {
 
 export function PublicSite() {
   const publicPage = useAppStore((s) => s.publicPage);
+  const setPublicPage = useAppStore((s) => s.setPublicPage);
+  const { data: settings } = useSettings();
   // Smooth scroll to top on page change
   const page = useMemo(() => publicPage, [publicPage]);
+
+  // Defensive: if user lands on the collection page while the service is
+  // disabled, redirect home (the nav link is hidden too).
+  const effectivePage: PublicPage =
+    publicPage === "collection" && settings?.collectionEnabled === false
+      ? "home"
+      : publicPage;
+
+  // Side-effect: sync the store so the URL state stays consistent
+  useEffect(() => {
+    if (publicPage === "collection" && settings?.collectionEnabled === false) {
+      setPublicPage("home");
+    }
+  }, [publicPage, settings, setPublicPage]);
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <AnnouncementBanner />
       <Header />
       <main className="flex-1" key={page}>
-        {page === "home" && <HomePage />}
-        {page === "services" && <ServicesSection />}
-        {page === "service-detail" && <ServiceDetail />}
-        {page === "collection" && <CollectionSection />}
-        {page === "reviews" && <ReviewsSection />}
-        {page === "contact" && <ContactSection />}
+        {effectivePage === "home" && <HomePage />}
+        {effectivePage === "services" && <ServicesSection />}
+        {effectivePage === "service-detail" && <ServiceDetail />}
+        {effectivePage === "collection" && <CollectionSection />}
+        {effectivePage === "reviews" && <ReviewsSection />}
+        {effectivePage === "contact" && <ContactSection />}
+        {effectivePage === "track" && <TrackSection />}
+        {effectivePage === "blog" && <BlogSection />}
+        {effectivePage === "blog-detail" && <BlogDetail />}
       </main>
       <Footer />
       <BookingModal />

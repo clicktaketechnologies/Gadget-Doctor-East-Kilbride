@@ -37,7 +37,7 @@ import {
 } from "@/components/ui/select";
 import { Icon } from "@/components/icon";
 import { useAppStore } from "@/lib/store";
-import { useServices, useCreateBooking } from "@/lib/api-hooks";
+import { useServices, useCreateBooking, useSettings } from "@/lib/api-hooks";
 import {
   BRAND,
   SERVICE_CATEGORIES,
@@ -49,10 +49,16 @@ import { cn } from "@/lib/utils";
 
 const TOTAL_STEPS = 4;
 
-function StepDots({ step }: { step: number }) {
+function StepDots({
+  step,
+  total = TOTAL_STEPS,
+}: {
+  step: number;
+  total?: number;
+}) {
   return (
     <div className="flex items-center gap-1.5">
-      {Array.from({ length: TOTAL_STEPS }).map((_, i) => {
+      {Array.from({ length: total }).map((_, i) => {
         const n = i + 1;
         const done = n < step;
         const active = n === step;
@@ -81,14 +87,17 @@ interface BookingFormProps {
 
 function BookingForm({ initialCategory, onClose }: BookingFormProps) {
   const mutation = useCreateBooking();
+  const { data: settings } = useSettings();
+  const collectionEnabled = settings?.collectionEnabled ?? true;
 
   const [step, setStep] = useState(1);
   const [category, setCategory] = useState<string>(initialCategory ?? "");
   const [deviceModel, setDeviceModel] = useState("");
   const [issues, setIssues] = useState<string[]>([]);
   const [description, setDescription] = useState("");
+  // Force dropoff when collection is disabled
   const [collection, setCollection] = useState<"dropoff" | "collection">(
-    "dropoff"
+    collectionEnabled ? "dropoff" : "dropoff"
   );
   const [address, setAddress] = useState("");
   const [name, setName] = useState("");
@@ -97,6 +106,10 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
 
   const submitted = mutation.isSuccess;
   const ticketId = mutation.data?.ticketId;
+
+  // Total steps adapt to collection availability (skip the collection
+  // step entirely when the master toggle is off).
+  const totalSteps = collectionEnabled ? 4 : 3;
 
   const toggleIssue = (issue: string) => {
     setIssues((prev) =>
@@ -109,16 +122,18 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
   const canNext = useMemo(() => {
     if (step === 1) return !!category;
     if (step === 2) return !!deviceModel && (issues.length > 0 || description.trim().length > 0);
-    if (step === 3)
+    // Step 3 is only the collection page when enabled; otherwise step 3 IS the contact page.
+    if (collectionEnabled && step === 3)
       return collection === "dropoff" || (collection === "collection" && address.trim().length > 4);
-    if (step === 4)
+    const contactStep = collectionEnabled ? 4 : 3;
+    if (step === contactStep)
       return (
         name.trim().length > 1 &&
         /.+@.+\..+/.test(email) &&
         phone.replace(/\s+/g, "").length >= 7
       );
     return false;
-  }, [step, category, deviceModel, issues, description, collection, address, name, email, phone]);
+  }, [step, category, deviceModel, issues, description, collection, address, name, email, phone, collectionEnabled]);
 
   const handleSubmit = () => {
     if (!canNext || mutation.isPending) return;
@@ -135,8 +150,11 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
       deviceType: category,
       deviceModel,
       issue: issueText || "No specific issue described",
-      needsCollection: collection === "collection",
-      collectionAddr: collection === "collection" ? address.trim() : undefined,
+      needsCollection: collectionEnabled && collection === "collection",
+      collectionAddr:
+        collectionEnabled && collection === "collection"
+          ? address.trim()
+          : undefined,
     });
   };
 
@@ -151,7 +169,7 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
     );
   }
 
-  const next = () => setStep((s) => Math.min(TOTAL_STEPS, s + 1));
+  const next = () => setStep((s) => Math.min(totalSteps, s + 1));
   const back = () => setStep((s) => Math.max(1, s - 1));
 
   return (
@@ -163,17 +181,17 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
             Book a Repair
           </DialogTitle>
           <DialogDescription className="text-xs">
-            Step {step} of {TOTAL_STEPS} ·{" "}
+            Step {step} of {totalSteps} ·{" "}
             {step === 1
               ? "Choose device type"
               : step === 2
               ? "Describe the problem"
-              : step === 3
+              : step === 3 && collectionEnabled
               ? "Collection preference"
               : "Your contact details"}
           </DialogDescription>
         </div>
-        <StepDots step={step} />
+        <StepDots step={step} total={totalSteps} />
       </div>
 
       {/* Body */}
@@ -294,8 +312,8 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
           </div>
         )}
 
-        {/* Step 3: Collection preference */}
-        {step === 3 && (
+        {/* Step 3: Collection preference (skipped when collection disabled) */}
+        {step === 3 && collectionEnabled && (
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
               How would you like to get your device to us?
@@ -352,12 +370,6 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
                     <span className="text-sm font-semibold text-foreground">
                       Doorstep collection
                     </span>
-                    <Badge
-                      variant="outline"
-                      className="border-accent/40 bg-accent/10 text-[10px] text-accent-foreground"
-                    >
-                      FREE
-                    </Badge>
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">
                     We pick it up, fix it, and return it — across East
@@ -392,8 +404,8 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
           </div>
         )}
 
-        {/* Step 4: Contact info + summary */}
-        {step === 4 && (
+        {/* Contact step (step 4 when collection enabled, step 3 when disabled) */}
+        {((collectionEnabled && step === 4) || (!collectionEnabled && step === 3)) && (
           <div className="space-y-5">
             {/* Summary */}
             <div className="rounded-xl border border-border bg-background/40 p-4">
@@ -432,10 +444,10 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
                 <div className="flex items-center justify-between gap-2">
                   <dt className="text-muted-foreground">Delivery</dt>
                   <dd className="font-medium text-foreground">
-                    {collection === "collection" ? (
+                    {collectionEnabled && collection === "collection" ? (
                       <span className="inline-flex items-center gap-1">
                         <Truck className="size-3.5 text-accent" />
-                        Doorstep (free)
+                        Doorstep pickup
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1">
@@ -526,7 +538,7 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
           <ChevronLeft className="size-4" />
           Back
         </Button>
-        {step < TOTAL_STEPS ? (
+        {step < totalSteps ? (
           <Button
             type="button"
             onClick={next}

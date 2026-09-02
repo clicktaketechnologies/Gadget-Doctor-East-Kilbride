@@ -69,8 +69,15 @@ export function Hero() {
 
   return (
     <section className="relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="bg-grid pointer-events-none absolute inset-0 opacity-60" />
+      {/* Background image with dark overlay */}
+      <img
+        src="/images/hero-workshop.jpg"
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30"
+      />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-background via-background/85 to-background/40" />
+      <div className="bg-grid pointer-events-none absolute inset-0 opacity-50" />
       <div className="pointer-events-none absolute -top-32 left-1/2 h-[480px] w-[680px] -translate-x-1/2 rounded-full bg-primary/20 blur-[120px]" />
       <div className="pointer-events-none absolute -right-32 top-40 h-72 w-72 rounded-full bg-accent/10 blur-[100px]" />
 
@@ -135,7 +142,7 @@ export function Hero() {
                 { icon: Star, label: `${rating}★ Rating`, sub: "Verified" },
                 { icon: ShieldCheck, label: `${reviewCount}+ Reviews`, sub: "On Google" },
                 { icon: Award, label: "12+ Years", sub: "Experience" },
-                { icon: Truck, label: "Free Collection", sub: "Doorstep" },
+                { icon: Truck, label: "Doorstep Collection", sub: "Across EK" },
               ].map((b) => (
                 <div
                   key={b.label}

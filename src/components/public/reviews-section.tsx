@@ -12,6 +12,7 @@ import { relativeTime } from "@/lib/format";
 import type { Review } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { ReviewForm } from "./review-form";
+import { CtaBand } from "./cta-band";
 
 function Stars({ value, className }: { value: number; className?: string }) {
   return (
@@ -133,6 +134,7 @@ export function ReviewsSection() {
   });
 
   return (
+    <>
     <section className="relative py-12 sm:py-16">
       <div className="bg-grid pointer-events-none absolute inset-0 opacity-40" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -232,6 +234,12 @@ export function ReviewsSection() {
         </div>
       </div>
     </section>
+    <CtaBand
+      title="Join 10,000+ happy customers"
+      subtitle="Book your repair today and find out why East Kilbride trusts us with their gadgets — same-day service, 12-month warranty, honest pricing."
+      bookLabel="Book Your Repair"
+    />
+    </>
   );
 }
 

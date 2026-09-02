@@ -15,7 +15,7 @@ import {
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { useAppStore } from "@/lib/store";
-import { useBranding } from "@/lib/api-hooks";
+import { useBranding, useSettings } from "@/lib/api-hooks";
 import { BRAND } from "@/lib/brand";
 
 const STEPS = [
@@ -30,14 +30,14 @@ const STEPS = [
     n: 2,
     icon: Truck,
     title: "We Collect",
-    desc: "Our driver arrives at your door — anywhere in East Kilbride — for free.",
+    desc: "Our driver arrives at your door — anywhere in East Kilbride.",
     color: "from-accent/20 to-accent/5",
   },
   {
     n: 3,
     icon: Wrench,
     title: "We Repair",
-    desc: "Certified technicians fix your device with genuine parts & 12-month warranty.",
+    desc: "Certified technicians fix your device with genuine-grade parts & 12-month warranty.",
     color: "from-violet-500/20 to-violet-500/5",
   },
   {
@@ -58,10 +58,25 @@ const TRUST = [
 export function CollectionSection() {
   const openBooking = useAppStore((s) => s.openBooking);
   const { data: branding } = useBranding();
+  const { data: settings } = useSettings();
   const phone = branding?.phone ?? BRAND.phones[0];
   const phoneDigits = phone.replace(/\s+/g, "");
-  const targetAreas =
-    branding?.targetAreas ?? BRAND.targetAreas;
+  const targetAreas = branding?.targetAreas ?? BRAND.targetAreas;
+  const collectionEnabled = settings?.collectionEnabled ?? true;
+
+  // Master toggle: when disabled, the entire collection page is hidden from
+  // the public site. public-site.tsx guards the routing, but we also bail
+  // out defensively here.
+  if (!collectionEnabled) {
+    return (
+      <section className="py-20 text-center">
+        <p className="text-sm text-muted-foreground">
+          Doorstep collection is currently unavailable. Please drop by our
+          workshop or call us — we&apos;re happy to help.
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section className="relative overflow-hidden py-12 sm:py-16">
@@ -71,40 +86,49 @@ export function CollectionSection() {
       <div className="pointer-events-none absolute bottom-0 left-0 h-72 w-72 rounded-full bg-accent/15 blur-[100px]" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Hero */}
-        <div className="mx-auto max-w-3xl text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-            <Truck className="size-3.5" />
-            Free Doorstep Collection
-          </span>
-          <h1 className="mt-4 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-            We Come to <span className="text-gradient-cyan">You</span>
-          </h1>
-          <p className="mt-4 text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Too busy to drop off your device? Our free doorstep collection
-            service covers all of East Kilbride and surrounding areas. We pick
-            it up, fix it, and bring it back — usually within 24 hours.
-          </p>
-          <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button
-              onClick={() => openBooking()}
-              size="lg"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/25"
-            >
-              <Truck className="size-5" />
-              Book Free Collection
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="border-primary/30 bg-background/40 text-foreground hover:border-primary/60 hover:bg-primary/10"
-            >
-              <a href={`tel:${phoneDigits}`}>
-                <Phone className="size-5 text-primary" />
-                {phone}
-              </a>
-            </Button>
+        {/* Hero with van image */}
+        <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-card">
+          <img
+            src="/images/collection-van.jpg"
+            alt="Gadget Doctor doorstep collection van"
+            loading="lazy"
+            className="absolute inset-0 h-full w-full object-cover opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-background/95 via-background/80 to-background/40" />
+          <div className="relative mx-auto max-w-3xl px-6 py-12 text-center sm:px-12 sm:py-16">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary backdrop-blur">
+              <Truck className="size-3.5" />
+              Doorstep Collection Service
+            </span>
+            <h1 className="mt-4 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+              We Come to <span className="text-gradient-cyan">You</span>
+            </h1>
+            <p className="mt-4 text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
+              Too busy to drop off your device? Our doorstep collection service
+              covers all of East Kilbride and surrounding areas. We pick it up,
+              fix it, and bring it back — usually within 24 hours.
+            </p>
+            <div className="mt-7 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Button
+                onClick={() => openBooking()}
+                size="lg"
+                className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/25"
+              >
+                <Truck className="size-5" />
+                Book Collection
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="border-primary/30 bg-background/40 text-foreground hover:border-primary/60 hover:bg-primary/10"
+              >
+                <a href={`tel:${phoneDigits}`}>
+                  <Phone className="size-5 text-primary" />
+                  {phone}
+                </a>
+              </Button>
+            </div>
           </div>
         </div>
 
@@ -163,7 +187,7 @@ export function CollectionSection() {
                   Coverage Area
                 </h3>
                 <p className="text-xs text-muted-foreground">
-                  Free pickup &amp; return across East Kilbride &amp; nearby
+                  Pickup &amp; return across East Kilbride &amp; nearby
                 </p>
               </div>
             </div>
@@ -217,14 +241,15 @@ export function CollectionSection() {
             <div className="mt-5 rounded-lg border border-border bg-background/40 p-4">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Collection Fee
+                  Collection
                 </span>
-                <span className="text-lg font-bold text-emerald-400">
-                  FREE
+                <span className="text-sm font-semibold text-foreground">
+                  Pickup &amp; return
                 </span>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
-                No hidden charges. Pay only for the repair itself.
+                We&apos;ll confirm collection availability and any applicable
+                charge when you book — no hidden fees.
               </p>
             </div>
             <Button

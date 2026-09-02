@@ -53,19 +53,30 @@ export function ContactSection() {
     <section className="relative py-12 sm:py-16">
       <div className="bg-grid pointer-events-none absolute inset-0 opacity-40" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mx-auto max-w-2xl text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-            <MessageCircle className="size-3.5" />
-            Get In Touch
-          </span>
-          <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-            Visit or <span className="text-gradient-cyan">Contact Us</span>
-          </h1>
-          <p className="mt-3 text-sm text-muted-foreground sm:text-base">
-            Drop by our East Kilbride workshop, give us a call, or send a
-            message — we&apos;re here to help with any gadget problem.
-          </p>
+        {/* Header with shop image */}
+        <div className="relative mb-10 overflow-hidden rounded-3xl border border-border">
+          <img
+            src="/images/contact-shop.jpg"
+            alt="Gadget Doctor East Kilbride workshop front"
+            loading="lazy"
+            className="h-44 w-full object-cover sm:h-56 lg:h-64"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/20" />
+          <div className="absolute inset-0 flex items-end p-6 sm:p-10">
+            <div className="mx-auto w-full max-w-2xl text-center">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary backdrop-blur">
+                <MessageCircle className="size-3.5" />
+                Get In Touch
+              </span>
+              <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+                Visit or <span className="text-gradient-cyan">Contact Us</span>
+              </h1>
+              <p className="mt-2 text-sm text-muted-foreground sm:text-base">
+                Drop by our East Kilbride workshop, give us a call, or send a
+                message — we&apos;re here to help with any gadget problem.
+              </p>
+            </div>
+          </div>
         </div>
 
         <div className="mt-12 grid gap-6 lg:grid-cols-2">

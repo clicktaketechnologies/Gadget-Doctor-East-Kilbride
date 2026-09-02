@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { isAdminAuthorized } from "@/lib/auth";
 
-// GET is public (public site reads announcement + collection banner status)
+// GET is public (public site reads announcement + collection toggle status)
 export async function GET() {
   let s = await db.siteSettings.findUnique({ where: { id: "singleton" } });
   if (!s) {
     s = await db.siteSettings.create({
       data: {
         id: "singleton",
+        collectionEnabled: true,
         collectionBannerEnabled: true,
         announcementEnabled: false,
         announcementText: null,
@@ -24,12 +25,15 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const body = (await req.json()) as {
+    collectionEnabled?: boolean;
     collectionBannerEnabled?: boolean;
     announcementEnabled?: boolean;
     announcementText?: string | null;
   };
 
   const data: Record<string, unknown> = {};
+  if (body.collectionEnabled !== undefined)
+    data.collectionEnabled = body.collectionEnabled;
   if (body.collectionBannerEnabled !== undefined)
     data.collectionBannerEnabled = body.collectionBannerEnabled;
   if (body.announcementEnabled !== undefined)
@@ -42,6 +46,7 @@ export async function PATCH(req: NextRequest) {
     s = await db.siteSettings.create({
       data: {
         id: "singleton",
+        collectionEnabled: true,
         collectionBannerEnabled: true,
         announcementEnabled: false,
         announcementText: null,

@@ -18,6 +18,16 @@ import type {
   CreateReviewInput,
   AdminLoginInput,
   AuthResponse,
+  BlogPost,
+  CreateBlogPostInput,
+  UpdateBlogPostInput,
+  PageContentMap,
+  UpdatePageContentInput,
+  EmailSettings,
+  UpdateEmailSettingsInput,
+  SendEmailInput,
+  SentEmail,
+  TrackResult,
 } from "@/lib/types";
 
 async function api<T>(
@@ -249,3 +259,123 @@ export function useUpdateBranding() {
     },
   });
 }
+
+// ---------- Blog ----------
+export function useBlogPosts(publishedOnly = false) {
+  return useQuery<BlogPost[]>({
+    queryKey: ["blog", publishedOnly],
+    queryFn: () => api(`/api/blog${publishedOnly ? "?published=true" : ""}`),
+  });
+}
+
+export function useCreateBlogPost() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: CreateBlogPostInput) =>
+      api<BlogPost>("/api/blog", { method: "POST", body: JSON.stringify(input) }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["blog"] });
+    },
+  });
+}
+
+export function useUpdateBlogPost(id: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: UpdateBlogPostInput) =>
+      api<BlogPost>(`/api/blog/${id}`, { method: "PATCH", body: JSON.stringify(input) }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["blog"] });
+    },
+  });
+}
+
+export function useDeleteBlogPost() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      api<{ ok: true }>(`/api/blog/${id}`, { method: "DELETE" }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["blog"] });
+    },
+  });
+}
+
+// ---------- Page Content (CMS) ----------
+export function usePageContent(page?: string) {
+  return useQuery<PageContentMap>({
+    queryKey: ["pages", page],
+    queryFn: () => api(`/api/pages${page ? `?page=${page}` : ""}`),
+    staleTime: 60_000,
+  });
+}
+
+export function useSavePageContent() {
+  const qc = useQueryClient();
+  const { toast } = useToast();
+  return useMutation({
+    mutationFn: (items: UpdatePageContentInput[]) =>
+      api<{ ok: true }>("/api/pages", { method: "PATCH", body: JSON.stringify(items) }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["pages"] });
+      toast({ title: "Page content saved", description: "Changes are now live." });
+    },
+  });
+}
+
+// ---------- Ticket Tracking ----------
+export function useTrackTicket(ticketId: string | null) {
+  return useQuery<TrackResult>({
+    queryKey: ["track", ticketId],
+    queryFn: () => api(`/api/track/${encodeURIComponent(ticketId || "")}`),
+    enabled: !!ticketId && ticketId.trim().length >= 4,
+    retry: false,
+  });
+}
+
+// ---------- Email Settings ----------
+export function useEmailSettings() {
+  return useQuery<EmailSettings>({
+    queryKey: ["email-settings"],
+    queryFn: () => api("/api/email/settings"),
+  });
+}
+
+export function useUpdateEmailSettings() {
+  const qc = useQueryClient();
+  const { toast } = useToast();
+  return useMutation({
+    mutationFn: (input: UpdateEmailSettingsInput) =>
+      api<EmailSettings>("/api/email/settings", { method: "PATCH", body: JSON.stringify(input) }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["email-settings"] });
+      toast({ title: "Email settings saved" });
+    },
+  });
+}
+
+export function useSendEmail() {
+  const qc = useQueryClient();
+  const { toast } = useToast();
+  return useMutation({
+    mutationFn: (input: SendEmailInput) =>
+      api<{ ok: boolean; log: SentEmail }>("/api/email/send", { method: "POST", body: JSON.stringify(input) }),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["email-log"] });
+      if (res.ok) {
+        toast({ title: "Email sent", description: `Message delivered to ${res.log.toEmail}.` });
+      }
+    },
+    onError: (e) => {
+      toast({ title: "Email failed", description: e.message, variant: "destructive" });
+    },
+  });
+}
+
+export function useEmailLog() {
+  return useQuery<SentEmail[]>({
+    queryKey: ["email-log"],
+    queryFn: () => api("/api/email/log"),
+  });
+}
+

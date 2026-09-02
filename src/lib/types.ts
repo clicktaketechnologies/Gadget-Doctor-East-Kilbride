@@ -65,6 +65,7 @@ export interface Review {
 
 export interface SiteSettings {
   id: string;
+  collectionEnabled: boolean;
   collectionBannerEnabled: boolean;
   announcementEnabled: boolean;
   announcementText: string | null;
@@ -201,3 +202,115 @@ export interface AuthResponse {
   token: string;
   user: AdminUser;
 }
+
+// ---- Blog ----
+export interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  coverImage: string | null;
+  category: string;
+  tags: string;
+  author: string;
+  published: boolean;
+  featured: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateBlogPostInput {
+  title: string;
+  excerpt: string;
+  content: string;
+  coverImage?: string;
+  category?: string;
+  tags?: string;
+  author?: string;
+  published?: boolean;
+  featured?: boolean;
+}
+
+export type UpdateBlogPostInput = Partial<CreateBlogPostInput>;
+
+// ---- Page content (CMS) ----
+export interface PageContent {
+  id: string;
+  page: string;
+  section: string;
+  key: string;
+  value: string;
+  updatedAt: string;
+}
+
+export interface PageContentMap {
+  // page -> section -> key -> value
+  [page: string]: { [section: string]: { [key: string]: string } };
+}
+
+export interface UpdatePageContentInput {
+  page: string;
+  section: string;
+  key: string;
+  value: string;
+}
+
+// ---- Email ----
+export interface EmailSettings {
+  id: string;
+  enabled: boolean;
+  host: string;
+  port: number;
+  secure: boolean;
+  user: string;
+  password: string;
+  fromEmail: string;
+  fromName: string;
+}
+
+export interface UpdateEmailSettingsInput {
+  enabled?: boolean;
+  host?: string;
+  port?: number;
+  secure?: boolean;
+  user?: string;
+  password?: string;
+  fromEmail?: string;
+  fromName?: string;
+}
+
+export interface SendEmailInput {
+  toEmail: string;
+  subject: string;
+  body: string;
+  relatedBookingId?: string;
+}
+
+export interface SentEmail {
+  id: string;
+  toEmail: string;
+  subject: string;
+  body: string;
+  status: string;
+  relatedBookingId: string | null;
+  createdAt: string;
+}
+
+// ---- Ticket tracking ----
+export interface TrackResult {
+  ticketId: string;
+  customerName: string;
+  deviceType: string;
+  deviceModel: string;
+  issue: string;
+  status: BookingStatus;
+  needsCollection: boolean;
+  quotedPrice: number | null;
+  finalPrice: number | null;
+  technicianNotes: string | null;
+  createdAt: string;
+  updatedAt: string;
+  found: boolean;
+}
+

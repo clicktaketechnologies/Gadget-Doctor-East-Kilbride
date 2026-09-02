@@ -10,8 +10,12 @@ import {
   Loader2,
   Trash2,
   AlertCircle,
+  Send,
+  ChevronDown,
+  ChevronUp,
+  Check,
 } from "lucide-react";
-import { useUpdateBooking, useDeleteBooking } from "@/lib/api-hooks";
+import { useUpdateBooking, useDeleteBooking, useSendEmail } from "@/lib/api-hooks";
 import { useToast } from "@/hooks/use-toast";
 import type { Booking, BookingStatus } from "@/lib/types";
 import { STATUS_COLORS, formatDateTime, formatPrice, deviceLabel } from "@/lib/format";
@@ -322,6 +326,11 @@ function BookingDetailBody({
             )}
           </div>
         </Section>
+
+        <Separator className="my-4" />
+
+        {/* Reply to customer */}
+        <ReplyToCustomer booking={booking} />
       </div>
 
       {/* Footer */}
@@ -416,6 +425,182 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
       </div>
       <div className="text-sm text-foreground">{value}</div>
     </div>
+  );
+}
+
+function ReplyToCustomer({ booking }: { booking: Booking }) {
+  const sendMutation = useSendEmail();
+  const [expanded, setExpanded] = useState(false);
+
+  const buildDefaultSubject = () => `Update on your repair ${booking.ticketId}`;
+  const buildDefaultBody = () =>
+    `Hi ${booking.customerName},\n\n` +
+    `Your repair (${booking.ticketId}) status is now: ${booking.status}.\n\n` +
+    `Device: ${deviceLabel(booking.deviceType)} · ${booking.deviceModel}\n` +
+    `Issue: ${booking.issue}\n\n` +
+    `[Add your message here]\n\n` +
+    `Best regards,\n` +
+    `Gadget Doctor East Kilbride\n` +
+    `+44 1355 458135`;
+
+  const [subject, setSubject] = useState(buildDefaultSubject);
+  const [body, setBody] = useState(buildDefaultBody);
+  const [sent, setSent] = useState(false);
+
+  const handleSend = () => {
+    sendMutation.mutate(
+      {
+        toEmail: booking.email,
+        subject: subject.trim() || buildDefaultSubject(),
+        body,
+        relatedBookingId: booking.id,
+      },
+      {
+        onSuccess: () => {
+          setSent(true);
+          setExpanded(false);
+        },
+      }
+    );
+  };
+
+  const handleReset = () => {
+    setSubject(buildDefaultSubject());
+    setBody(buildDefaultBody());
+    setSent(false);
+  };
+
+  return (
+    <section>
+      <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        Reply to Customer
+      </h3>
+
+      {sent ? (
+        <div className="flex items-center justify-between gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5">
+          <div className="flex items-center gap-2 text-sm text-emerald-300">
+            <Check className="size-4" />
+            <span>Email sent to {booking.email}</span>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={handleReset}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            Compose another
+          </Button>
+        </div>
+      ) : (
+        <>
+          <button
+            type="button"
+            onClick={() => setExpanded((e) => !e)}
+            className="flex w-full items-center justify-between gap-2 rounded-lg border border-border/60 bg-secondary/20 px-3 py-2.5 text-left transition-colors hover:bg-secondary/40"
+            aria-expanded={expanded}
+          >
+            <span className="flex items-center gap-2.5 text-sm">
+              <span className="flex size-7 items-center justify-center rounded-md bg-primary/10 text-primary">
+                <Mail className="size-4" />
+              </span>
+              <span className="font-medium text-foreground">
+                Email {booking.customerName}
+              </span>
+              <span className="hidden text-xs text-muted-foreground sm:inline">
+                {booking.email}
+              </span>
+            </span>
+            {expanded ? (
+              <ChevronUp className="size-4 text-muted-foreground" />
+            ) : (
+              <ChevronDown className="size-4 text-muted-foreground" />
+            )}
+          </button>
+
+          {expanded && (
+            <div className="mt-3 space-y-3 rounded-lg border border-border/60 bg-secondary/20 p-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="rpl-to">To</Label>
+                <Input
+                  id="rpl-to"
+                  value={booking.email}
+                  readOnly
+                  className="bg-background/40 text-muted-foreground"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="rpl-subject">Subject</Label>
+                <Input
+                  id="rpl-subject"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="rpl-body">Message</Label>
+                <Textarea
+                  id="rpl-body"
+                  rows={10}
+                  value={body}
+                  onChange={(e) => setBody(e.target.value)}
+                  className="font-mono text-sm"
+                />
+              </div>
+
+              <p className="text-[11px] text-muted-foreground">
+                Sends an email to the customer. Requires SMTP to be configured
+                in Email Settings; otherwise the email is logged but not
+                actually delivered.
+              </p>
+
+              {sendMutation.isError && (
+                <div className="flex items-center gap-2 rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+                  <AlertCircle className="size-4 shrink-0" />
+                  <span>{sendMutation.error?.message ?? "Email failed"}</span>
+                </div>
+              )}
+
+              <div className="flex flex-wrap items-center gap-2">
+                <Button
+                  onClick={handleSend}
+                  disabled={sendMutation.isPending}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  {sendMutation.isPending ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" />
+                      Sending…
+                    </>
+                  ) : (
+                    <>
+                      <Send className="size-4" />
+                      Send Email
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleReset}
+                  disabled={sendMutation.isPending}
+                >
+                  Reset template
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setExpanded(false)}
+                  disabled={sendMutation.isPending}
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+    </section>
   );
 }
 

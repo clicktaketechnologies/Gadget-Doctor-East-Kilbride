@@ -7,18 +7,21 @@ import {
   Clock,
   ArrowRight,
   Navigation,
+  Search,
 } from "lucide-react";
 import { useAppStore, type PublicPage } from "@/lib/store";
-import { useBranding } from "@/lib/api-hooks";
+import { useBranding, useSettings } from "@/lib/api-hooks";
 import { BRAND, SERVICE_CATEGORIES, SOCIAL_LINKS } from "@/lib/brand";
 import { Icon } from "@/components/icon";
 import { cn } from "@/lib/utils";
+import { TicketTrackerWidget } from "./ticket-tracker-widget";
 
 const NAV: { label: string; page: PublicPage }[] = [
   { label: "Home", page: "home" },
   { label: "Services", page: "services" },
-  { label: "Collection Service", page: "collection" },
+  { label: "Blog", page: "blog" },
   { label: "Reviews", page: "reviews" },
+  { label: "Track Repair", page: "track" },
   { label: "Contact", page: "contact" },
 ];
 
@@ -27,6 +30,8 @@ export function Footer() {
   const openBooking = useAppStore((s) => s.openBooking);
   const openServiceDetail = useAppStore((s) => s.openServiceDetail);
   const { data: branding } = useBranding();
+  const { data: settings } = useSettings();
+  const collectionEnabled = settings?.collectionEnabled ?? true;
 
   const businessName = branding?.businessName ?? BRAND.fullName;
   const shortName = branding?.businessName ?? BRAND.name;
@@ -88,9 +93,18 @@ export function Footer() {
             <p className="mt-4 max-w-sm text-sm leading-relaxed text-muted-foreground">
               {tagline}. Your trusted local specialist for phone, tablet,
               laptop, MacBook, computer, custom PC, console and Apple Watch
-              repairs. Fast turnaround, honest pricing and free doorstep
+              repairs. Fast turnaround, honest pricing and doorstep
               collection across East Kilbride.
             </p>
+
+            {/* Ticket tracker widget */}
+            <div className="mt-5 max-w-xs">
+              <p className="mb-1.5 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                <Search className="size-3 text-primary" />
+                Track your repair
+              </p>
+              <TicketTrackerWidget />
+            </div>
 
             {/* Social links */}
             {activeSocials.length > 0 && (
@@ -130,6 +144,16 @@ export function Footer() {
                   </button>
                 </li>
               ))}
+              {collectionEnabled && (
+                <li>
+                  <button
+                    onClick={() => go("collection")}
+                    className="text-sm text-muted-foreground transition-colors hover:text-primary"
+                  >
+                    Collection Service
+                  </button>
+                </li>
+              )}
             </ul>
           </div>
 
@@ -275,12 +299,24 @@ export function Footer() {
           </button>
         </div>
 
-        {/* Bottom bar */}
-        <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row">
-          <p>
+        {/* Bottom bar with Powered by ClickTake Technologies */}
+        <div className="mt-8 border-t border-border/50 pt-4 text-center text-xs text-muted-foreground">
+          <span>
             © {new Date().getFullYear()} {businessName}. All rights reserved.
-          </p>
-          <div className="flex items-center gap-4">
+          </span>
+          <span className="mx-2">·</span>
+          <span>
+            Powered by{" "}
+            <a
+              href="https://www.clicktaketech.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-primary hover:underline"
+            >
+              ClickTake Technologies
+            </a>
+          </span>
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
             {website && (
               <a
                 href={website}

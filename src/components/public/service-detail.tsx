@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Icon } from "@/components/icon";
 import { useAppStore } from "@/lib/store";
-import { useBranding, useServices } from "@/lib/api-hooks";
+import { useBranding, useServices, useSettings } from "@/lib/api-hooks";
 import { BRAND, SERVICE_CATEGORIES } from "@/lib/brand";
 import { formatPriceRange } from "@/lib/format";
 import type { Service } from "@/lib/types";
@@ -49,8 +49,8 @@ const WHY_FEATURES = [
   },
   {
     icon: Truck,
-    title: "Free collection",
-    desc: "Too busy to drop off? We'll collect and return your device for free across East Kilbride & nearby.",
+    title: "Doorstep collection",
+    desc: "Too busy to drop off? We offer pickup & return across East Kilbride & nearby areas.",
   },
 ];
 
@@ -61,13 +61,13 @@ const PROCESS_STEPS = [
     n: 1,
     icon: Phone,
     title: "Book online or call",
-    desc: "Pick your device, describe the issue, and choose drop-off or free collection — under 60 seconds.",
+    desc: "Pick your device, describe the issue, and choose drop-off or doorstep collection — under 60 seconds.",
   },
   {
     n: 2,
     icon: Truck,
     title: "Drop off or collection",
-    desc: "Bring it to our East Kilbride workshop, or our driver comes to you. Free pickup across the local area.",
+    desc: "Bring it to our East Kilbride workshop, or our driver comes to you. Pickup & return across the local area.",
   },
   {
     n: 3,
@@ -203,6 +203,8 @@ export function ServiceDetail() {
   const openServiceDetail = useAppStore((s) => s.openServiceDetail);
   const { data: branding } = useBranding();
   const { data: services, isLoading } = useServices(true);
+  const { data: settings } = useSettings();
+  const collectionEnabled = settings?.collectionEnabled ?? true;
 
   const phone = branding?.phone ?? BRAND.phones[0];
   const businessName = branding?.businessName ?? BRAND.fullName;
@@ -346,10 +348,12 @@ export function ServiceDetail() {
                   <ShieldCheck className="size-3.5 text-primary" />
                   12-month warranty
                 </span>
-                <span className="inline-flex items-center gap-1.5">
-                  <Truck className="size-3.5 text-primary" />
-                  Free local collection
-                </span>
+                {collectionEnabled && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <Truck className="size-3.5 text-primary" />
+                    Doorstep collection
+                  </span>
+                )}
               </div>
             </motion.div>
 
@@ -374,7 +378,9 @@ export function ServiceDetail() {
                     { icon: Award, label: `${BRAND.yearsExperience}+ years in business` },
                     { icon: ShieldCheck, label: "12-month repair warranty" },
                     { icon: Clock, label: "Same-day on most repairs" },
-                    { icon: Truck, label: "Free doorstep collection" },
+                    ...(collectionEnabled
+                      ? [{ icon: Truck, label: "Doorstep collection" }]
+                      : []),
                   ].map((it) => (
                     <li
                       key={it.label}
