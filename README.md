@@ -699,10 +699,18 @@ The admin panel has an **Email module** (`/admin` → Email) where you configure
 ## Troubleshooting
 
 ### `npm install` fails with peer dependency errors
-Run with the legacy resolver:
+The repo includes a `.npmrc` with `legacy-peer-deps=true`, so this should be handled automatically. If you still see errors:
 ```bash
 npm install --legacy-peer-deps
 ```
+
+### Email feature requires nodemailer (optional)
+The email/reply-to-customer feature uses **nodemailer**, which is **not** a declared dependency (to avoid a peer conflict with `next-auth`). It's loaded dynamically only when SMTP is enabled. To use the email feature, install nodemailer manually:
+```bash
+npm install nodemailer@6
+npm install -D @types/nodemailer@6
+```
+If you don't install it, the app works fine — emails are just simulated and logged (the default behavior when SMTP is disabled).
 
 ### Prisma client not generated
 ```bash

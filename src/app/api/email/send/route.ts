@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { isAdminAuthorized } from "@/lib/auth";
 import type { SendEmailInput } from "@/lib/types";
-import nodemailer from "nodemailer";
 
 // POST /api/email/send (admin)
 export async function POST(req: NextRequest) {
@@ -21,8 +20,10 @@ export async function POST(req: NextRequest) {
   let errorMsg: string | null = null;
 
   if (settings?.enabled && settings.host && settings.user && settings.fromEmail) {
-    // Real SMTP send
+    // Real SMTP send — dynamically import nodemailer to avoid a static
+    // dependency (which conflicts with next-auth's peerOptional requirement).
     try {
+      const nodemailer = (await import("nodemailer")).default;
       const transporter = nodemailer.createTransport({
         host: settings.host,
         port: settings.port,
