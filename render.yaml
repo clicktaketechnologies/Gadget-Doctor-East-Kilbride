@@ -1,0 +1,38 @@
+# Render Blueprint — one-click deploy at https://render.com
+# After connecting your repo, Render reads this file automatically.
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: gadget-doctor
+    runtime: node
+    plan: free # upgrade to 'starter' for always-on + persistent disk
+    region: frankfurt # closest to UK; change if needed
+    buildCommand: npm ci && npx prisma generate && npm run build
+    startCommand: npx prisma db push --accept-data-loss && npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        # SQLite on Render needs a persistent disk (paid plan).
+        # For free tier, switch to PostgreSQL — see README.
+        value: file:/data/custom.db
+      # Uncomment to configure SMTP email
+      # - key: SMTP_HOST
+      #   value: smtp.gmail.com
+      # - key: SMTP_PORT
+      #   value: "587"
+      # - key: SMTP_USER
+      #   sync: false
+      # - key: SMTP_PASS
+      #   sync: false
+      # - key: SMTP_FROM_EMAIL
+      #   sync: false
+      # - key: SMTP_FROM_NAME
+      #   value: Gadget Doctor East Kilbride
+    # Persistent disk for SQLite (requires 'starter' plan or higher)
+    disk:
+      name: gadgetData
+      mountPath: /data
+      sizeGB: 1

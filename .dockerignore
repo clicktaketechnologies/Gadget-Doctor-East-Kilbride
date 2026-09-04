@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+*.log
+dev.log
+dev.out.log
+server.log
+db/*.db
+db/*.db-journal
+.env.local
+.env.production
+upload
+download
+skills
