@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { isAdminAuthorized } from "@/lib/auth";
 import type { SendEmailInput } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 // POST /api/email/send (admin)
 export async function POST(req: NextRequest) {
   if (!isAdminAuthorized(req)) {

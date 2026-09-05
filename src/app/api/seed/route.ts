@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { ADMIN_DEMO, BRAND } from "@/lib/brand";
 
+export const dynamic = "force-dynamic";
+
 // Idempotent seed endpoint — safe to call repeatedly
 export async function POST() {
   try {

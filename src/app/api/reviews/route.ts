@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { isAdminAuthorized } from "@/lib/auth";
 import type { CreateReviewInput } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/reviews?approved=true
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);

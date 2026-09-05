@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { makeToken } from "@/lib/auth";
 import type { AdminLoginInput } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as AdminLoginInput;
   if (!body.email || !body.password) {

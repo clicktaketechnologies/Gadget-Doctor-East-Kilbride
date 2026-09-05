@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { isAdminAuthorized } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 // GET is public (public site reads announcement + collection toggle status)
 export async function GET() {
   let s = await db.siteSettings.findUnique({ where: { id: "singleton" } });

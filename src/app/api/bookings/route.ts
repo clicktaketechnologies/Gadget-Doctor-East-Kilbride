@@ -4,6 +4,8 @@ import { isAdminAuthorized } from "@/lib/auth";
 import { genTicketId } from "@/lib/format";
 import type { CreateBookingInput } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/bookings  (admin)
 export async function GET(req: NextRequest) {
   if (!isAdminAuthorized(req)) {

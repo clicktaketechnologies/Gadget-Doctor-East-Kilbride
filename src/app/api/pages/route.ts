@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { isAdminAuthorized } from "@/lib/auth";
 import type { UpdatePageContentInput, PageContentMap } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/pages?page=home (public) | default (admin: all pages)
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);

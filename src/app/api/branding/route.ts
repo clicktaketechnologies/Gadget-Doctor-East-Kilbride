@@ -4,6 +4,8 @@ import { isAdminAuthorized } from "@/lib/auth";
 import { BRAND, SERVICE_CATEGORIES } from "@/lib/brand";
 import type { Branding, UpdateBrandingInput, BusinessHours, SocialLinks } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 const DEFAULT_HOURS: BusinessHours[] = BRAND.hours.map((h) => ({ ...h }));
 const DEFAULT_SOCIALS: SocialLinks = { ...BRAND.socials };
 const DEFAULT_AREAS: string[] = [...BRAND.targetAreas];

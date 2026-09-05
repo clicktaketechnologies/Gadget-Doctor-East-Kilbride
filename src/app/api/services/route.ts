@@ -3,6 +3,8 @@ import { db } from "@/lib/db";
 import { isAdminAuthorized } from "@/lib/auth";
 import type { CreateServiceInput } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/services?active=true   (public)  |  default (admin: all)
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);

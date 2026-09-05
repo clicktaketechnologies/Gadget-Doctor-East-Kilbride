@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { isAdminAuthorized } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+
 // GET /api/email/log (admin) — recent sent emails
 export async function GET(req: NextRequest) {
   if (!isAdminAuthorized(req)) {
