@@ -2,24 +2,10 @@
   "hosting": {
     "public": "firebase-public",
     "ignore": ["**/.*"],
-    "redirects": [
+    "rewrites": [
       {
-        "source": "/",
-        "destination": "https://gadget-doctor-east-kilbride.onrender.com/",
-        "type": 302
-      },
-      {
-        "source": "/:path*",
-        "destination": "https://gadget-doctor-east-kilbride.onrender.com/:path",
-        "type": 302
-      }
-    ],
-    "headers": [
-      {
-        "source": "/**",
-        "headers": [
-          { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
-        ]
+        "source": "**",
+        "destination": "/index.html"
       }
     ]
   }

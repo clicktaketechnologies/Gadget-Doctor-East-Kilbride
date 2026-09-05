@@ -1,0 +1,20 @@
+# Firebase App Hosting configuration
+# Deploys the Next.js app so it runs directly on gadgetdoctorls.web.app
+# (no redirect to Render — the app is served by Firebase).
+# Docs: https://firebase.google.com/docs/app-hosting
+
+run:
+  # Build the Next.js app
+  buildCommand: npm install --legacy-peer-deps && npm install nodemailer@6 --legacy-peer-deps && npx prisma generate && npm run build
+  # Start the Next.js production server
+  startCommand: npm start
+  # Environment variables (set secrets via: firebase apphosting:secrets:set)
+  env:
+    - variable: DATABASE_URL
+      secret: DATABASE_URL
+    - variable: DIRECT_DATABASE_URL
+      secret: DIRECT_DATABASE_URL
+    - variable: NODE_ENV
+      value: production
+    - variable: PORT
+      value: "8080"
