@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Mail, Lock, Loader2, AlertCircle, Zap } from "lucide-react";
+import { ArrowLeft, Mail, Lock, Loader2, AlertCircle } from "lucide-react";
 import { useAdminLogin } from "@/lib/api-hooks";
-import { ADMIN_DEMO, BRAND } from "@/lib/brand";
+import { BRAND } from "@/lib/brand";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
 
 const LOGO_URL = "/gadget-doctor-logo.jpg";
 
@@ -22,11 +21,6 @@ export function AdminLogin() {
     e.preventDefault();
     if (!email || !password) return;
     login.mutate({ email, password });
-  };
-
-  const autofill = () => {
-    setEmail(ADMIN_DEMO.email);
-    setPassword(ADMIN_DEMO.password);
   };
 
   return (
@@ -144,29 +138,6 @@ export function AdminLogin() {
               )}
             </Button>
           </form>
-
-          {/* Demo creds hint */}
-          <div className="mt-6 rounded-lg border border-primary/20 bg-primary/5 p-3.5">
-            <div className="flex items-center gap-2 text-xs font-medium text-primary">
-              <Zap className="size-3.5" />
-              Demo credentials
-            </div>
-            <div className="mt-1.5 flex items-center justify-between gap-3">
-              <code className="font-mono text-xs text-muted-foreground">
-                {ADMIN_DEMO.email} / {ADMIN_DEMO.password}
-              </code>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={autofill}
-                disabled={login.isPending}
-                className={cn("h-7 shrink-0 px-2.5 text-xs")}
-              >
-                Autofill
-              </Button>
-            </div>
-          </div>
         </div>
 
         <p className="mt-6 text-center text-xs text-muted-foreground">
