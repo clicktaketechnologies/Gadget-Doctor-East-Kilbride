@@ -8,7 +8,7 @@ services:
     runtime: node
     plan: free # PostgreSQL is external (Supabase), so free tier works fine
     region: frankfurt # closest to UK; change if needed
-    buildCommand: npm install --legacy-peer-deps && npm install nodemailer@6 --legacy-peer-deps && npx prisma generate && npm run build
+    buildCommand: npm install --legacy-peer-deps --ignore-scripts && npm install nodemailer@6 --legacy-peer-deps --ignore-scripts && npx prisma generate && npm run build
     startCommand: npx prisma db push --accept-data-loss && npm start
     healthCheckPath: /
     envVars:

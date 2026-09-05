@@ -5,12 +5,15 @@ WORKDIR /app
 # Copy package files (package-lock.json may not exist — that's OK)
 COPY package.json* package-lock.json* ./
 # Use 'npm install' (not 'npm ci') so it works without a lockfile.
+# --ignore-scripts skips the 'postinstall: prisma generate' step because
+# prisma/schema.prisma hasn't been copied yet (it's copied below).
+# We run prisma generate explicitly after copying the source.
 # Also install nodemailer (used for the email feature; not in package.json
 # to avoid a next-auth peerOptional conflict).
-RUN npm install --no-audit --no-fund --legacy-peer-deps
-RUN npm install nodemailer@6 --no-audit --no-fund --legacy-peer-deps
+RUN npm install --no-audit --no-fund --legacy-peer-deps --ignore-scripts
+RUN npm install nodemailer@6 --no-audit --no-fund --legacy-peer-deps --ignore-scripts
 
-# Copy source and build
+# Copy source (now prisma/schema.prisma is available)
 COPY . .
 RUN npx prisma generate
 RUN npm run build
@@ -37,9 +40,6 @@ COPY --from=builder /app/tsconfig.json ./
 COPY --from=builder /app/postcss.config.mjs ./
 COPY --from=builder /app/tailwind.config.ts ./
 COPY --from=builder /app/components.json ./
-
-# Create directory for SQLite DB
-RUN mkdir -p /app/db
 
 EXPOSE 3000
 
