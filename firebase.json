@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "hosting": {
+    "redirects": [
+      {
+        "source": "/**",
+        "destination": "https://REPLACE-WITH-YOUR-RENDER-URL.onrender.com/**",
+        "type": 302
+      }
+    ],
+    "headers": [
+      {
+        "source": "/**",
+        "headers": [
+          { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+        ]
+      }
+    ]
+  }
+}
