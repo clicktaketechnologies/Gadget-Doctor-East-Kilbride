@@ -1,10 +1,9 @@
 {
-  "$schema": "https://json-schema.org/draft-07/schema#",
   "hosting": {
     "redirects": [
       {
         "source": "/**",
-        "destination": "https://REPLACE-WITH-YOUR-RENDER-URL.onrender.com/**",
+        "destination": "https://gadget-doctor-east-kilbride.onrender.com/**",
         "type": 302
       }
     ],
