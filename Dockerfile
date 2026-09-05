@@ -43,7 +43,10 @@ COPY --from=builder /app/components.json ./
 
 EXPOSE 10000
 
-# On startup: (1) push the Prisma schema to create/sync all tables in
-# PostgreSQL, then (2) start the Next.js server on Render's $PORT.
-# Uses sh -c so the shell expands $PORT (Render sets PORT=10000).
-CMD ["sh", "-c", "npx prisma db push --accept-data-loss && npm start"]
+# Just start the Next.js server on Render's $PORT.
+# NOTE: 'prisma db push' (schema migration) is NOT run here because it needs
+# the DIRECT database connection which Render can't reach (IPv6 issue with
+# Supabase). Run migrations from your local machine once:
+#   DIRECT_DATABASE_URL=postgresql://postgres:PASS@db.XXX.supabase.co:5432/postgres npx prisma db push
+# The app at runtime uses DATABASE_URL (the pooler) which works on Render.
+CMD ["sh", "-c", "npm start"]
