@@ -30,12 +30,17 @@ import type {
   TrackResult,
 } from "@/lib/types";
 
+// When the public frontend is statically hosted on Firebase, all API calls
+// go to the Render backend. When running on the same origin (Render dev/prod),
+// API_BASE is empty so calls use relative URLs.
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+
 async function api<T>(
   path: string,
   opts: RequestInit = {}
 ): Promise<T> {
   const token = useAppStore.getState().adminToken;
-  const res = await fetch(path, {
+  const res = await fetch(API_BASE + path, {
     ...opts,
     headers: {
       "Content-Type": "application/json",

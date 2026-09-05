@@ -1,15 +1,22 @@
 import type { NextConfig } from "next";
 
+// When BUILD_TARGET=firebase, export a static site for Firebase Hosting.
+// Otherwise (Render/local), run as a normal Next.js server app.
+const isFirebaseBuild = process.env.BUILD_TARGET === "firebase";
+
 const nextConfig: NextConfig = {
-  // NOTE: "output: standalone" is removed — it's incompatible with "next start".
-  // We use "next start" which works with the standard build output.
+  ...(isFirebaseBuild
+    ? {
+        output: "export" as const,
+        images: { unoptimized: true },
+        // Static export: trailing slashes so /admin/ works on Firebase
+        trailingSlash: true,
+      }
+    : {}),
   typescript: {
     ignoreBuildErrors: true,
   },
   reactStrictMode: false,
-  // Allow the sandbox preview panel (preview-chat-*.space-z.ai) to load
-  // dev-mode /_next/* resources cross-origin. Without this the preview iframe
-  // loads a blank page because Next.js blocks cross-origin dev asset requests.
   allowedDevOrigins: ["*.space-z.ai", "*.chatglm.cn", "*.z.ai"],
 };
 
