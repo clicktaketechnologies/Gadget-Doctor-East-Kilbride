@@ -22,8 +22,11 @@ export async function POST(req: NextRequest) {
   if (settings?.enabled && settings.host && settings.user && settings.fromEmail) {
     // Real SMTP send — dynamically import nodemailer to avoid a static
     // dependency (which conflicts with next-auth's peerOptional requirement).
+    // Using a variable for the module name so the static analyzer doesn't
+    // try to resolve it during the Firebase static export build.
     try {
-      const nodemailer = (await import("nodemailer")).default;
+      const moduleName = "nodemailer";
+      const nodemailer = (await import(/* webpackIgnore: true */ moduleName)).default;
       const transporter = nodemailer.createTransport({
         host: settings.host,
         port: settings.port,

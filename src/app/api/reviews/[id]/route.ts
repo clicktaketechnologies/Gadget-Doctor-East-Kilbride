@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { isAdminAuthorized } from "@/lib/auth";
 
+// Required for static export (Firebase) — tells Next.js not to pre-generate
+// any static pages for this dynamic API route. The route runs on Render.
+export function generateStaticParams() {
+  return [];
+}
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }

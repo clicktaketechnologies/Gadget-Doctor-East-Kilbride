@@ -3,6 +3,11 @@ import { db } from "@/lib/db";
 import { deviceLabel } from "@/lib/format";
 import type { TrackResult } from "@/lib/types";
 
+// Required for static export (Firebase) — API routes run on Render only.
+export function generateStaticParams() {
+  return [];
+}
+
 // GET /api/track/GD-8561 (public)
 export async function GET(
   _req: NextRequest,
