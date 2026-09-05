@@ -4,8 +4,13 @@
     "ignore": ["**/.*"],
     "redirects": [
       {
-        "source": "/**",
-        "destination": "https://gadget-doctor-east-kilbride.onrender.com/**",
+        "source": "/",
+        "destination": "https://gadget-doctor-east-kilbride.onrender.com/",
+        "type": 302
+      },
+      {
+        "source": "/:path*",
+        "destination": "https://gadget-doctor-east-kilbride.onrender.com/:path",
         "type": 302
       }
     ],
