@@ -2,10 +2,16 @@
   "hosting": {
     "public": "firebase-public",
     "ignore": ["**/.*"],
-    "rewrites": [
+    "redirects": [
       {
-        "source": "**",
-        "destination": "/index.html"
+        "source": "/",
+        "destination": "https://gadget-doctor-east-kilbride.onrender.com/",
+        "type": 302
+      },
+      {
+        "source": "/:path*",
+        "destination": "https://gadget-doctor-east-kilbride.onrender.com/:path",
+        "type": 302
       }
     ]
   }
