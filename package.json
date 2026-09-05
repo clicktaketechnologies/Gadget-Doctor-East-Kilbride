@@ -6,7 +6,7 @@
     "dev": "next dev -p 3000",
     "build": "next build",
     "start": "next start -p ${PORT:-3000}",
-    "build:firebase": "cross-env BUILD_TARGET=firebase NEXT_PUBLIC_API_BASE_URL=https://gadget-doctor-east-kilbride.onrender.com next build",
+    "build:firebase": "node scripts/build-firebase.mjs",
     "lint": "eslint .",
     "postinstall": "prisma generate",
     "db:push": "prisma db push --accept-data-loss",

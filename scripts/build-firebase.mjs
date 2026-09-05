@@ -1,0 +1,52 @@
+// Build script for Firebase static export.
+// Temporarily removes the /api routes and middleware (they only run on Render)
+// so Next.js 'output: export' succeeds, then restores them after.
+import { execSync } from "node:child_process";
+import { existsSync, renameSync, mkdirSync, rmSync } from "node:fs";
+import { join } from "node:path";
+
+const root = process.cwd();
+const apiDir = join(root, "src", "app", "api");
+const apiBackup = join(root, ".api-backup");
+const middlewareFile = join(root, "src", "middleware.ts");
+const middlewareBackup = join(root, ".middleware-backup.ts");
+
+console.log("🔥 Building static site for Firebase Hosting...");
+console.log("   (API routes run on Render — temporarily removing them from this build)\n");
+
+// 1. Move src/app/api → .api-backup
+if (existsSync(apiDir)) {
+  if (existsSync(apiBackup)) rmSync(apiBackup, { recursive: true, force: true });
+  renameSync(apiDir, apiBackup);
+  console.log("   ✓ Moved src/app/api out of the build");
+}
+
+// 2. Move src/middleware.ts → .middleware-backup.ts
+if (existsSync(middlewareFile)) {
+  renameSync(middlewareFile, middlewareBackup);
+  console.log("   ✓ Moved src/middleware.ts out of the build");
+}
+
+try {
+  // 3. Run the Next.js build with Firebase export settings
+  execSync(
+    'cross-env BUILD_TARGET=firebase NEXT_PUBLIC_API_BASE_URL=https://gadget-doctor-east-kilbride.onrender.com next build',
+    { stdio: "inherit", cwd: root, shell: true }
+  );
+  console.log("\n✅ Firebase static export build complete (out/ directory created).");
+} catch (e) {
+  console.error("\n❌ Build failed.");
+  process.exitCode = 1;
+} finally {
+  // 4. ALWAYS restore the moved files, even if the build failed
+  if (existsSync(apiBackup)) {
+    if (existsSync(apiDir)) rmSync(apiDir, { recursive: true, force: true });
+    mkdirSync(join(root, "src", "app"), { recursive: true });
+    renameSync(apiBackup, apiDir);
+    console.log("   ✓ Restored src/app/api");
+  }
+  if (existsSync(middlewareBackup)) {
+    renameSync(middlewareBackup, middlewareFile);
+    console.log("   ✓ Restored src/middleware.ts");
+  }
+}
