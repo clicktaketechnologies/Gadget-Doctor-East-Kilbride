@@ -41,7 +41,9 @@ COPY --from=builder /app/postcss.config.mjs ./
 COPY --from=builder /app/tailwind.config.ts ./
 COPY --from=builder /app/components.json ./
 
-EXPOSE 3000
+EXPOSE 10000
 
-# Default command — Render's startCommand overrides this if using render.yaml
-CMD ["npm", "start"]
+# On startup: (1) push the Prisma schema to create/sync all tables in
+# PostgreSQL, then (2) start the Next.js server on Render's $PORT.
+# Uses sh -c so the shell expands $PORT (Render sets PORT=10000).
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && npm start"]
