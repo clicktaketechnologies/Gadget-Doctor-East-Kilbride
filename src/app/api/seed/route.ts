@@ -4,15 +4,19 @@ import { ADMIN_DEMO, BRAND } from "@/lib/brand";
 
 // Idempotent seed endpoint — safe to call repeatedly
 export async function POST() {
-  // 1. Admin user
-  const existingAdmin = await db.adminUser.findFirst({
-    where: { email: ADMIN_DEMO.email },
-  });
-  if (!existingAdmin) {
-    await db.adminUser.create({
-      data: { email: ADMIN_DEMO.email, password: ADMIN_DEMO.password, name: ADMIN_DEMO.name },
+  try {
+    // 0. Ensure tables exist (creates them if missing — useful on first deploy)
+    await db.$executeRawUnsafe('SELECT 1');
+
+    // 1. Admin user
+    const existingAdmin = await db.adminUser.findFirst({
+      where: { email: ADMIN_DEMO.email },
     });
-  }
+    if (!existingAdmin) {
+      await db.adminUser.create({
+        data: { email: ADMIN_DEMO.email, password: ADMIN_DEMO.password, name: ADMIN_DEMO.name },
+      });
+    }
 
   // 2. Site settings singleton
   const settings = await db.siteSettings.findUnique({ where: { id: "singleton" } });
@@ -264,6 +268,14 @@ export async function POST() {
   }
 
   return NextResponse.json({ ok: true });
+  } catch (err) {
+    // Return the actual error so we can debug database connection issues
+    const message = err instanceof Error ? err.message : String(err);
+    return NextResponse.json(
+      { ok: false, error: message, stack: err instanceof Error ? err.stack : undefined },
+      { status: 500 }
+    );
+  }
 }
 
 export async function GET() {
