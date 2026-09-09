@@ -34,6 +34,21 @@ try {
     { stdio: "inherit", cwd: root, shell: true }
   );
   console.log("\n✅ Firebase static export build complete (out/ directory created).");
+
+  // 4. Remove the /admin and /superadmin static pages so Firebase's redirect
+  // rules take effect (otherwise Firebase serves the static HTML instead of
+  // redirecting to Render). The admin dashboard must run on Render (it needs
+  // server-side API access).
+  const outAdmin = join(root, "out", "admin");
+  const outSuperadmin = join(root, "out", "superadmin");
+  if (existsSync(outAdmin)) {
+    rmSync(outAdmin, { recursive: true, force: true });
+    console.log("   ✓ Removed out/admin (redirects to Render via firebase.json)");
+  }
+  if (existsSync(outSuperadmin)) {
+    rmSync(outSuperadmin, { recursive: true, force: true });
+    console.log("   ✓ Removed out/superadmin (redirects to Render via firebase.json)");
+  }
 } catch (e) {
   console.error("\n❌ Build failed.");
   process.exitCode = 1;

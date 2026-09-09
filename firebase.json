@@ -2,18 +2,21 @@
   "hosting": {
     "public": "out",
     "ignore": ["**/.*"],
-    "rewrites": [
+    "redirects": [
       {
         "source": "/admin",
-        "destination": "https://gadget-doctor-east-kilbride.onrender.com/admin"
+        "destination": "https://gadget-doctor-east-kilbride.onrender.com/admin",
+        "type": 302
       },
       {
         "source": "/admin/**",
-        "destination": "https://gadget-doctor-east-kilbride.onrender.com/admin"
+        "destination": "https://gadget-doctor-east-kilbride.onrender.com/admin",
+        "type": 302
       },
       {
         "source": "/superadmin",
-        "destination": "https://gadget-doctor-east-kilbride.onrender.com/admin"
+        "destination": "https://gadget-doctor-east-kilbride.onrender.com/admin",
+        "type": 302
       }
     ],
     "headers": [
