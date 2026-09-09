@@ -18,55 +18,76 @@ export async function POST(req: NextRequest) {
 
   const settings = await db.emailSettings.findUnique({ where: { id: "singleton" } });
 
-  let status: "sent" | "failed" | "queued" = "queued";
-  let errorMsg: string | null = null;
-
-  if (settings?.enabled && settings.host && settings.user && settings.fromEmail) {
-    // Real SMTP send — dynamically import nodemailer to avoid a static
-    // dependency (which conflicts with next-auth's peerOptional requirement).
-    // Using a variable for the module name so the static analyzer doesn't
-    // try to resolve it during the Firebase static export build.
-    try {
-      const moduleName = "nodemailer";
-      const nodemailer = (await import(/* webpackIgnore: true */ moduleName)).default;
-      const transporter = nodemailer.createTransport({
-        host: settings.host,
-        port: settings.port,
-        secure: settings.secure,
-        auth: { user: settings.user, pass: settings.password },
-      });
-      await transporter.sendMail({
-        from: `"${settings.fromName}" <${settings.fromEmail}>`,
-        to: body.toEmail,
+  // If SMTP is not enabled or not fully configured, log as simulated
+  if (!settings?.enabled || !settings.host || !settings.user || !settings.fromEmail || !settings.password) {
+    const log = await db.sentEmail.create({
+      data: {
+        toEmail: body.toEmail,
         subject: body.subject,
-        text: body.body,
-        html: body.body.replace(/\n/g, "<br/>"),
-      });
-      status = "sent";
-    } catch (e) {
-      status = "failed";
-      errorMsg = e instanceof Error ? e.message : "Unknown SMTP error";
-    }
-  } else {
-    // Sandbox / not configured — store as queued (simulated send)
-    status = "sent"; // mark as sent so the admin sees it "delivered" in sandbox
+        body: body.body,
+        status: "sent",
+        relatedBookingId: body.relatedBookingId ?? null,
+      },
+    });
+    return NextResponse.json({
+      ok: true,
+      simulated: true,
+      message: "Email logged (simulated) — SMTP not enabled/configured. Configure SMTP in Email Settings to send real emails.",
+      log,
+    });
   }
 
-  const log = await db.sentEmail.create({
-    data: {
-      toEmail: body.toEmail,
-      subject: body.subject,
-      body: body.body,
-      status,
-      relatedBookingId: body.relatedBookingId ?? null,
-    },
-  });
+  // Real SMTP send
+  try {
+    const nodemailer = (await import("nodemailer")).default;
+    const transporter = nodemailer.createTransport({
+      host: settings.host,
+      port: settings.port,
+      secure: settings.secure,
+      auth: { user: settings.user, pass: settings.password },
+    });
 
-  if (status === "failed") {
+    // Verify the connection first (gives a clearer error)
+    await transporter.verify();
+
+    const info = await transporter.sendMail({
+      from: `"${settings.fromName}" <${settings.fromEmail}>`,
+      to: body.toEmail,
+      subject: body.subject,
+      text: body.body,
+      html: body.body.replace(/\n/g, "<br/>"),
+    });
+
+    const log = await db.sentEmail.create({
+      data: {
+        toEmail: body.toEmail,
+        subject: body.subject,
+        body: body.body,
+        status: "sent",
+        relatedBookingId: body.relatedBookingId ?? null,
+      },
+    });
+
+    return NextResponse.json({
+      ok: true,
+      simulated: false,
+      messageId: info.messageId,
+      log,
+    });
+  } catch (e) {
+    const errorMsg = e instanceof Error ? e.message : "Unknown SMTP error";
+    const log = await db.sentEmail.create({
+      data: {
+        toEmail: body.toEmail,
+        subject: body.subject,
+        body: body.body,
+        status: "failed",
+        relatedBookingId: body.relatedBookingId ?? null,
+      },
+    });
     return NextResponse.json(
       { ok: false, error: errorMsg, log },
       { status: 502 }
     );
   }
-  return NextResponse.json({ ok: true, log });
 }

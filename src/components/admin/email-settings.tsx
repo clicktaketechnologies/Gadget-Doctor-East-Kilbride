@@ -10,11 +10,13 @@ import {
   AlertCircle,
   Inbox,
   ShieldCheck,
+  Send,
 } from "lucide-react";
 import {
   useEmailSettings,
   useUpdateEmailSettings,
   useEmailLog,
+  useTestEmail,
 } from "@/lib/api-hooks";
 import type { EmailSettings, UpdateEmailSettingsInput } from "@/lib/types";
 import { relativeTime } from "@/lib/format";
@@ -77,9 +79,124 @@ export function EmailSettings() {
         />
       )}
 
+      {/* Test email card */}
+      {settingsQ.data && <TestEmailCard settings={settingsQ.data} />}
+
       {/* Log card */}
       <EmailLogCard />
     </div>
+  );
+}
+
+function TestEmailCard({ settings }: { settings: EmailSettings }) {
+  const testMutation = useTestEmail();
+  const [testEmail, setTestEmail] = useState("");
+  const [result, setResult] = useState<{ ok: boolean; message?: string; error?: string; hint?: string } | null>(null);
+
+  const handleTest = () => {
+    if (!testEmail) return;
+    setResult(null);
+    testMutation.mutate(testEmail, {
+      onSuccess: (data) => {
+        setResult({ ok: true, message: data.message });
+      },
+      onError: (err: Error & { hint?: string }) => {
+        setResult({ ok: false, error: err.message, hint: err.hint });
+      },
+    });
+  };
+
+  const isConfigured =
+    settings.enabled &&
+    settings.host &&
+    settings.user &&
+    settings.password &&
+    settings.fromEmail;
+
+  return (
+    <Card className="glass flex flex-col gap-4 p-5">
+      <div className="flex items-start gap-3">
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/30">
+          <Send className="size-5" />
+        </div>
+        <div className="flex-1">
+          <h3 className="text-sm font-semibold text-foreground">Test Email</h3>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Send a test email to verify your SMTP settings are working.
+          </p>
+        </div>
+        {isConfigured ? (
+          <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
+            <Check className="mr-1 size-3" /> Configured
+          </Badge>
+        ) : (
+          <Badge variant="outline" className="border-amber-500/30 bg-amber-500/10 text-amber-400">
+            <AlertCircle className="mr-1 size-3" /> Not configured
+          </Badge>
+        )}
+      </div>
+
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
+        <div className="flex-1 space-y-2">
+          <Label htmlFor="test-email" className="text-xs">Send test email to</Label>
+          <Input
+            id="test-email"
+            type="email"
+            placeholder="your-email@example.com"
+            value={testEmail}
+            onChange={(e) => setTestEmail(e.target.value)}
+            disabled={testMutation.isPending}
+          />
+        </div>
+        <Button
+          onClick={handleTest}
+          disabled={!testEmail || testMutation.isPending}
+          className="gap-2"
+        >
+          {testMutation.isPending ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Sending test…
+            </>
+          ) : (
+            <>
+              <Send className="size-4" />
+              Send Test Email
+            </>
+          )}
+        </Button>
+      </div>
+
+      {result && (
+        <div className={cn(
+          "rounded-lg border p-3 text-sm",
+          result.ok
+            ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+            : "border-rose-500/30 bg-rose-500/10 text-rose-300"
+        )}>
+          <div className="flex items-start gap-2">
+            {result.ok ? (
+              <Check className="size-4 shrink-0 mt-0.5" />
+            ) : (
+              <AlertCircle className="size-4 shrink-0 mt-0.5" />
+            )}
+            <div className="flex-1">
+              <p className="font-medium">{result.ok ? "Success!" : "Failed"}</p>
+              {result.message && <p className="mt-1 text-xs">{result.message}</p>}
+              {result.error && <p className="mt-1 text-xs font-mono">{result.error}</p>}
+              {result.hint && <p className="mt-2 text-xs text-amber-300">💡 {result.hint}</p>}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!isConfigured && (
+        <p className="text-xs text-muted-foreground">
+          ⚠️ SMTP is not fully configured or is disabled. Save your settings above
+          (with the Enable toggle ON) before testing.
+        </p>
+      )}
+    </Card>
   );
 }
 

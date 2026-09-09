@@ -385,6 +385,32 @@ export function useEmailLog() {
   });
 }
 
+// ---------- Test Email ----------
+export function useTestEmail() {
+  const qc = useQueryClient();
+  const { toast } = useToast();
+  return useMutation({
+    mutationFn: (toEmail: string) =>
+      api<{ ok: boolean; message?: string; error?: string; hint?: string }>("/api/email/test", {
+        method: "POST",
+        body: JSON.stringify({ toEmail }),
+      }),
+    onSuccess: (res) => {
+      qc.invalidateQueries({ queryKey: ["email-log"] });
+      if (res.ok) {
+        toast({ title: "✅ Test email sent!", description: res.message });
+      }
+    },
+    onError: (e: Error & { hint?: string }) => {
+      toast({
+        title: "❌ Test email failed",
+        description: e.message,
+        variant: "destructive",
+      });
+    },
+  });
+}
+
 // ---------- Change Password ----------
 export function useChangePassword() {
   const setAdminAuth = useAppStore((s) => s.setAdminAuth);
