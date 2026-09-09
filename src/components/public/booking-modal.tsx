@@ -15,6 +15,7 @@ import {
   Phone,
   User,
   MapPin,
+  Clock,
 } from "lucide-react";
 import {
   Dialog,
@@ -48,6 +49,24 @@ import type { ServiceCategory } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const TOTAL_STEPS = 4;
+
+const TIME_SLOTS = [
+  "09:30 AM",
+  "10:30 AM",
+  "11:30 AM",
+  "12:30 PM",
+  "01:30 PM",
+  "02:30 PM",
+] as const;
+
+/** Today's date as yyyy-mm-dd, used as the min for the preferred date input. */
+function todayISO(): string {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
 
 function StepDots({
   step,
@@ -103,6 +122,8 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [bookingDate, setBookingDate] = useState<string>("");
+  const [bookingTime, setBookingTime] = useState<string>("");
 
   const submitted = mutation.isSuccess;
   const ticketId = mutation.data?.ticketId;
@@ -155,6 +176,8 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
         collectionEnabled && collection === "collection"
           ? address.trim()
           : undefined,
+      bookingDate: bookingDate || undefined,
+      bookingTime: bookingTime || undefined,
     });
   };
 
@@ -457,6 +480,29 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
                     )}
                   </dd>
                 </div>
+                {(bookingDate || bookingTime) && (
+                  <div className="flex items-center justify-between gap-2">
+                    <dt className="text-muted-foreground">Preferred slot</dt>
+                    <dd className="font-medium text-foreground">
+                      <span className="inline-flex items-center gap-1.5">
+                        <CalendarCheck className="size-3.5 text-primary" />
+                        {bookingDate
+                          ? new Date(bookingDate).toLocaleDateString("en-GB", {
+                              day: "2-digit",
+                              month: "short",
+                            })
+                          : "Any date"}
+                        {bookingTime && (
+                          <>
+                            <span className="text-muted-foreground">·</span>
+                            <Clock className="size-3.5 text-accent" />
+                            {bookingTime}
+                          </>
+                        )}
+                      </span>
+                    </dd>
+                  </div>
+                )}
               </dl>
             </div>
 
@@ -511,6 +557,62 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
                       className="pl-9"
                       autoComplete="tel"
                     />
+                  </div>
+                </div>
+              </div>
+
+              {/* Preferred date & time (optional) */}
+              <div className="rounded-xl border border-border bg-background/40 p-4">
+                <div className="flex items-center justify-between gap-2">
+                  <Label className="flex items-center gap-1.5 text-foreground">
+                    <CalendarCheck className="size-3.5 text-primary" />
+                    Preferred date &amp; time
+                  </Label>
+                  <span className="text-[11px] text-muted-foreground">
+                    Optional — we&apos;ll do our best to accommodate.
+                  </span>
+                </div>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <Label
+                      htmlFor="bk-date"
+                      className="mb-1.5 text-xs text-muted-foreground"
+                    >
+                      Date
+                    </Label>
+                    <Input
+                      id="bk-date"
+                      type="date"
+                      value={bookingDate}
+                      min={todayISO()}
+                      onChange={(e) => setBookingDate(e.target.value)}
+                      className="[color-scheme:dark]"
+                      aria-label="Preferred booking date"
+                    />
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="bk-time"
+                      className="mb-1.5 text-xs text-muted-foreground"
+                    >
+                      Time slot
+                    </Label>
+                    <Select value={bookingTime} onValueChange={setBookingTime}>
+                      <SelectTrigger
+                        id="bk-time"
+                        className="w-full"
+                        aria-label="Preferred booking time"
+                      >
+                        <SelectValue placeholder="Any time" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TIME_SLOTS.map((t) => (
+                          <SelectItem key={t} value={t}>
+                            {t}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
               </div>

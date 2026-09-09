@@ -12,6 +12,7 @@ import {
   FileText,
   FileEdit,
   Mail,
+  UserCog,
   type LucideIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -42,6 +43,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: "blog", label: "Blog", icon: FileText },
   { id: "pages", label: "Pages", icon: FileEdit },
   { id: "email", label: "Email", icon: Mail },
+  { id: "settings", label: "Settings", icon: UserCog },
 ];
 
 interface AdminSidebarProps {

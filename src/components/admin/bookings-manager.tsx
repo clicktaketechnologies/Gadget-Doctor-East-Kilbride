@@ -9,15 +9,23 @@ import {
   X,
   Inbox,
   Clock,
+  CalendarDays,
+  CalendarRange,
 } from "lucide-react";
 import { useBookings } from "@/lib/api-hooks";
 import { SERVICE_CATEGORIES } from "@/lib/brand";
-import { STATUS_COLORS, relativeTime, deviceLabel } from "@/lib/format";
+import {
+  STATUS_COLORS,
+  formatDate,
+  relativeTime,
+  deviceLabel,
+} from "@/lib/format";
 import type { Booking, BookingStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -46,17 +54,46 @@ const STATUS_FILTERS: (BookingStatus | "All")[] = [
   "Cancelled",
 ];
 
+const TABLE_COLUMN_COUNT = 9;
+
+/** Returns `yyyy-mm-dd` for the given Date in local time. */
+function toISODate(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+/** Monday of the current week (Sun → previous Monday). */
+function startOfWeek(d: Date): Date {
+  const monday = new Date(d);
+  const day = monday.getDay(); // 0 = Sun, 1 = Mon, ...
+  const offset = day === 0 ? -6 : 1 - day;
+  monday.setDate(monday.getDate() + offset);
+  monday.setHours(0, 0, 0, 0);
+  return monday;
+}
+
 interface BookingsManagerProps {
   search: string;
   onSearchChange: (v: string) => void;
 }
 
-export function BookingsManager({ search, onSearchChange }: BookingsManagerProps) {
+export function BookingsManager({
+  search,
+  onSearchChange,
+}: BookingsManagerProps) {
   const bookingsQ = useBookings();
-  const [statusFilter, setStatusFilter] = useState<BookingStatus | "All">("All");
+  const [statusFilter, setStatusFilter] = useState<BookingStatus | "All">(
+    "All"
+  );
   const [deviceFilter, setDeviceFilter] = useState<string>("All");
+  const [dateFrom, setDateFrom] = useState<string>("");
+  const [dateTo, setDateTo] = useState<string>("");
   const [selected, setSelected] = useState<Booking | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+
+  const dateFilterActive = !!dateFrom || !!dateTo;
 
   const filtered = useMemo(() => {
     const list = bookingsQ.data ?? [];
@@ -64,6 +101,14 @@ export function BookingsManager({ search, onSearchChange }: BookingsManagerProps
     return list
       .filter((b) => statusFilter === "All" || b.status === statusFilter)
       .filter((b) => deviceFilter === "All" || b.deviceType === deviceFilter)
+      .filter((b) => {
+        if (!dateFrom && !dateTo) return true;
+        if (!b.bookingDate) return false;
+        const bd = b.bookingDate.slice(0, 10);
+        if (dateFrom && bd < dateFrom) return false;
+        if (dateTo && bd > dateTo) return false;
+        return true;
+      })
       .filter((b) => {
         if (!q) return true;
         return (
@@ -74,15 +119,34 @@ export function BookingsManager({ search, onSearchChange }: BookingsManagerProps
         );
       })
       .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
-  }, [bookingsQ.data, search, statusFilter, deviceFilter]);
+  }, [bookingsQ.data, search, statusFilter, deviceFilter, dateFrom, dateTo]);
 
   const hasActiveFilters =
-    statusFilter !== "All" || deviceFilter !== "All" || search.trim() !== "";
+    statusFilter !== "All" ||
+    deviceFilter !== "All" ||
+    search.trim() !== "" ||
+    dateFilterActive;
 
   const resetFilters = () => {
     setStatusFilter("All");
     setDeviceFilter("All");
+    setDateFrom("");
+    setDateTo("");
     onSearchChange("");
+  };
+
+  const setToday = () => {
+    const iso = toISODate(new Date());
+    setDateFrom(iso);
+    setDateTo(iso);
+  };
+
+  const setThisWeek = () => {
+    const monday = startOfWeek(new Date());
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    setDateFrom(toISODate(monday));
+    setDateTo(toISODate(sunday));
   };
 
   const openBooking = (b: Booking) => {
@@ -110,9 +174,14 @@ export function BookingsManager({ search, onSearchChange }: BookingsManagerProps
               <Filter className="size-4 text-muted-foreground" />
               <Select
                 value={statusFilter}
-                onValueChange={(v) => setStatusFilter(v as BookingStatus | "All")}
+                onValueChange={(v) =>
+                  setStatusFilter(v as BookingStatus | "All")
+                }
               >
-                <SelectTrigger className="w-[150px]" aria-label="Filter by status">
+                <SelectTrigger
+                  className="w-[150px]"
+                  aria-label="Filter by status"
+                >
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -125,7 +194,10 @@ export function BookingsManager({ search, onSearchChange }: BookingsManagerProps
               </Select>
             </div>
             <Select value={deviceFilter} onValueChange={setDeviceFilter}>
-              <SelectTrigger className="w-[150px]" aria-label="Filter by device type">
+              <SelectTrigger
+                className="w-[150px]"
+                aria-label="Filter by device type"
+              >
                 <SelectValue placeholder="Device" />
               </SelectTrigger>
               <SelectContent>
@@ -138,19 +210,120 @@ export function BookingsManager({ search, onSearchChange }: BookingsManagerProps
               </SelectContent>
             </Select>
             {hasActiveFilters && (
-              <Button variant="ghost" size="sm" onClick={resetFilters} className="gap-1.5">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={resetFilters}
+                className="gap-1.5"
+              >
                 <X className="size-3.5" />
                 Reset
               </Button>
             )}
           </div>
         </div>
-        <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+
+        {/* Date filter row */}
+        <div className="mt-3 flex flex-col gap-3 border-t border-border/60 pt-3 sm:flex-row sm:items-end sm:flex-wrap">
+          <div className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            <CalendarRange className="size-3.5" />
+            Booking date
+          </div>
+          <div className="flex flex-wrap items-end gap-2">
+            <div className="space-y-1">
+              <Label
+                htmlFor="bk-filter-from"
+                className="text-[10px] uppercase tracking-wider text-muted-foreground"
+              >
+                From
+              </Label>
+              <Input
+                id="bk-filter-from"
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="h-9 w-[160px] [color-scheme:dark]"
+                aria-label="Filter from date"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label
+                htmlFor="bk-filter-to"
+                className="text-[10px] uppercase tracking-wider text-muted-foreground"
+              >
+                To
+              </Label>
+              <Input
+                id="bk-filter-to"
+                type="date"
+                value={dateTo}
+                min={dateFrom || undefined}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="h-9 w-[160px] [color-scheme:dark]"
+                aria-label="Filter to date"
+              />
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={setToday}
+              className="h-9 gap-1.5"
+            >
+              <CalendarDays className="size-3.5" />
+              Today
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={setThisWeek}
+              className="h-9 gap-1.5"
+            >
+              <CalendarRange className="size-3.5" />
+              This Week
+            </Button>
+            {dateFilterActive && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setDateFrom("");
+                  setDateTo("");
+                }}
+                className="h-9 gap-1.5 text-muted-foreground"
+              >
+                <X className="size-3.5" />
+                Clear dates
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Summary line */}
+        <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
           <span>
             {bookingsQ.isLoading
               ? "Loading…"
               : `${filtered.length} of ${bookingsQ.data?.length ?? 0} tickets`}
           </span>
+          {dateFilterActive && (
+            <>
+              <span className="text-muted-foreground/50">·</span>
+              <span className="text-foreground/80">
+                {filtered.length} booking{filtered.length === 1 ? "" : "s"}{" "}
+                between{" "}
+                <span className="font-medium text-foreground">
+                  {dateFrom ? formatDate(dateFrom) : "any time"}
+                </span>{" "}
+                and{" "}
+                <span className="font-medium text-foreground">
+                  {dateTo ? formatDate(dateTo) : "any time"}
+                </span>
+              </span>
+            </>
+          )}
         </div>
       </Card>
 
@@ -166,6 +339,7 @@ export function BookingsManager({ search, onSearchChange }: BookingsManagerProps
                 <TableHead className="max-w-[220px]">Issue</TableHead>
                 <TableHead>Collection</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Booking Date</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead className="pr-4 text-right">Actions</TableHead>
               </TableRow>
@@ -174,8 +348,11 @@ export function BookingsManager({ search, onSearchChange }: BookingsManagerProps
               {bookingsQ.isLoading ? (
                 Array.from({ length: 6 }).map((_, i) => (
                   <TableRow key={i} className="border-border/60">
-                    {Array.from({ length: 8 }).map((__, j) => (
-                      <TableCell key={j} className={j === 0 ? "pl-4" : ""}>
+                    {Array.from({ length: TABLE_COLUMN_COUNT }).map((__, j) => (
+                      <TableCell
+                        key={j}
+                        className={j === 0 ? "pl-4" : j === 8 ? "pr-4" : ""}
+                      >
                         <Skeleton className="h-5 w-full max-w-[120px] rounded" />
                       </TableCell>
                     ))}
@@ -183,7 +360,7 @@ export function BookingsManager({ search, onSearchChange }: BookingsManagerProps
                 ))
               ) : filtered.length === 0 ? (
                 <TableRow className="border-border/60 hover:bg-transparent">
-                  <TableCell colSpan={8} className="h-48">
+                  <TableCell colSpan={TABLE_COLUMN_COUNT} className="h-48">
                     <div className="flex flex-col items-center justify-center gap-2 text-center">
                       <div className="flex size-12 items-center justify-center rounded-full bg-secondary/40">
                         <Inbox className="size-6 text-muted-foreground" />
@@ -256,6 +433,24 @@ export function BookingsManager({ search, onSearchChange }: BookingsManagerProps
                       >
                         {b.status}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {b.bookingDate ? (
+                        <div className="flex flex-col">
+                          <span className="inline-flex items-center gap-1 text-sm text-foreground">
+                            <CalendarDays className="size-3 text-primary" />
+                            {formatDate(b.bookingDate)}
+                          </span>
+                          {b.bookingTime && (
+                            <span className="inline-flex items-center gap-1 pl-4 text-xs text-muted-foreground">
+                              <Clock className="size-3" />
+                              {b.bookingTime}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">

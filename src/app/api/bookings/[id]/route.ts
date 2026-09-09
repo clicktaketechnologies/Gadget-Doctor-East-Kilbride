@@ -23,6 +23,8 @@ export async function PATCH(
   if (body.technicianNotes !== undefined) data.technicianNotes = body.technicianNotes;
   if (body.quotedPrice !== undefined) data.quotedPrice = body.quotedPrice;
   if (body.finalPrice !== undefined) data.finalPrice = body.finalPrice;
+  if (body.bookingDate !== undefined) data.bookingDate = body.bookingDate ? new Date(body.bookingDate) : null;
+  if (body.bookingTime !== undefined) data.bookingTime = body.bookingTime;
 
   const updated = await db.booking.update({ where: { id }, data });
   return NextResponse.json(updated);

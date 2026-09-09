@@ -476,3 +476,41 @@ Stage Summary:
 - The public site at **/** has NO admin access and NO floating switcher — completely separate.
 - Admin demo: admin@gadgetdoctor.co.uk / admin123 (login at /admin or /superadmin).
 - "View Public Site" / "Back to website" buttons in admin navigate to `/` via Next.js router.
+
+---
+Task ID: 13
+Agent: Task Agent 13 (Frontend)
+Task: Add booking date/time picker to public booking modal, add date filtering + "Booking Date" column to admin bookings manager, create admin Settings page (password change + branding quick access) and wire it into the sidebar/panel/topbar.
+
+Work Log:
+- store.ts: extended `AdminModule` union with `"settings"` (single-line, required so the new module is routable and lint passes).
+- Task 1 — `src/components/public/booking-modal.tsx`:
+  - Added `TIME_SLOTS` const (09:30 AM, 10:30 AM, 11:30 AM, 12:30 PM, 01:30 PM, 02:30 PM) and `todayISO()` helper used as the min date.
+  - Added local state `bookingDate` + `bookingTime`.
+  - Added a bordered "Preferred date & time" panel to the Contact Info step with a dark-themed `<input type="date">` (`[color-scheme:dark]`, `min=today`) and a `Select` of time slots. Both optional.
+  - Added a "Preferred slot" row to the Booking Summary card when either is set.
+  - Wired `bookingDate` and `bookingTime` into `useCreateBooking().mutate()`.
+- Task 2 — `src/components/admin/bookings-manager.tsx`:
+  - Added `dateFrom` / `dateTo` state + a dedicated date-filter row (From / To date inputs with `[color-scheme:dark]`, "Today" + "This Week" quick buttons, "Clear dates" when active).
+  - Added `toISODate()` + `startOfWeek()` helpers (Monday-anchored week).
+  - Filter logic now narrows by `bookingDate.slice(0,10)` against the from/to range.
+  - Added a new "Booking Date" table column between Status and Created, rendering `formatDate(b.bookingDate)` plus `bookingTime` (with CalendarDays/Clock icons) when set, em-dash otherwise.
+  - Updated skeleton + empty-state `colSpan` to 9 (TABLE_COLUMN_COUNT constant) to match the new column count.
+  - Added a summary line that reads e.g. "3 of 12 tickets · 3 bookings between 14 Jan 2025 and 20 Jan 2025" when a date filter is active.
+- Task 3 — `src/components/admin/admin-settings.tsx` (new file):
+  - `ChangePasswordCard`: current/new/confirm password inputs with show/hide toggles (Eye/EyeOff), client-side validation (>=6 chars, new===confirm, new!==current), surfaces API error (e.g. "Current password is incorrect"), success state, calls `useChangePassword()`, clears fields on success.
+  - `BrandingQuickAccessCard`: pulls `useBranding()`, shows logo preview, business name + tagline, primary/secondary color swatches with hex codes, phone + email, and an "Edit Branding" button that calls `setAdminModule("branding")`. Loading skeleton + error fallback included.
+- Wiring:
+  - `admin-sidebar.tsx`: added `UserCog` icon import and `{ id: "settings", label: "Settings", icon: UserCog }` nav item (kept `Settings` icon for Services & Pricing to avoid duplication).
+  - `admin-panel.tsx`: imported `AdminSettings`, added `{adminModule === "settings" && <AdminSettings/>}` route.
+  - `admin-topbar.tsx`: added `settings: { title: "Settings", subtitle: "Password & account settings" }` to MODULE_META.
+
+Verification:
+- `bun install` then `bun run lint` → exit 0, no errors.
+- `bunx tsc --noEmit` → only pre-existing errors in `examples/websocket/*` (socket.io deps missing), unrelated to this task and ignored by eslint config.
+- Files NOT touched: page.tsx, layout.tsx, globals.css, src/lib/* (except the one-line AdminModule union extension in store.ts which is required for the new module to type-check), src/app/api/*.
+
+Stage Summary:
+- Customers can now optionally pick a preferred date + time slot when booking a repair.
+- Admins can filter the bookings table by date range, jump to Today / This Week, and see the requested booking date + time as a dedicated column.
+- New admin "Settings" module at /admin → Settings: change password (validated, with API error display) and a Branding quick-access card that summarises live branding and links into the Branding editor.

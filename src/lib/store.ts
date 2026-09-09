@@ -25,7 +25,8 @@ export type AdminModule =
   | "branding"
   | "blog"
   | "pages"
-  | "email";
+  | "email"
+  | "settings";
 
 interface AppState {
   view: AppView;

@@ -42,6 +42,8 @@ model Booking {
   technicianNotes String?
   quotedPrice     Int?
   finalPrice      Int?
+  bookingDate     DateTime? // preferred drop-off/collection date
+  bookingTime     String?   // preferred time slot, e.g. "10:00 AM"
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

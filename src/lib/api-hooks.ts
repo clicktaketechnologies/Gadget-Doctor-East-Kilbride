@@ -12,6 +12,7 @@ import type {
   Branding,
   UpdateBrandingInput,
   CreateBookingInput,
+  ChangePasswordInput,
   CreateServiceInput,
   UpdateServiceInput,
   UpdateBookingInput,
@@ -381,6 +382,24 @@ export function useEmailLog() {
   return useQuery<SentEmail[]>({
     queryKey: ["email-log"],
     queryFn: () => api("/api/email/log"),
+  });
+}
+
+// ---------- Change Password ----------
+export function useChangePassword() {
+  const setAdminAuth = useAppStore((s) => s.setAdminAuth);
+  const adminName = useAppStore((s) => s.adminName);
+  const { toast } = useToast();
+  return useMutation({
+    mutationFn: (input: ChangePasswordInput) =>
+      api<{ ok: boolean; token: string }>("/api/admin/change-password", {
+        method: "POST",
+        body: JSON.stringify(input),
+      }),
+    onSuccess: (res) => {
+      setAdminAuth(res.token, adminName ?? "Admin");
+      toast({ title: "Password changed", description: "Your password has been updated successfully." });
+    },
   });
 }
 

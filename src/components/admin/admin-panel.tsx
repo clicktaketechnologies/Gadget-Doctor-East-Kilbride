@@ -14,6 +14,7 @@ import { BrandingManager } from "./branding-manager";
 import { BlogManager } from "./blog-manager";
 import { PagesEditor } from "./pages-editor";
 import { EmailSettings } from "./email-settings";
+import { AdminSettings } from "./admin-settings";
 
 export function AdminPanel() {
   const adminToken = useAppStore((s) => s.adminToken);
@@ -63,6 +64,7 @@ export function AdminPanel() {
           {adminModule === "blog" && <BlogManager />}
           {adminModule === "pages" && <PagesEditor />}
           {adminModule === "email" && <EmailSettings />}
+          {adminModule === "settings" && <AdminSettings />}
         </main>
       </div>
     </div>

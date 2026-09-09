@@ -24,6 +24,7 @@ const MODULE_META: Record<AdminModule, { title: string; subtitle: string }> = {
   blog: { title: "Blog", subtitle: "Write & manage articles" },
   pages: { title: "Pages", subtitle: "Edit text & images on public pages" },
   email: { title: "Email", subtitle: "SMTP config & sent email log" },
+  settings: { title: "Settings", subtitle: "Password & account settings" },
 };
 
 export function AdminTopbar({ onMenuClick, search, onSearchChange }: AdminTopbarProps) {

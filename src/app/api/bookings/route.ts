@@ -44,6 +44,8 @@ export async function POST(req: NextRequest) {
       needsCollection: body.needsCollection,
       collectionAddr: body.collectionAddr || null,
       status: "Pending",
+      bookingDate: body.bookingDate ? new Date(body.bookingDate) : null,
+      bookingTime: body.bookingTime || null,
     },
   });
   return NextResponse.json(booking, { status: 201 });

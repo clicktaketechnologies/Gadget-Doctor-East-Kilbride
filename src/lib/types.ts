@@ -48,6 +48,8 @@ export interface Booking {
   technicianNotes: string | null;
   quotedPrice: number | null;
   finalPrice: number | null;
+  bookingDate: string | null;
+  bookingTime: string | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -139,6 +141,8 @@ export interface CreateBookingInput {
   issue: string;
   needsCollection: boolean;
   collectionAddr?: string;
+  bookingDate?: string;
+  bookingTime?: string;
 }
 
 export interface CreateServiceInput {
@@ -161,6 +165,13 @@ export interface UpdateBookingInput {
   technicianNotes?: string;
   quotedPrice?: number | null;
   finalPrice?: number | null;
+  bookingDate?: string | null;
+  bookingTime?: string | null;
+}
+
+export interface ChangePasswordInput {
+  currentPassword: string;
+  newPassword: string;
 }
 
 export interface CreateReviewInput {
