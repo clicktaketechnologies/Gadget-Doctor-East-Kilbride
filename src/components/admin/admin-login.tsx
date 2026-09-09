@@ -114,12 +114,22 @@ export function AdminLogin() {
             {login.isError && (
               <div
                 role="alert"
-                className="flex items-center gap-2 rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300"
+                className="flex flex-col gap-2 rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300"
               >
-                <AlertCircle className="size-4 shrink-0" />
-                <span>
-                  {login.error?.message ?? "Invalid credentials. Please try again."}
-                </span>
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="size-4 shrink-0" />
+                  <span>
+                    {login.error?.message ?? "Invalid credentials. Please try again."}
+                  </span>
+                </div>
+                {"Failed to fetch" === login.error?.message && (
+                  <a
+                    href="https://gadget-doctor-east-kilbride.onrender.com/admin"
+                    className="text-xs font-medium text-primary hover:underline"
+                  >
+                    → Click here to access the admin dashboard directly
+                  </a>
+                )}
               </div>
             )}
 
