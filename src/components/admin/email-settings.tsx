@@ -215,6 +215,106 @@ function SmtpCard({ settings }: { settings: EmailSettings }) {
   const [fromEmail, setFromEmail] = useState(settings.fromEmail);
   const [fromName, setFromName] = useState(settings.fromName);
 
+  // Provider presets — selecting one fills the form with the correct
+  // host/port/secure for that provider.
+  const PROVIDER_PRESETS: Record<string, { host: string; port: number; secure: boolean; label: string; hint: string; userPlaceholder: string }> = {
+    cpanel: {
+      label: "cPanel (your domain)",
+      host: "mail.gadgetdoctorls.co.uk",
+      port: 465,
+      secure: true,
+      hint: "Use your FULL email address (e.g. info@gadgetdoctorls.co.uk) as the username and the email account password.",
+      userPlaceholder: "info@gadgetdoctorls.co.uk",
+    },
+    gmail: {
+      label: "Gmail",
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      hint: "Enable 2-Step Verification, then generate an App Password at https://myaccount.google.com/apppasswords — use that 16-char password (not your Gmail password).",
+      userPlaceholder: "you@gmail.com",
+    },
+    outlook: {
+      label: "Outlook / Office 365",
+      host: "smtp.office365.com",
+      port: 587,
+      secure: false,
+      hint: "Use your Outlook/Office 365 email and password.",
+      userPlaceholder: "you@outlook.com",
+    },
+    yahoo: {
+      label: "Yahoo",
+      host: "smtp.mail.yahoo.com",
+      port: 587,
+      secure: false,
+      hint: "Generate an App Password in your Yahoo account security settings.",
+      userPlaceholder: "you@yahoo.com",
+    },
+    zoho: {
+      label: "Zoho",
+      host: "smtp.zoho.com",
+      port: 465,
+      secure: true,
+      hint: "Use your Zoho email and password (or App Password if 2FA is on).",
+      userPlaceholder: "you@zoho.com",
+    },
+    mailgun: {
+      label: "Mailgun",
+      host: "smtp.mailgun.org",
+      port: 587,
+      secure: false,
+      hint: "Use the SMTP credentials from your Mailgun domain settings.",
+      userPlaceholder: "postmaster@your-domain.com",
+    },
+    sendgrid: {
+      label: "SendGrid",
+      host: "smtp.sendgrid.net",
+      port: 587,
+      secure: false,
+      hint: "Username is 'apikey', password is your SendGrid API key.",
+      userPlaceholder: "apikey",
+    },
+    brevo: {
+      label: "Brevo (Sendinblue)",
+      host: "smtp-relay.brevo.com",
+      port: 587,
+      secure: false,
+      hint: "Use your Brevo SMTP key (not your login password).",
+      userPlaceholder: "you@brevo.com",
+    },
+    custom: {
+      label: "Custom / Manual",
+      host: "",
+      port: 587,
+      secure: false,
+      hint: "Enter your SMTP details manually.",
+      userPlaceholder: "username",
+    },
+  };
+
+  const [selectedProvider, setSelectedProvider] = useState<string>(() => {
+    // Detect the current provider from the saved host
+    const h = (settings.host || "").toLowerCase();
+    if (h.includes("gadgetdoctorls") || h.includes("mail.")) return "cpanel";
+    if (h.includes("gmail") || h.includes("google")) return "gmail";
+    if (h.includes("office365") || h.includes("outlook")) return "outlook";
+    if (h.includes("yahoo")) return "yahoo";
+    if (h.includes("zoho")) return "zoho";
+    if (h.includes("mailgun")) return "mailgun";
+    if (h.includes("sendgrid")) return "sendgrid";
+    if (h.includes("brevo") || h.includes("sendinblue")) return "brevo";
+    return "custom";
+  });
+
+  const applyProvider = (key: string) => {
+    setSelectedProvider(key);
+    const preset = PROVIDER_PRESETS[key];
+    if (!preset) return;
+    setHost(preset.host);
+    setPort(String(preset.port));
+    setSecure(preset.secure);
+  };
+
   const dirty =
     enabled !== settings.enabled ||
     host !== settings.host ||
@@ -282,6 +382,35 @@ function SmtpCard({ settings }: { settings: EmailSettings }) {
         </div>
       </div>
 
+      {/* Provider selector */}
+      <div className="space-y-2">
+        <Label className="text-xs uppercase tracking-wide text-muted-foreground">
+          Email Provider
+        </Label>
+        <div className="flex flex-wrap gap-1.5">
+          {Object.entries(PROVIDER_PRESETS).map(([key, preset]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => applyProvider(key)}
+              className={cn(
+                "rounded-md border px-3 py-1.5 text-xs font-medium transition-colors",
+                selectedProvider === key
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-card/40 text-muted-foreground hover:border-primary/40 hover:text-foreground"
+              )}
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+        {selectedProvider !== "custom" && (
+          <p className="text-xs text-muted-foreground">
+            💡 {PROVIDER_PRESETS[selectedProvider]?.hint}
+          </p>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="smtp-host">SMTP host</Label>
@@ -308,7 +437,7 @@ function SmtpCard({ settings }: { settings: EmailSettings }) {
           <Label htmlFor="smtp-user">Username</Label>
           <Input
             id="smtp-user"
-            placeholder="you@example.com"
+            placeholder={PROVIDER_PRESETS[selectedProvider]?.userPlaceholder || "you@example.com"}
             value={user}
             onChange={(e) => setUser(e.target.value)}
             autoComplete="off"
@@ -367,34 +496,6 @@ function SmtpCard({ settings }: { settings: EmailSettings }) {
           onCheckedChange={setSecure}
           aria-label="Toggle SSL/TLS"
         />
-      </div>
-
-      {/* Provider hints */}
-      <div className="rounded-lg border border-border/60 bg-secondary/20 p-3 text-xs text-muted-foreground">
-        <div className="mb-1 font-medium text-foreground">
-          Common providers
-        </div>
-        <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2">
-          <li>
-            <span className="font-medium text-primary">cPanel (your domain):</span>{" "}
-            mail.gadgetdoctorls.co.uk:465 (SSL, Secure=ON)
-          </li>
-          <li>
-            <span className="font-medium">Gmail:</span> smtp.gmail.com:587
-            (STARTTLS, needs App Password)
-          </li>
-          <li>
-            <span className="font-medium">Outlook / 365:</span>{" "}
-            smtp.office365.com:587
-          </li>
-          <li>
-            <span className="font-medium">Yahoo:</span> smtp.mail.yahoo.com:587
-          </li>
-        </ul>
-        <p className="mt-2 text-[11px] text-muted-foreground">
-          For cPanel email: use your FULL email address as the username and
-          the email account password. Port 465 with Secure=ON.
-        </p>
       </div>
 
       {updateMutation.isError && (
