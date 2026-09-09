@@ -390,11 +390,27 @@ export function useTestEmail() {
   const qc = useQueryClient();
   const { toast } = useToast();
   return useMutation({
-    mutationFn: (toEmail: string) =>
-      api<{ ok: boolean; message?: string; error?: string; hint?: string }>("/api/email/test", {
+    mutationFn: async (toEmail: string): Promise<{ ok: boolean; message?: string; error?: string; hint?: string; configured?: boolean; enabled?: boolean }> => {
+      // Custom fetch so we can read the error body even on 502
+      const token = useAppStore.getState().adminToken;
+      const res = await fetch(API_BASE + "/api/email/test", {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ toEmail }),
-      }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok && !data.ok) {
+        // Attach the error details to the Error so onError can read them
+        const err = new Error(data.error || data.message || `HTTP ${res.status}`);
+        (err as Error & { hint?: string; configured?: boolean }).hint = data.hint;
+        (err as Error & { hint?: string; configured?: boolean }).configured = data.configured;
+        throw err;
+      }
+      return data;
+    },
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ["email-log"] });
       if (res.ok) {

@@ -448,13 +448,15 @@ function SmtpCard({ settings }: { settings: EmailSettings }) {
           <Input
             id="smtp-pass"
             type="password"
-            placeholder="••••••••"
+            placeholder="Enter your email password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="new-password"
           />
           <p className="text-[11px] text-muted-foreground">
-            Saved password is masked. Type a new value to replace it.
+            {password === PASSWORD_MASK
+              ? "⚠️ Password is saved (masked). Type a new value to replace it. If the test fails with 'auth error', re-enter your password here and save."
+              : "Type your email account password (for cPanel) or App Password (for Gmail)."}
           </p>
         </div>
         <div className="space-y-1.5">
