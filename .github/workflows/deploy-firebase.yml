@@ -1,7 +1,15 @@
 # Auto-deploy the public frontend to Firebase Hosting on every push to main.
-# Requires the FIREBASE_TOKEN secret to be set in GitHub repo settings.
-# Generate the token by running: firebase login:ci
-# Then add it as a repo secret at: GitHub → Settings → Secrets and variables → Actions
+#
+# Uses the OFFICIAL Firebase hosting deploy action with a service account key.
+# The service account JSON is stored as a GitHub secret (FIREBASE_SERVICE_ACCOUNT)
+# — it is NEVER committed to the repo.
+#
+# Setup (one-time):
+# 1. Generate a service account key in Firebase console:
+#    Project Settings → Service accounts → Generate new private key → download JSON
+# 2. Add the ENTIRE JSON as a GitHub repo secret named FIREBASE_SERVICE_ACCOUNT:
+#    GitHub → Settings → Secrets and variables → Actions → New repository secret
+# 3. Push to main — the workflow runs automatically.
 
 name: Deploy to Firebase Hosting
 
@@ -32,9 +40,8 @@ jobs:
           NEXT_PUBLIC_API_BASE_URL: https://gadget-doctor-east-kilbride.onrender.com
 
       - name: Deploy to Firebase Hosting
-        uses: w9jds/firebase-action@v13.9.0
+        uses: FirebaseExtended/action-hosting-deploy@v0.9.0
         with:
-          args: deploy --only hosting --project gadgetdoctorls
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          PROJECT_ID: gadgetdoctorls
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          projectId: gadgetdoctorls
+          channelId: live
