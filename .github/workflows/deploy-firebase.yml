@@ -1,0 +1,41 @@
+# Auto-deploy the public frontend to Firebase Hosting on every push to main.
+# Requires the FIREBASE_TOKEN secret to be set in GitHub repo settings.
+# Generate the token by running: firebase login:ci
+# Then add it as a repo secret at: GitHub → Settings → Secrets and variables → Actions
+
+name: Deploy to Firebase Hosting
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Build static site for Firebase
+        run: npm run build:firebase
+        env:
+          BUILD_TARGET: firebase
+          NEXT_PUBLIC_API_BASE_URL: https://gadget-doctor-east-kilbride.onrender.com
+
+      - name: Deploy to Firebase Hosting
+        uses: w9jds/firebase-action@v13.9.0
+        with:
+          args: deploy --only hosting --project gadgetdoctorls
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          PROJECT_ID: gadgetdoctorls
