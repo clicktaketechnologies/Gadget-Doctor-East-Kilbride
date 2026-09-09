@@ -40,11 +40,17 @@ export async function POST(req: NextRequest) {
   // Real SMTP send
   try {
     const nodemailer = (await import("nodemailer")).default;
+    // For port 465, force secure=true (SSL). For 587, use STARTTLS.
+    const useSecure = settings.port === 465 ? true : settings.secure;
     const transporter = nodemailer.createTransport({
       host: settings.host,
       port: settings.port,
-      secure: settings.secure,
+      secure: useSecure,
       auth: { user: settings.user, pass: settings.password },
+      tls: { rejectUnauthorized: false },
+      connectionTimeout: 15000,
+      greetingTimeout: 10000,
+      socketTimeout: 15000,
     });
 
     // Verify the connection first (gives a clearer error)

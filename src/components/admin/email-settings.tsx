@@ -376,8 +376,12 @@ function SmtpCard({ settings }: { settings: EmailSettings }) {
         </div>
         <ul className="grid grid-cols-1 gap-1 sm:grid-cols-2">
           <li>
+            <span className="font-medium text-primary">cPanel (your domain):</span>{" "}
+            mail.gadgetdoctorls.co.uk:465 (SSL, Secure=ON)
+          </li>
+          <li>
             <span className="font-medium">Gmail:</span> smtp.gmail.com:587
-            (STARTTLS)
+            (STARTTLS, needs App Password)
           </li>
           <li>
             <span className="font-medium">Outlook / 365:</span>{" "}
@@ -386,10 +390,11 @@ function SmtpCard({ settings }: { settings: EmailSettings }) {
           <li>
             <span className="font-medium">Yahoo:</span> smtp.mail.yahoo.com:587
           </li>
-          <li>
-            <span className="font-medium">Zoho:</span> smtp.zoho.com:465 (SSL)
-          </li>
         </ul>
+        <p className="mt-2 text-[11px] text-muted-foreground">
+          For cPanel email: use your FULL email address as the username and
+          the email account password. Port 465 with Secure=ON.
+        </p>
       </div>
 
       {updateMutation.isError && (
