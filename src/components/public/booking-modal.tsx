@@ -619,10 +619,17 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
             </div>
 
             {mutation.isError && (
-              <p className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
-                Something went wrong submitting your booking. Please try again
-                or call us.
-              </p>
+              <div className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+                <p className="font-medium">
+                  Something went wrong submitting your booking.
+                </p>
+                <p className="mt-1 text-xs text-rose-300/80">
+                  Error: {mutation.error?.message || "Unknown error"}
+                </p>
+                <p className="mt-1 text-xs text-rose-300/60">
+                  Please try again or call us on +44 1355 458135.
+                </p>
+              </div>
             )}
           </div>
         )}
