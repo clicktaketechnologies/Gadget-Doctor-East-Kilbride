@@ -627,7 +627,7 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
                   Error: {mutation.error?.message || "Unknown error"}
                 </p>
                 <p className="mt-1 text-xs text-rose-300/60">
-                  Please try again or call us on +44 1355 458135.
+                  Please try again or call us on +44 7777 200175.
                 </p>
               </div>
             )}

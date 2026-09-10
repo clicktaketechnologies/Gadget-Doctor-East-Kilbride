@@ -478,7 +478,7 @@ function BrandingForm({
                 id="br-phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+44 1355 458135"
+                placeholder="+44 7777 200175"
               />
             </Field>
             <Field label="WhatsApp" htmlFor="br-whatsapp">
@@ -486,7 +486,7 @@ function BrandingForm({
                 id="br-whatsapp"
                 value={whatsapp}
                 onChange={(e) => setWhatsapp(e.target.value)}
-                placeholder="+44 1355 458135"
+                placeholder="+44 7777 200175"
               />
             </Field>
             <Field label="Email" htmlFor="br-email">

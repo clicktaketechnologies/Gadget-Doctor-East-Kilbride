@@ -441,7 +441,7 @@ function ReplyToCustomer({ booking }: { booking: Booking }) {
     `[Add your message here]\n\n` +
     `Best regards,\n` +
     `Gadget Doctor East Kilbride\n` +
-    `+44 1355 458135`;
+    `+44 7777 200175`;
 
   const [subject, setSubject] = useState(buildDefaultSubject);
   const [body, setBody] = useState(buildDefaultBody);
