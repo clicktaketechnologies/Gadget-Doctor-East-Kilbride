@@ -29,10 +29,19 @@ if (existsSync(middlewareFile)) {
 
 try {
   // 3. Run the Next.js build with Firebase export settings
-  execSync(
-    'cross-env BUILD_TARGET=firebase NEXT_PUBLIC_API_BASE_URL=https://gadget-doctor-east-kilbride.onrender.com next build',
-    { stdio: "inherit", cwd: root, shell: true }
-  );
+  // Merge process.env (which includes NEXT_PUBLIC_API_BASE_URL from GitHub Actions)
+  // with the build-specific vars.
+  const buildEnv = {
+    ...process.env,
+    BUILD_TARGET: "firebase",
+    NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || "https://gadget-doctor-east-kilbride.onrender.com",
+  };
+  execSync("next build", {
+    stdio: "inherit",
+    cwd: root,
+    shell: true,
+    env: buildEnv,
+  });
   console.log("\n✅ Firebase static export build complete (out/ directory created).");
 
   // 4. Remove the /admin and /superadmin static pages so Firebase's redirect
