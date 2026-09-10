@@ -9,7 +9,6 @@ const nextConfig: NextConfig = {
     ? {
         output: "export" as const,
         images: { unoptimized: true },
-        // Static export: trailing slashes so /admin/ works on Firebase
         trailingSlash: true,
       }
     : {}),
@@ -18,6 +17,22 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: false,
   allowedDevOrigins: ["*.space-z.ai", "*.chatglm.cn", "*.z.ai"],
+  // Global CORS headers — applied to ALL API routes on Render.
+  // This is a THIRD layer of CORS (alongside middleware/proxy + route handlers).
+  async headers() {
+    return [
+      {
+        source: "/api/:path*",
+        headers: [
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          { key: "Access-Control-Allow-Methods", value: "GET, POST, PATCH, PUT, DELETE, OPTIONS" },
+          { key: "Access-Control-Allow-Headers", value: "Content-Type, Authorization" },
+          { key: "Access-Control-Allow-Credentials", value: "true" },
+          { key: "Access-Control-Max-Age", value: "86400" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;
