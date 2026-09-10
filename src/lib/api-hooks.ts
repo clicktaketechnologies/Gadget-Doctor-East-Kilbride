@@ -132,8 +132,22 @@ export function useCreateBooking() {
   const qc = useQueryClient();
   const { toast } = useToast();
   return useMutation({
-    mutationFn: (input: CreateBookingInput) =>
-      api<Booking>("/api/bookings", { method: "POST", body: JSON.stringify(input) }),
+    mutationFn: async (input: CreateBookingInput): Promise<Booking> => {
+      // Use a PLAIN fetch (no Authorization header) — this is a public endpoint.
+      // Sending the Authorization header (from a stale admin token in localStorage)
+      // triggers a CORS preflight that fails on Firebase → "Failed to fetch".
+      const baseUrl = getApiBase();
+      const res = await fetch(baseUrl + "/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) {
+        const msg = await res.json().catch(() => ({}));
+        throw new Error((msg as { error?: string }).error || res.statusText);
+      }
+      return res.json() as Promise<Booking>;
+    },
     onSuccess: (b) => {
       qc.invalidateQueries({ queryKey: ["bookings"] });
       toast({
@@ -182,8 +196,20 @@ export function useCreateReview() {
   const qc = useQueryClient();
   const { toast } = useToast();
   return useMutation({
-    mutationFn: (input: CreateReviewInput) =>
-      api<Review>("/api/reviews", { method: "POST", body: JSON.stringify(input) }),
+    mutationFn: async (input: CreateReviewInput): Promise<Review> => {
+      // Plain fetch (no Authorization header) — public endpoint
+      const baseUrl = getApiBase();
+      const res = await fetch(baseUrl + "/api/reviews", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+      });
+      if (!res.ok) {
+        const msg = await res.json().catch(() => ({}));
+        throw new Error((msg as { error?: string }).error || res.statusText);
+      }
+      return res.json() as Promise<Review>;
+    },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["reviews"] });
       toast({ title: "Thanks for your review!", description: "It's now live on our page." });
