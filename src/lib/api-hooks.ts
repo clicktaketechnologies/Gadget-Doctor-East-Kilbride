@@ -38,34 +38,33 @@ import type {
 // during the static export build.
 const RENDER_API_URL = "https://gadget-doctor-east-kilbride.onrender.com";
 
+// Called PER REQUEST (not at module load) so it works correctly on both
+// server-side (static export) and client-side (browser).
 function getApiBase(): string {
-  // Server-side: always use env var or empty (relative)
-  if (typeof window === "undefined") {
-    return process.env.NEXT_PUBLIC_API_BASE_URL || "";
-  }
-  // Client-side: if we're on Firebase (web.app) or a custom domain (not Render),
-  // use the Render API URL. If we're on Render, use relative URLs.
-  const host = window.location.hostname;
-  if (
-    process.env.NEXT_PUBLIC_API_BASE_URL // env var baked in at build time
-  ) {
+  // If the env var is baked in at build time, use it
+  if (process.env.NEXT_PUBLIC_API_BASE_URL) {
     return process.env.NEXT_PUBLIC_API_BASE_URL;
   }
+  // Server-side (SSR / static export): no window — use empty (relative)
+  if (typeof window === "undefined") {
+    return "";
+  }
+  // Client-side: check the hostname
+  const host = window.location.hostname;
   if (host.includes("onrender.com")) {
     return ""; // same origin — relative URLs
   }
-  // We're on Firebase or a custom domain — use the Render API
+  // We're on Firebase (*.web.app) or a custom domain — use the Render API
   return RENDER_API_URL;
 }
-
-const API_BASE = getApiBase();
 
 async function api<T>(
   path: string,
   opts: RequestInit = {}
 ): Promise<T> {
   const token = useAppStore.getState().adminToken;
-  const res = await fetch(API_BASE + path, {
+  const baseUrl = getApiBase();
+  const res = await fetch(baseUrl + path, {
     ...opts,
     headers: {
       "Content-Type": "application/json",
@@ -417,7 +416,7 @@ export function useTestEmail() {
     mutationFn: async (toEmail: string): Promise<{ ok: boolean; message?: string; error?: string; hint?: string; configured?: boolean; enabled?: boolean }> => {
       // Custom fetch so we can read the error body even on 502
       const token = useAppStore.getState().adminToken;
-      const res = await fetch(API_BASE + "/api/email/test", {
+      const res = await fetch(getApiBase() + "/api/email/test", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
