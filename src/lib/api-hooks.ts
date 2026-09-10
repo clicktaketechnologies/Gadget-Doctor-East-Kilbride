@@ -34,7 +34,31 @@ import type {
 // When the public frontend is statically hosted on Firebase, all API calls
 // go to the Render backend. When running on the same origin (Render dev/prod),
 // API_BASE is empty so calls use relative URLs.
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+// Hardcoded fallback ensures it works even if the env var isn't baked in
+// during the static export build.
+const RENDER_API_URL = "https://gadget-doctor-east-kilbride.onrender.com";
+
+function getApiBase(): string {
+  // Server-side: always use env var or empty (relative)
+  if (typeof window === "undefined") {
+    return process.env.NEXT_PUBLIC_API_BASE_URL || "";
+  }
+  // Client-side: if we're on Firebase (web.app) or a custom domain (not Render),
+  // use the Render API URL. If we're on Render, use relative URLs.
+  const host = window.location.hostname;
+  if (
+    process.env.NEXT_PUBLIC_API_BASE_URL // env var baked in at build time
+  ) {
+    return process.env.NEXT_PUBLIC_API_BASE_URL;
+  }
+  if (host.includes("onrender.com")) {
+    return ""; // same origin — relative URLs
+  }
+  // We're on Firebase or a custom domain — use the Render API
+  return RENDER_API_URL;
+}
+
+const API_BASE = getApiBase();
 
 async function api<T>(
   path: string,
