@@ -10,6 +10,8 @@ const apiDir = join(root, "src", "app", "api");
 const apiBackup = join(root, ".api-backup");
 const middlewareFile = join(root, "src", "middleware.ts");
 const middlewareBackup = join(root, ".middleware-backup.ts");
+const proxyFile = join(root, "src", "proxy.ts");
+const proxyBackup = join(root, ".proxy-backup.ts");
 
 console.log("🔥 Building static site for Firebase Hosting...");
 console.log("   (API routes run on Render — temporarily removing them from this build)\n");
@@ -25,6 +27,12 @@ if (existsSync(apiDir)) {
 if (existsSync(middlewareFile)) {
   renameSync(middlewareFile, middlewareBackup);
   console.log("   ✓ Moved src/middleware.ts out of the build");
+}
+
+// 2b. Move src/proxy.ts → .proxy-backup.ts (Next.js 16 renamed middleware → proxy)
+if (existsSync(proxyFile)) {
+  renameSync(proxyFile, proxyBackup);
+  console.log("   ✓ Moved src/proxy.ts out of the build");
 }
 
 try {
@@ -72,5 +80,9 @@ try {
   if (existsSync(middlewareBackup)) {
     renameSync(middlewareBackup, middlewareFile);
     console.log("   ✓ Restored src/middleware.ts");
+  }
+  if (existsSync(proxyBackup)) {
+    renameSync(proxyBackup, proxyFile);
+    console.log("   ✓ Restored src/proxy.ts");
   }
 }

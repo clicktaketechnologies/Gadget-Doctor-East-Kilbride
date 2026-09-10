@@ -55,3 +55,4 @@ server.log
 # Firebase build temp files (from scripts/build-firebase.mjs)
 .api-backup
 .middleware-backup.ts
+.proxy-backup.ts
