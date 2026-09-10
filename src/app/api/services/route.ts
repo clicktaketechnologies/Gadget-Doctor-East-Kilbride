@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { isAdminAuthorized } from "@/lib/auth";
+import { setCorsHeaders, handlePreflight } from "@/lib/cors";
 import type { CreateServiceInput } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+
+// Handle CORS preflight
+export async function OPTIONS(req: NextRequest) {
+  return handlePreflight(req) ?? new NextResponse(null, { status: 204 });
+}
 
 // GET /api/services?active=true   (public)  |  default (admin: all)
 export async function GET(req: NextRequest) {
@@ -14,13 +20,13 @@ export async function GET(req: NextRequest) {
     where: activeOnly ? { active: true } : undefined,
     orderBy: [{ category: "asc" }, { priceFrom: "asc" }],
   });
-  return NextResponse.json(services);
+  return setCorsHeaders(req, NextResponse.json(services));
 }
 
 // POST /api/services  (admin)
 export async function POST(req: NextRequest) {
   if (!isAdminAuthorized(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return setCorsHeaders(req, NextResponse.json({ error: "Unauthorized" }, { status: 401 }));
   }
   const body = (await req.json()) as CreateServiceInput;
   const slug =
@@ -45,5 +51,5 @@ export async function POST(req: NextRequest) {
       active: true,
     },
   });
-  return NextResponse.json(svc, { status: 201 });
+  return setCorsHeaders(req, NextResponse.json(svc, { status: 201 }));
 }

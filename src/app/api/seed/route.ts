@@ -1,11 +1,17 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { ADMIN_DEMO, BRAND } from "@/lib/brand";
+import { setCorsHeaders, handlePreflight } from "@/lib/cors";
 
 export const dynamic = "force-dynamic";
 
+// Handle CORS preflight
+export async function OPTIONS(req: NextRequest) {
+  return handlePreflight(req) ?? new NextResponse(null, { status: 204 });
+}
+
 // Idempotent seed endpoint — safe to call repeatedly
-export async function POST() {
+export async function POST(req: NextRequest) {
   try {
     // 0. Ensure tables exist (creates them if missing — useful on first deploy)
     await db.$executeRawUnsafe('SELECT 1');
@@ -269,17 +275,20 @@ export async function POST() {
     });
   }
 
-  return NextResponse.json({ ok: true });
+  return setCorsHeaders(req, NextResponse.json({ ok: true }));
   } catch (err) {
     // Return the actual error so we can debug database connection issues
     const message = err instanceof Error ? err.message : String(err);
-    return NextResponse.json(
-      { ok: false, error: message, stack: err instanceof Error ? err.stack : undefined },
-      { status: 500 }
+    return setCorsHeaders(
+      req,
+      NextResponse.json(
+        { ok: false, error: message, stack: err instanceof Error ? err.stack : undefined },
+        { status: 500 }
+      )
     );
   }
 }
 
-export async function GET() {
-  return NextResponse.json({ ok: true, message: "POST to seed the database" });
+export async function GET(req: NextRequest) {
+  return setCorsHeaders(req, NextResponse.json({ ok: true, message: "POST to seed the database" }));
 }

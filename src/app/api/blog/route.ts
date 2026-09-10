@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { isAdminAuthorized } from "@/lib/auth";
+import { setCorsHeaders, handlePreflight } from "@/lib/cors";
 import type { CreateBlogPostInput } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+
+// Handle CORS preflight
+export async function OPTIONS(req: NextRequest) {
+  return handlePreflight(req) ?? new NextResponse(null, { status: 204 });
+}
 
 // GET /api/blog?published=true (public) | default (admin: all)
 export async function GET(req: NextRequest) {
@@ -14,13 +20,13 @@ export async function GET(req: NextRequest) {
     where: publishedOnly ? { published: true } : undefined,
     orderBy: [{ featured: "desc" }, { createdAt: "desc" }],
   });
-  return NextResponse.json(posts);
+  return setCorsHeaders(req, NextResponse.json(posts));
 }
 
 // POST /api/blog (admin)
 export async function POST(req: NextRequest) {
   if (!isAdminAuthorized(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return setCorsHeaders(req, NextResponse.json({ error: "Unauthorized" }, { status: 401 }));
   }
   const body = (await req.json()) as CreateBlogPostInput;
   const slug =
@@ -45,5 +51,5 @@ export async function POST(req: NextRequest) {
       featured: body.featured ?? false,
     },
   });
-  return NextResponse.json(post, { status: 201 });
+  return setCorsHeaders(req, NextResponse.json(post, { status: 201 }));
 }

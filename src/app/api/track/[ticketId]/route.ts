@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { deviceLabel } from "@/lib/format";
+import { setCorsHeaders, handlePreflight } from "@/lib/cors";
 import type { TrackResult } from "@/lib/types";
 
 // Required for static export (Firebase) — API routes run on Render only.
@@ -8,9 +9,14 @@ export function generateStaticParams() {
   return [];
 }
 
+// Handle CORS preflight
+export async function OPTIONS(req: NextRequest) {
+  return handlePreflight(req) ?? new NextResponse(null, { status: 204 });
+}
+
 // GET /api/track/GD-8561 (public)
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ ticketId: string }> }
 ) {
   const { ticketId } = await params;
@@ -36,7 +42,7 @@ export async function GET(
       updatedAt: "",
       found: false,
     };
-    return NextResponse.json(empty);
+    return setCorsHeaders(req, NextResponse.json(empty));
   }
 
   const result: TrackResult = {
@@ -54,5 +60,5 @@ export async function GET(
     updatedAt: booking.updatedAt.toISOString(),
     found: true,
   };
-  return NextResponse.json(result);
+  return setCorsHeaders(req, NextResponse.json(result));
 }

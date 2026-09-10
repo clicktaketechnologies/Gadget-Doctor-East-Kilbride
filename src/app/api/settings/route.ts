@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { isAdminAuthorized } from "@/lib/auth";
+import { setCorsHeaders, handlePreflight } from "@/lib/cors";
 
 export const dynamic = "force-dynamic";
 
+// Handle CORS preflight
+export async function OPTIONS(req: NextRequest) {
+  return handlePreflight(req) ?? new NextResponse(null, { status: 204 });
+}
+
 // GET is public (public site reads announcement + collection toggle status)
-export async function GET() {
+export async function GET(req: NextRequest) {
   let s = await db.siteSettings.findUnique({ where: { id: "singleton" } });
   if (!s) {
     s = await db.siteSettings.create({
@@ -18,13 +24,13 @@ export async function GET() {
       },
     });
   }
-  return NextResponse.json(s);
+  return setCorsHeaders(req, NextResponse.json(s));
 }
 
 // PATCH admin only
 export async function PATCH(req: NextRequest) {
   if (!isAdminAuthorized(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return setCorsHeaders(req, NextResponse.json({ error: "Unauthorized" }, { status: 401 }));
   }
   const body = (await req.json()) as {
     collectionEnabled?: boolean;
@@ -58,5 +64,5 @@ export async function PATCH(req: NextRequest) {
   } else {
     s = await db.siteSettings.update({ where: { id: "singleton" }, data });
   }
-  return NextResponse.json(s);
+  return setCorsHeaders(req, NextResponse.json(s));
 }

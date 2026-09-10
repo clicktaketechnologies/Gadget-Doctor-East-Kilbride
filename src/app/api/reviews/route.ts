@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { isAdminAuthorized } from "@/lib/auth";
+import { setCorsHeaders, handlePreflight } from "@/lib/cors";
 import type { CreateReviewInput } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+
+// Handle CORS preflight
+export async function OPTIONS(req: NextRequest) {
+  return handlePreflight(req) ?? new NextResponse(null, { status: 204 });
+}
 
 // GET /api/reviews?approved=true
 export async function GET(req: NextRequest) {
@@ -14,14 +20,14 @@ export async function GET(req: NextRequest) {
     where: approvedOnly ? { approved: true } : undefined,
     orderBy: { createdAt: "desc" },
   });
-  return NextResponse.json(reviews);
+  return setCorsHeaders(req, NextResponse.json(reviews));
 }
 
 // POST /api/reviews  (public can submit, auto-approved for demo)
 export async function POST(req: NextRequest) {
   const body = (await req.json()) as CreateReviewInput;
   if (!body.author || !body.comment || !body.rating) {
-    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    return setCorsHeaders(req, NextResponse.json({ error: "Missing fields" }, { status: 400 }));
   }
   const review = await db.review.create({
     data: {
@@ -33,5 +39,5 @@ export async function POST(req: NextRequest) {
       approved: true,
     },
   });
-  return NextResponse.json(review, { status: 201 });
+  return setCorsHeaders(req, NextResponse.json(review, { status: 201 }));
 }

@@ -1,10 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { isAdminAuthorized } from "@/lib/auth";
+import { setCorsHeaders, handlePreflight } from "@/lib/cors";
 import { BRAND, SERVICE_CATEGORIES } from "@/lib/brand";
 import type { Branding, UpdateBrandingInput, BusinessHours, SocialLinks } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+
+// Handle CORS preflight
+export async function OPTIONS(req: NextRequest) {
+  return handlePreflight(req) ?? new NextResponse(null, { status: 204 });
+}
 
 const DEFAULT_HOURS: BusinessHours[] = BRAND.hours.map((h) => ({ ...h }));
 const DEFAULT_SOCIALS: SocialLinks = { ...BRAND.socials };
@@ -77,7 +83,7 @@ function rowToBranding(r: {
 }
 
 // GET is public — the public site reads branding for logo/colors/contact
-export async function GET() {
+export async function GET(req: NextRequest) {
   let r = await db.branding.findUnique({ where: { id: "singleton" } });
   if (!r) {
     r = await db.branding.create({
@@ -106,13 +112,13 @@ export async function GET() {
       },
     });
   }
-  return NextResponse.json(rowToBranding(r));
+  return setCorsHeaders(req, NextResponse.json(rowToBranding(r)));
 }
 
 // PATCH admin only
 export async function PATCH(req: NextRequest) {
   if (!isAdminAuthorized(req)) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return setCorsHeaders(req, NextResponse.json({ error: "Unauthorized" }, { status: 401 }));
   }
   const body = (await req.json()) as UpdateBrandingInput;
 
@@ -170,7 +176,7 @@ export async function PATCH(req: NextRequest) {
   } else {
     r = await db.branding.update({ where: { id: "singleton" }, data });
   }
-  return NextResponse.json(rowToBranding(r));
+  return setCorsHeaders(req, NextResponse.json(rowToBranding(r)));
 }
 
 // silence unused import
