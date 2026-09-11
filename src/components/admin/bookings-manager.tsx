@@ -13,8 +13,9 @@ import {
   CalendarRange,
   AlertCircle,
   RotateCcw,
+  Trash2,
 } from "lucide-react";
-import { useBookings } from "@/lib/api-hooks";
+import { useBookings, useDeleteBooking } from "@/lib/api-hooks";
 import { SERVICE_CATEGORIES } from "@/lib/brand";
 import {
   STATUS_COLORS,
@@ -45,6 +46,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { BookingDetailModal } from "./booking-detail-modal";
 
 const STATUS_FILTERS: (BookingStatus | "All")[] = [
@@ -94,6 +105,8 @@ export function BookingsManager({
   const [dateTo, setDateTo] = useState<string>("");
   const [selected, setSelected] = useState<Booking | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Booking | null>(null);
+  const deleteMutation = useDeleteBooking();
 
   const dateFilterActive = !!dateFrom || !!dateTo;
 
@@ -499,18 +512,32 @@ export function BookingsManager({
                       </div>
                     </TableCell>
                     <TableCell className="pr-4 text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="size-8"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openBooking(b);
-                        }}
-                        aria-label={`View ticket ${b.ticketId}`}
-                      >
-                        <Eye className="size-4" />
-                      </Button>
+                      <div className="flex items-center justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-8"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openBooking(b);
+                          }}
+                          aria-label={`View ticket ${b.ticketId}`}
+                        >
+                          <Eye className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 text-rose-400 hover:bg-rose-500/10 hover:text-rose-300"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteTarget(b);
+                          }}
+                          aria-label={`Delete ticket ${b.ticketId}`}
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -525,6 +552,43 @@ export function BookingsManager({
         open={modalOpen}
         onOpenChange={setModalOpen}
       />
+
+      {/* Delete confirmation */}
+      <AlertDialog
+        open={!!deleteTarget}
+        onOpenChange={(open) => {
+          if (!open) setDeleteTarget(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete ticket {deleteTarget?.ticketId}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the booking for{" "}
+              <strong>{deleteTarget?.customerName}</strong> ({deleteTarget?.deviceModel}).
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={deleteMutation.isPending}
+              onClick={() => {
+                if (deleteTarget) {
+                  deleteMutation.mutate(deleteTarget.id, {
+                    onSuccess: () => setDeleteTarget(null),
+                  });
+                }
+              }}
+              className="bg-rose-600 text-white hover:bg-rose-700"
+            >
+              {deleteMutation.isPending ? "Deleting…" : "Delete ticket"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
