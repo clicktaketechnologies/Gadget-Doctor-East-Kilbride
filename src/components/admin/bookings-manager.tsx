@@ -11,6 +11,8 @@ import {
   Clock,
   CalendarDays,
   CalendarRange,
+  AlertCircle,
+  RotateCcw,
 } from "lucide-react";
 import { useBookings } from "@/lib/api-hooks";
 import { SERVICE_CATEGORIES } from "@/lib/brand";
@@ -346,6 +348,44 @@ export function BookingsManager({
             </TableHeader>
             <TableBody>
               {bookingsQ.isLoading ? (
+                Array.from({ length: 6 }).map((_, i) => (
+                  <TableRow key={i} className="border-border/60">
+                    {Array.from({ length: TABLE_COLUMN_COUNT }).map((__, j) => (
+                      <TableCell
+                        key={j}
+                        className={j === 0 ? "pl-4" : j === 8 ? "pr-4" : ""}
+                      >
+                        <Skeleton className="h-5 w-full max-w-[120px] rounded" />
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : bookingsQ.isError ? (
+                <TableRow className="border-border/60 hover:bg-transparent">
+                  <TableCell colSpan={TABLE_COLUMN_COUNT} className="h-48">
+                    <div className="flex flex-col items-center justify-center gap-3 text-center">
+                      <div className="flex size-12 items-center justify-center rounded-full bg-rose-500/10">
+                        <AlertCircle className="size-6 text-rose-400" />
+                      </div>
+                      <div className="text-sm font-medium text-foreground">
+                        Failed to load bookings
+                      </div>
+                      <div className="max-w-md text-xs text-muted-foreground">
+                        {bookingsQ.error?.message || "Your session may have expired. Please sign out and sign in again."}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => bookingsQ.refetch()}
+                        className="mt-1 gap-1.5"
+                      >
+                        <RotateCcw className="size-3.5" />
+                        Retry
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : filtered.length === 0 ? (
                 Array.from({ length: 6 }).map((_, i) => (
                   <TableRow key={i} className="border-border/60">
                     {Array.from({ length: TABLE_COLUMN_COUNT }).map((__, j) => (

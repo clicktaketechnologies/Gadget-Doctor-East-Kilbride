@@ -125,6 +125,8 @@ export function useBookings() {
   return useQuery<Booking[]>({
     queryKey: ["bookings"],
     queryFn: () => api("/api/bookings"),
+    retry: 2,
+    refetchOnMount: true,
   });
 }
 
