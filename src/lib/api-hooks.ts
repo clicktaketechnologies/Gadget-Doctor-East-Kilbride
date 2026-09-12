@@ -73,6 +73,10 @@ async function api<T>(
     },
   });
   if (!res.ok) {
+    // If 401 Unauthorized, the token is expired/invalid — auto-logout
+    if (res.status === 401) {
+      useAppStore.getState().clearAdminAuth();
+    }
     const msg = await res.json().catch(() => ({}));
     throw new Error((msg as { error?: string }).error || res.statusText);
   }
