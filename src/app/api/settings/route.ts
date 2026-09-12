@@ -21,6 +21,7 @@ export async function GET(req: NextRequest) {
         collectionBannerEnabled: true,
         announcementEnabled: false,
         announcementText: null,
+        ticketIdVisible: true,
       },
     });
   }
@@ -37,6 +38,7 @@ export async function PATCH(req: NextRequest) {
     collectionBannerEnabled?: boolean;
     announcementEnabled?: boolean;
     announcementText?: string | null;
+    ticketIdVisible?: boolean;
   };
 
   const data: Record<string, unknown> = {};
@@ -48,6 +50,8 @@ export async function PATCH(req: NextRequest) {
     data.announcementEnabled = body.announcementEnabled;
   if (body.announcementText !== undefined)
     data.announcementText = body.announcementText;
+  if (body.ticketIdVisible !== undefined)
+    data.ticketIdVisible = body.ticketIdVisible;
 
   let s = await db.siteSettings.findUnique({ where: { id: "singleton" } });
   if (!s) {
@@ -58,6 +62,7 @@ export async function PATCH(req: NextRequest) {
         collectionBannerEnabled: true,
         announcementEnabled: false,
         announcementText: null,
+        ticketIdVisible: true,
         ...data,
       } as never,
     });

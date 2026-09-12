@@ -1,6 +1,7 @@
 "use client";
 
-import { Menu, Bell, Search, Globe } from "lucide-react";
+import { useState } from "react";
+import { Menu, Bell, Search, Globe, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useAppStore, type AdminModule } from "@/lib/store";
 import { ADMIN_DEMO } from "@/lib/brand";
@@ -34,6 +35,16 @@ export function AdminTopbar({ onMenuClick, search, onSearchChange }: AdminTopbar
   const adminName = useAppStore((s) => s.adminName);
   const meta = MODULE_META[adminModule];
 
+  // Reload-on-click refresh: simplest way to pull fresh data from every
+  // API route at once. Spinner shows while the page tears down.
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const handleRefresh = () => {
+    if (isRefreshing) return;
+    setIsRefreshing(true);
+    // Defer the reload a tick so the spinner state can flush to the DOM.
+    window.setTimeout(() => window.location.reload(), 120);
+  };
+
   const initials =
     (adminName ?? ADMIN_DEMO.name)
       .split(" ")
@@ -64,6 +75,21 @@ export function AdminTopbar({ onMenuClick, search, onSearchChange }: AdminTopbar
           {meta.subtitle}
         </p>
       </div>
+
+      {/* Refresh */}
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={handleRefresh}
+        disabled={isRefreshing}
+        className="hidden shrink-0 gap-2 sm:inline-flex"
+        aria-label="Refresh data"
+      >
+        <RefreshCw className={cn("size-4", isRefreshing && "animate-spin")} />
+        <span className="hidden md:inline">
+          {isRefreshing ? "Refreshing…" : "Refresh"}
+        </span>
+      </Button>
 
       {/* Search */}
       <div className="relative hidden flex-1 max-w-md md:block">

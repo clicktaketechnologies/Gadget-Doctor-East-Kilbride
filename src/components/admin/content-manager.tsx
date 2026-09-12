@@ -9,6 +9,7 @@ import {
   Check,
   ExternalLink,
   Power,
+  Ticket,
 } from "lucide-react";
 import { useSettings, useUpdateSettings } from "@/lib/api-hooks";
 import type { SiteSettings } from "@/lib/types";
@@ -46,6 +47,9 @@ export function ContentManager() {
         </p>
       </div>
 
+      {/* Ticket ID visibility (customer-facing) — top of page */}
+      <TicketIdVisibilityCard settings={settings} />
+
       {/* Collection service master toggle (site-wide) */}
       <CollectionMasterToggle settings={settings} />
 
@@ -60,6 +64,78 @@ export function ContentManager() {
         />
       </div>
     </div>
+  );
+}
+
+function TicketIdVisibilityCard({ settings }: { settings: SiteSettings }) {
+  const updateMutation = useUpdateSettings();
+  const visible = settings.ticketIdVisible;
+
+  return (
+    <Card
+      className={cn(
+        "glass relative overflow-hidden p-5 transition-colors",
+        visible ? "border-primary/40" : "border-rose-500/30"
+      )}
+    >
+      <div
+        className={cn(
+          "pointer-events-none absolute inset-0 transition-opacity",
+          visible ? "opacity-100" : "opacity-60"
+        )}
+        style={{
+          background: visible
+            ? "radial-gradient(circle at top right, oklch(0.62 0.24 27 / 0.08), transparent 60%)"
+            : "radial-gradient(circle at top right, oklch(0.65 0.2 15 / 0.08), transparent 60%)",
+        }}
+      />
+      <div className="relative flex flex-wrap items-start justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <div
+            className={cn(
+              "flex size-11 shrink-0 items-center justify-center rounded-xl ring-1",
+              visible
+                ? "bg-primary/10 text-primary ring-primary/30"
+                : "bg-rose-500/10 text-rose-300 ring-rose-500/30"
+            )}
+          >
+            {visible ? (
+              <Ticket className="size-5" />
+            ) : (
+              <Power className="size-5" />
+            )}
+          </div>
+          <div className="max-w-2xl">
+            <h3 className="text-sm font-semibold text-foreground">
+              Booking Ticket ID — Visibility Toggle
+            </h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              When enabled, customers see their ticket ID (e.g. GD-1234) after
+              booking and on the Track Repair page. When disabled, ticket IDs
+              are hidden from customers but still visible to admin.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2.5">
+          <span
+            className={cn(
+              "text-xs font-medium uppercase tracking-wider",
+              visible ? "text-primary" : "text-rose-300"
+            )}
+          >
+            {visible ? "Visible to customers" : "Hidden from customers"}
+          </span>
+          <Switch
+            checked={visible}
+            disabled={updateMutation.isPending}
+            onCheckedChange={(v) =>
+              updateMutation.mutate({ ticketIdVisible: v })
+            }
+            aria-label="Toggle ticket ID visibility for customers"
+          />
+        </div>
+      </div>
+    </Card>
   );
 }
 

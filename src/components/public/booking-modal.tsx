@@ -187,6 +187,7 @@ function BookingForm({ initialCategory, onClose }: BookingFormProps) {
         ticketId={ticketId}
         name={name}
         collection={collection}
+        ticketIdVisible={settings?.ticketIdVisible ?? true}
         onClose={onClose}
       />
     );
@@ -686,11 +687,13 @@ function SuccessView({
   ticketId,
   name,
   collection,
+  ticketIdVisible,
   onClose,
 }: {
   ticketId: string;
   name: string;
   collection: "dropoff" | "collection";
+  ticketIdVisible: boolean;
   onClose: () => void;
 }) {
   return (
@@ -703,22 +706,33 @@ function SuccessView({
         Booking confirmed, {name.split(" ")[0] || "there"}!
       </DialogTitle>
       <DialogDescription className="mt-2 text-sm text-muted-foreground">
-        We&apos;ve received your repair request and our team will be in touch
-        shortly to confirm your{" "}
-        {collection === "collection" ? "pickup time" : "drop-off time"}.
+        {ticketIdVisible ? (
+          <>
+            We&apos;ve received your repair request and our team will be in
+            touch shortly to confirm your{" "}
+            {collection === "collection" ? "pickup time" : "drop-off time"}.
+          </>
+        ) : (
+          <>
+            Your repair request has been received. We&apos;ll contact you
+            shortly.
+          </>
+        )}
       </DialogDescription>
 
-      <div className="mx-auto mt-6 max-w-xs rounded-xl border border-border bg-card p-4">
-        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-          Your Ticket ID
-        </p>
-        <p className="mt-1 font-mono text-2xl font-bold text-primary">
-          {ticketId}
-        </p>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Save this — quote it when you visit or call us.
-        </p>
-      </div>
+      {ticketIdVisible && (
+        <div className="mx-auto mt-6 max-w-xs rounded-xl border border-border bg-card p-4">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            Your Ticket ID
+          </p>
+          <p className="mt-1 font-mono text-2xl font-bold text-primary">
+            {ticketId}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Save this — quote it when you visit or call us.
+          </p>
+        </div>
+      )}
 
       <div className="mx-auto mt-5 flex max-w-sm items-center justify-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-2 text-xs text-muted-foreground">
         <Sparkles className="size-3.5 text-primary" />

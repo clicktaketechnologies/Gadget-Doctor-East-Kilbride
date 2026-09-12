@@ -14,6 +14,8 @@ import {
   AlertCircle,
   RotateCcw,
   Trash2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { useBookings, useDeleteBooking } from "@/lib/api-hooks";
 import { SERVICE_CATEGORIES } from "@/lib/brand";
@@ -108,6 +110,14 @@ export function BookingsManager({
   const [deleteTarget, setDeleteTarget] = useState<Booking | null>(null);
   const deleteMutation = useDeleteBooking();
 
+  // ---- Pagination ----
+  const pageSize = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  // Tracks the last seen filter combo so we can reset to page 1 whenever
+  // any filter changes. Stored as a string signature for cheap comparison.
+  const filterSignature = `${search}|${statusFilter}|${deviceFilter}|${dateFrom}|${dateTo}`;
+  const [prevFilterSignature, setPrevFilterSignature] = useState(filterSignature);
+
   const dateFilterActive = !!dateFrom || !!dateTo;
 
   const filtered = useMemo(() => {
@@ -135,6 +145,37 @@ export function BookingsManager({
       })
       .sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
   }, [bookingsQ.data, search, statusFilter, deviceFilter, dateFrom, dateTo]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+
+  // Auto-advance: if the current page is past the last valid page (e.g. a
+  // booking was deleted or filter shrank the list), jump back to the last
+  // valid page so the user never lands on an empty page. We adjust state
+  // during render (self-correcting pattern recommended by React docs)
+  // instead of using an effect, which avoids cascading renders.
+  if (currentPage > totalPages) {
+    setCurrentPage(totalPages);
+  }
+  // Reset to page 1 whenever the active filters change.
+  if (filterSignature !== prevFilterSignature) {
+    setPrevFilterSignature(filterSignature);
+    setCurrentPage(1);
+  }
+
+  const safePage = Math.min(currentPage, totalPages);
+
+  const paginated = useMemo(
+    () =>
+      filtered.slice(
+        (safePage - 1) * pageSize,
+        safePage * pageSize
+      ),
+    [filtered, safePage, pageSize]
+  );
+
+  const rangeStart =
+    paginated.length === 0 ? 0 : (safePage - 1) * pageSize + 1;
+  const rangeEnd = Math.min(safePage * pageSize, filtered.length);
 
   const hasActiveFilters =
     statusFilter !== "All" ||
@@ -399,19 +440,6 @@ export function BookingsManager({
                   </TableCell>
                 </TableRow>
               ) : filtered.length === 0 ? (
-                Array.from({ length: 6 }).map((_, i) => (
-                  <TableRow key={i} className="border-border/60">
-                    {Array.from({ length: TABLE_COLUMN_COUNT }).map((__, j) => (
-                      <TableCell
-                        key={j}
-                        className={j === 0 ? "pl-4" : j === 8 ? "pr-4" : ""}
-                      >
-                        <Skeleton className="h-5 w-full max-w-[120px] rounded" />
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : filtered.length === 0 ? (
                 <TableRow className="border-border/60 hover:bg-transparent">
                   <TableCell colSpan={TABLE_COLUMN_COUNT} className="h-48">
                     <div className="flex flex-col items-center justify-center gap-2 text-center">
@@ -430,7 +458,7 @@ export function BookingsManager({
                   </TableCell>
                 </TableRow>
               ) : (
-                filtered.map((b) => (
+                paginated.map((b) => (
                   <TableRow
                     key={b.id}
                     className="cursor-pointer border-border/60"
@@ -544,6 +572,59 @@ export function BookingsManager({
               )}
             </TableBody>
           </Table>
+        </div>
+
+        {/* Pagination footer */}
+        <div className="flex flex-col gap-3 border-t border-border/60 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-xs text-muted-foreground">
+            {bookingsQ.isLoading || bookingsQ.isError
+              ? "\u00A0"
+              : filtered.length === 0
+              ? `0 of ${filtered.length} tickets`
+              : `Showing ${rangeStart} to ${rangeEnd} of ${filtered.length} tickets`}
+          </div>
+          <div className="flex items-center justify-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setCurrentPage((p) => Math.max(1, Math.min(p, totalPages) - 1))
+              }
+              disabled={safePage <= 1 || bookingsQ.isLoading}
+              className="gap-1.5"
+              aria-label="Previous page"
+            >
+              <ChevronLeft className="size-4" />
+              Previous
+            </Button>
+            <span className="px-1 text-xs text-muted-foreground">
+              Page{" "}
+              <span className="font-semibold text-foreground">
+                {safePage}
+              </span>{" "}
+              of{" "}
+              <span className="font-semibold text-foreground">
+                {totalPages}
+              </span>
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() =>
+                setCurrentPage((p) =>
+                  Math.min(totalPages, Math.min(p, totalPages) + 1)
+                )
+              }
+              disabled={
+                safePage >= totalPages || bookingsQ.isLoading
+              }
+              className="gap-1.5"
+              aria-label="Next page"
+            >
+              Next
+              <ChevronRight className="size-4" />
+            </Button>
+          </div>
         </div>
       </Card>
 

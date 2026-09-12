@@ -22,6 +22,7 @@ function rowToBranding(r: {
   tagline: string;
   about: string;
   logoUrl: string;
+  faviconUrl: string;
   primaryColor: string;
   secondaryColor: string;
   phone: string;
@@ -63,6 +64,7 @@ function rowToBranding(r: {
     tagline: r.tagline,
     about: r.about,
     logoUrl: r.logoUrl,
+  faviconUrl: r.faviconUrl,
     primaryColor: r.primaryColor,
     secondaryColor: r.secondaryColor,
     phone: r.phone,
@@ -93,6 +95,7 @@ export async function GET(req: NextRequest) {
         tagline: BRAND.tagline,
         about: "",
         logoUrl: BRAND.logoUrl,
+        faviconUrl: BRAND.logoUrl,
         primaryColor: BRAND.primaryColor,
         secondaryColor: BRAND.secondaryColor,
         phone: BRAND.phones[0],
@@ -127,6 +130,7 @@ export async function PATCH(req: NextRequest) {
   if (body.tagline !== undefined) data.tagline = body.tagline;
   if (body.about !== undefined) data.about = body.about;
   if (body.logoUrl !== undefined) data.logoUrl = body.logoUrl;
+  if (body.faviconUrl !== undefined) data.faviconUrl = body.faviconUrl;
   if (body.primaryColor !== undefined) data.primaryColor = body.primaryColor;
   if (body.secondaryColor !== undefined) data.secondaryColor = body.secondaryColor;
   if (body.phone !== undefined) data.phone = body.phone;
@@ -154,6 +158,7 @@ export async function PATCH(req: NextRequest) {
         tagline: BRAND.tagline,
         about: "",
         logoUrl: BRAND.logoUrl,
+        faviconUrl: BRAND.logoUrl,
         primaryColor: BRAND.primaryColor,
         secondaryColor: BRAND.secondaryColor,
         phone: BRAND.phones[0],

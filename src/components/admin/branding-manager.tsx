@@ -20,6 +20,7 @@ import {
   Star,
   Check,
   ExternalLink,
+  X,
 } from "lucide-react";
 import { useBranding, useUpdateBranding } from "@/lib/api-hooks";
 import { SOCIAL_LINKS } from "@/lib/brand";
@@ -95,6 +96,7 @@ function BrandingForm({
   const [tagline, setTagline] = useState(branding.tagline);
   const [about, setAbout] = useState(branding.about);
   const [logoUrl, setLogoUrl] = useState(branding.logoUrl);
+  const [faviconUrl, setFaviconUrl] = useState(branding.faviconUrl);
   const [primaryColor, setPrimaryColor] = useState(branding.primaryColor);
   const [secondaryColor, setSecondaryColor] = useState(branding.secondaryColor);
   const [phone, setPhone] = useState(branding.phone);
@@ -123,6 +125,7 @@ function BrandingForm({
     tagline,
     about,
     logoUrl,
+    faviconUrl,
     primaryColor,
     secondaryColor,
     phone,
@@ -146,6 +149,7 @@ function BrandingForm({
     tagline: branding.tagline,
     about: branding.about,
     logoUrl: branding.logoUrl,
+    faviconUrl: branding.faviconUrl,
     primaryColor: branding.primaryColor,
     secondaryColor: branding.secondaryColor,
     phone: branding.phone,
@@ -181,6 +185,7 @@ function BrandingForm({
     setTagline(branding.tagline);
     setAbout(branding.about);
     setLogoUrl(branding.logoUrl);
+    setFaviconUrl(branding.faviconUrl);
     setPrimaryColor(branding.primaryColor);
     setSecondaryColor(branding.secondaryColor);
     setPhone(branding.phone);
@@ -419,6 +424,46 @@ function BrandingForm({
                   value={logoUrl}
                   onChange={(e) => setLogoUrl(e.target.value)}
                   placeholder="/gadget-doctor-logo.jpg"
+                  className="flex-1"
+                />
+              </div>
+            </Field>
+            <Field
+              label="Favicon URL"
+              htmlFor="br-favicon"
+              hint="Small icon shown in browser tabs (16x16 or 32x32 recommended)."
+            >
+              <div className="flex items-center gap-3">
+                {/* Browser-tab mockup preview */}
+                <div className="flex shrink-0 items-center gap-2 rounded-t-lg border border-b-0 border-border/60 bg-secondary/40 px-2.5 py-1.5">
+                  <span className="flex size-4 shrink-0 items-center justify-center overflow-hidden rounded-sm bg-background ring-1 ring-border/60">
+                    {faviconUrl ? (
+                      <img
+                        src={faviconUrl}
+                        alt="Favicon preview"
+                        className="h-full w-full object-contain"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display =
+                            "none";
+                        }}
+                      />
+                    ) : (
+                      <Globe className="size-3 text-muted-foreground" />
+                    )}
+                  </span>
+                  <span className="max-w-[80px] truncate text-[11px] font-medium text-foreground">
+                    {(businessName || "Your Site").slice(0, 18)}
+                  </span>
+                  <X
+                    className="size-3 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                </div>
+                <Input
+                  id="br-favicon"
+                  value={faviconUrl}
+                  onChange={(e) => setFaviconUrl(e.target.value)}
+                  placeholder="/favicon.ico"
                   className="flex-1"
                 />
               </div>

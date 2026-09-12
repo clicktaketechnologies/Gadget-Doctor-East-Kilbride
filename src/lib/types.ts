@@ -71,6 +71,7 @@ export interface SiteSettings {
   collectionBannerEnabled: boolean;
   announcementEnabled: boolean;
   announcementText: string | null;
+  ticketIdVisible: boolean;
 }
 
 export interface BusinessHours {
@@ -95,6 +96,7 @@ export interface Branding {
   tagline: string;
   about: string;
   logoUrl: string;
+  faviconUrl: string;
   primaryColor: string;
   secondaryColor: string;
   phone: string;
@@ -186,6 +188,7 @@ export interface UpdateBrandingInput {
   tagline?: string;
   about?: string;
   logoUrl?: string;
+  faviconUrl?: string;
   primaryColor?: string;
   secondaryColor?: string;
   phone?: string;

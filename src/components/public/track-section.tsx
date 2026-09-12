@@ -22,7 +22,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useAppStore } from "@/lib/store";
-import { useBranding, useTrackTicket } from "@/lib/api-hooks";
+import { useBranding, useSettings, useTrackTicket } from "@/lib/api-hooks";
 import { BRAND } from "@/lib/brand";
 import {
   formatPrice,
@@ -346,8 +346,14 @@ function TrackSkeleton() {
 export function TrackSection() {
   const openBooking = useAppStore((s) => s.openBooking);
   const { data: branding } = useBranding();
+  const { data: settings } = useSettings();
   const phone = branding?.phone ?? BRAND.phones[0];
   const phoneDigits = phone.replace(/\s+/g, "");
+
+  // Ticket tracking is gated on the site-wide `ticketIdVisible` setting.
+  // When disabled, customers see a friendly message instead of the
+  // tracker form. Admins still see ticket IDs in the admin panel.
+  const ticketIdVisible = settings?.ticketIdVisible ?? true;
 
   // Pending ticket ID (e.g. set by the compact widget in header/footer).
   const [initialPended] = useState<string | null>(() =>
@@ -384,6 +390,70 @@ export function TrackSection() {
 
   const notFound = !!submittedId && !isLoading && (!!error || (data && !data.found));
   const found = !!data && data.found;
+
+  if (!ticketIdVisible) {
+    return (
+      <section className="relative py-12 sm:py-16">
+        <div className="bg-grid pointer-events-none absolute inset-0 opacity-40" />
+        <div className="pointer-events-none absolute -top-32 left-1/2 h-72 w-[640px] -translate-x-1/2 rounded-full bg-primary/15 blur-[120px]" />
+
+        <div className="relative mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+              <Search className="size-3.5" />
+              Repair Tracker
+            </span>
+            <h1 className="mt-3 text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+              Track Your <span className="text-gradient-cyan">Repair</span>
+            </h1>
+          </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+            className="mt-8 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-8 text-center"
+          >
+            <div className="mx-auto grid size-14 place-items-center rounded-full bg-amber-500/15 text-amber-300">
+              <CircleAlert className="size-7" />
+            </div>
+            <h3 className="mt-4 text-lg font-bold text-foreground">
+              Tracker unavailable
+            </h3>
+            <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+              Ticket tracking is currently disabled. Please call us to check
+              your repair status.
+            </p>
+            <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
+              <Button
+                asChild
+                variant="outline"
+                className="border-primary/30 bg-background/60 text-foreground hover:border-primary/60 hover:bg-primary/10"
+              >
+                <a href={`tel:${phoneDigits}`}>
+                  <Phone className="size-4 text-primary" />
+                  Call {phone}
+                </a>
+              </Button>
+              <Button
+                onClick={() => openBooking()}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-md shadow-primary/20"
+              >
+                <CalendarCheck className="size-4" />
+                Book a Repair
+              </Button>
+            </div>
+          </motion.div>
+        </div>
+
+        <CtaBand
+          title="Questions about your repair?"
+          subtitle="Call us for a status update, or book a new repair in under a minute — same-day service and a 12-month warranty on every fix."
+          bookLabel="Book a Repair"
+        />
+      </section>
+    );
+  }
 
   return (
     <section className="relative py-12 sm:py-16">
