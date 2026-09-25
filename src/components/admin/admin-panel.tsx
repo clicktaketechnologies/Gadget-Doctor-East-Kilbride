@@ -7,6 +7,7 @@ import { AdminSidebar } from "./admin-sidebar";
 import { AdminTopbar } from "./admin-topbar";
 import { Overview } from "./overview";
 import { BookingsManager } from "./bookings-manager";
+import { WalkInCustomer } from "./walk-in-customer";
 import { ServicesCMS } from "./services-cms";
 import { ReviewsManager } from "./reviews-manager";
 import { ContentManager } from "./content-manager";
@@ -57,6 +58,7 @@ export function AdminPanel() {
               onSearchChange={setGlobalSearch}
             />
           )}
+          {adminModule === "walk-in" && <WalkInCustomer />}
           {adminModule === "services" && <ServicesCMS />}
           {adminModule === "reviews" && <ReviewsManager />}
           {adminModule === "content" && <ContentManager />}

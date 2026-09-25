@@ -19,6 +19,7 @@ export type PublicPage =
 export type AdminModule =
   | "overview"
   | "bookings"
+  | "walk-in"
   | "services"
   | "reviews"
   | "content"

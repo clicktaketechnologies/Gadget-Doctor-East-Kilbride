@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Providers } from "@/components/providers";
 import { FirebaseAnalytics } from "@/components/firebase-analytics";
+import { FaviconUpdater } from "@/components/favicon-updater";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,6 +56,7 @@ export default function RootLayout({
         <Providers>
           {children}
           <Toaster />
+          <FaviconUpdater />
         </Providers>
       </body>
     </html>

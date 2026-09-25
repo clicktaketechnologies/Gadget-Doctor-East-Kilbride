@@ -18,6 +18,7 @@ interface AdminTopbarProps {
 const MODULE_META: Record<AdminModule, { title: string; subtitle: string }> = {
   overview: { title: "Overview", subtitle: "Dashboard analytics & activity" },
   bookings: { title: "Bookings", subtitle: "Manage repair tickets" },
+  "walk-in": { title: "Walk-in Customer", subtitle: "Create a booking for walk-in customers" },
   services: { title: "Services & Pricing", subtitle: "Catalog & price management" },
   reviews: { title: "Reviews", subtitle: "Moderate customer testimonials" },
   content: { title: "Content", subtitle: "Banners & site messaging" },

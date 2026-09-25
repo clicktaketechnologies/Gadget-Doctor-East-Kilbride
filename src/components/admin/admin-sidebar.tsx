@@ -13,6 +13,7 @@ import {
   FileEdit,
   Mail,
   UserCog,
+  UserPlus,
   type LucideIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -36,6 +37,7 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "bookings", label: "Bookings", icon: Wrench },
+  { id: "walk-in", label: "Walk-in Customer", icon: UserPlus },
   { id: "services", label: "Services & Pricing", icon: Settings },
   { id: "reviews", label: "Reviews", icon: Star },
   { id: "content", label: "Content", icon: MessageSquare },
