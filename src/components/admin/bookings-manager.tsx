@@ -16,6 +16,8 @@ import {
   Trash2,
   ChevronLeft,
   ChevronRight,
+  UserPlus,
+  Globe,
 } from "lucide-react";
 import { useBookings, useDeleteBooking } from "@/lib/api-hooks";
 import { SERVICE_CATEGORIES } from "@/lib/brand";
@@ -69,7 +71,7 @@ const STATUS_FILTERS: (BookingStatus | "All")[] = [
   "Cancelled",
 ];
 
-const TABLE_COLUMN_COUNT = 9;
+const TABLE_COLUMN_COUNT = 10;
 
 /** Returns `yyyy-mm-dd` for the given Date in local time. */
 function toISODate(d: Date): string {
@@ -394,6 +396,7 @@ export function BookingsManager({
                 <TableHead>Device</TableHead>
                 <TableHead className="max-w-[220px]">Issue</TableHead>
                 <TableHead>Collection</TableHead>
+                <TableHead>Source</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Booking Date</TableHead>
                 <TableHead>Created</TableHead>
@@ -505,6 +508,25 @@ export function BookingsManager({
                         </Badge>
                       ) : (
                         <span className="text-xs text-muted-foreground">No</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {b.source === "walk-in" ? (
+                        <Badge
+                          variant="outline"
+                          className="border-violet-500/30 bg-violet-500/10 text-violet-300"
+                        >
+                          <UserPlus className="size-3" />
+                          Walk-in
+                        </Badge>
+                      ) : (
+                        <Badge
+                          variant="outline"
+                          className="border-cyan-500/30 bg-cyan-500/10 text-cyan-300"
+                        >
+                          <Globe className="size-3" />
+                          Online
+                        </Badge>
                       )}
                     </TableCell>
                     <TableCell>

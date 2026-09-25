@@ -50,6 +50,7 @@ export interface Booking {
   finalPrice: number | null;
   bookingDate: string | null;
   bookingTime: string | null;
+  source: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -145,6 +146,7 @@ export interface CreateBookingInput {
   collectionAddr?: string;
   bookingDate?: string;
   bookingTime?: string;
+  source?: string;
 }
 
 export interface CreateServiceInput {

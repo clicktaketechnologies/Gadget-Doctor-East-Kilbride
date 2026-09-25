@@ -53,6 +53,7 @@ export async function POST(req: NextRequest) {
         status: "Pending",
         bookingDate: body.bookingDate ? new Date(body.bookingDate) : null,
         bookingTime: body.bookingTime || null,
+        source: body.source || "online",
       },
     });
     return setCorsHeaders(req, NextResponse.json(booking, { status: 201 }));

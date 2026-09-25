@@ -44,6 +44,7 @@ model Booking {
   finalPrice      Int?
   bookingDate     DateTime? // preferred drop-off/collection date
   bookingTime     String?   // preferred time slot, e.g. "10:00 AM"
+  source          String   @default("online") // online | walk-in
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }

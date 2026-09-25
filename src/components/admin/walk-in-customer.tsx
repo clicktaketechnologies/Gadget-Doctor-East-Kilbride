@@ -75,6 +75,7 @@ export function WalkInCustomer() {
         collectionAddr: needsCollection ? collectionAddr.trim() : undefined,
         bookingDate: bookingDate || undefined,
         bookingTime: bookingTime || undefined,
+        source: "walk-in",
       },
       {
         onSuccess: (b) => {
