@@ -34,16 +34,44 @@ export const metadata: Metadata = {
   icons: {
     icon: "/gadget-doctor-logo.jpg",
   },
-  // Google Search Console verification — hardcoded so it's in the raw HTML
-  // on both Firebase (static export) and Render (SSR).
-  // This works on gadgetdoctorls.web.app, gadgetdoctorls.co.uk, and Render.
+  // Google Search Console verification
   verification: {
     google: "H-OKElcx2vleyf5JmpMgN3in5UqGlIwjV8z7KRqM7SA",
+  },
+  // Canonical URL — prevents duplicate content issues
+  metadataBase: new URL("https://gadgetdoctorls.web.app"),
+  alternates: {
+    canonical: "/",
+  },
+  // Robots meta — explicitly allow indexing
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
   openGraph: {
     title: "Gadget Doctor East Kilbride",
     description: "Fast & Reliable Electronics Repair in East Kilbride",
     type: "website",
+    siteName: "Gadget Doctor East Kilbride",
+    images: [
+      {
+        url: "/gadget-doctor-logo.jpg",
+        width: 1280,
+        height: 720,
+        alt: "Gadget Doctor East Kilbride — Electronics Repair Shop",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Gadget Doctor East Kilbride",
+    description: "Fast & Reliable Electronics Repair in East Kilbride",
   },
 };
 
@@ -87,6 +115,65 @@ export default async function RootLayout({
         )}
         {/* ServerMetaTags renders all custom header code as raw HTML */}
         {headerCode && <ServerMetaTags html={headerCode} />}
+
+        {/* LocalBusiness structured data for Google rich results */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              name: "Gadget Doctor East Kilbride",
+              description: "Fast & reliable electronics repair in East Kilbride. Phone, laptop, MacBook, console, Apple Watch and custom PC repairs.",
+              image: "https://gadgetdoctorls.web.app/gadget-doctor-logo.jpg",
+              url: "https://gadgetdoctorls.web.app/",
+              telephone: "+44 7777 200175",
+              priceRange: "££",
+              address: {
+                "@type": "PostalAddress",
+                streetAddress: "14 Stroud Rd, EK Business Centre",
+                addressLocality: "East Kilbride",
+                addressRegion: "Glasgow",
+                postalCode: "G75 0YA",
+                addressCountry: "GB",
+              },
+              geo: {
+                "@type": "GeoCoordinates",
+                latitude: 55.7477,
+                longitude: -4.2259,
+              },
+              openingHoursSpecification: [
+                {
+                  "@type": "OpeningHoursSpecification",
+                  dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday"],
+                  opens: "09:30",
+                  closes: "15:00",
+                },
+                {
+                  "@type": "OpeningHoursSpecification",
+                  dayOfWeek: "Friday",
+                  opens: "09:30",
+                  closes: "14:30",
+                },
+                {
+                  "@type": "OpeningHoursSpecification",
+                  dayOfWeek: "Saturday",
+                  opens: "10:00",
+                  closes: "14:00",
+                },
+              ],
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: "4.6",
+                reviewCount: "92",
+              },
+              areaServed: [
+                "East Kilbride", "Busby", "Eaglesham", "Cambuslang",
+                "Rutherglen", "Carmunnock", "Giffnock",
+              ],
+            }),
+          }}
+        />
         {/* Firebase Analytics — initialises on the client */}
         <FirebaseAnalytics />
       </head>

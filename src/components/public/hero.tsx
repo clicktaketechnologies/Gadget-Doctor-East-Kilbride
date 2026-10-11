@@ -72,8 +72,7 @@ export function Hero() {
       {/* Background image with dark overlay */}
       <img
         src="/images/hero-workshop.jpg"
-        alt=""
-        aria-hidden="true"
+        alt="Gadget Doctor repair workshop interior with technician working on phones and laptops"
         className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-30"
       />
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-background via-background/85 to-background/40" />
