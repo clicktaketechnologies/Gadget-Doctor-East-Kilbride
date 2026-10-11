@@ -46,12 +46,25 @@ export function CustomCodeManager() {
   const buildHeaderCode = () => {
     const parts = [];
     if (googleVerification.trim()) {
-      parts.push(`<!-- Google Search Console Verification -->
-<meta name="google-site-verification" content="${googleVerification.trim()}" />`);
+      // If user pasted the full meta tag, use it as-is; otherwise wrap it
+      const val = googleVerification.trim();
+      if (val.startsWith("<meta") || val.startsWith("<")) {
+        parts.push(`<!-- Google Search Console Verification -->
+${val}`);
+      } else {
+        parts.push(`<!-- Google Search Console Verification -->
+<meta name="google-site-verification" content="${val}" />`);
+      }
     }
     if (bingVerification.trim()) {
-      parts.push(`<!-- Bing Webmaster Tools Verification -->
-<meta name="msvalidate.01" content="${bingVerification.trim()}" />`);
+      const val = bingVerification.trim();
+      if (val.startsWith("<meta") || val.startsWith("<")) {
+        parts.push(`<!-- Bing Webmaster Tools Verification -->
+${val}`);
+      } else {
+        parts.push(`<!-- Bing Webmaster Tools Verification -->
+<meta name="msvalidate.01" content="${val}" />`);
+      }
     }
     if (customMetaTags.trim()) {
       parts.push(`<!-- Custom Meta Tags -->
