@@ -110,8 +110,12 @@ ${headerCode.trim()}`);
     setTesting(true);
     setTestResult(null);
     try {
-      const testUrl = "https://gadgetdoctorls.web.app/";
-      const res = await fetch(testUrl);
+      // Try the current origin first (same-origin, no CORS issues)
+      // Then try Firebase if on Render
+      const testUrl = window.location.hostname.includes("onrender.com")
+        ? "https://gadgetdoctorls.web.app/"
+        : window.location.origin;
+      const res = await fetch(testUrl, { mode: "cors" });
       const html = await res.text();
 
       const hasGoogle = googleVerification
