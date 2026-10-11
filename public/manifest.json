@@ -1,0 +1,59 @@
+{
+  "name": "Gadget Doctor East Kilbride",
+  "description": "Fast & reliable electronics repair in East Kilbride, Scotland. 4.6★ rated with 92+ Google reviews. 12-month warranty on all repairs.",
+  "url": "https://gadgetdoctorls.co.uk",
+  "logo": "https://gadgetdoctorls.co.uk/gadget-doctor-logo.jpg",
+  "phone": "+44 7777 200175",
+  "email": "info@gadgetdoctorscotland.co.uk",
+  "address": {
+    "street": "14 Stroud Rd, EK Business Centre",
+    "city": "East Kilbride",
+    "region": "South Lanarkshire",
+    "postalCode": "G75 0YA",
+    "country": "GB"
+  },
+  "geo": {
+    "latitude": 55.7477,
+    "longitude": -4.2259
+  },
+  "openingHours": [
+    { "days": ["Monday","Tuesday","Wednesday","Thursday"], "opens": "09:30", "closes": "15:00" },
+    { "days": ["Friday"], "opens": "09:30", "closes": "14:30" },
+    { "days": ["Saturday"], "opens": "10:00", "closes": "14:00" }
+  ],
+  "rating": { "value": 4.6, "count": 92 },
+  "services": [
+    "Mobile Phone Repair",
+    "Tablet & iPad Repair",
+    "Laptop Repair",
+    "MacBook Repair",
+    "Computer Repair",
+    "Custom Computer Builds",
+    "Game Console Repair",
+    "Apple Watch Repairs",
+    "Data Recovery",
+    "Doorstep Collection Service"
+  ],
+  "serviceAreas": [
+    "East Kilbride", "Busby", "Eaglesham", "Cambuslang",
+    "Rutherglen", "Carmunnock", "Giffnock"
+  ],
+  "social": {
+    "facebook": "https://www.facebook.com/GadgetDoctorEastKilbride/",
+    "instagram": "https://www.instagram.com/gadgetdoctoreastkilbride",
+    "tiktok": "https://www.tiktok.com/@gadgetdoctoreastkilbride",
+    "youtube": "https://www.youtube.com/@gadgetdoctoreastkilbride",
+    "pinterest": "https://uk.pinterest.com/gadgetdoctoreastkilbride/",
+    "linkedin": "https://www.linkedin.com/company/gadget-doctor-east-kilbride",
+    "blog": "https://gadgetdoctoreastkilbride.blogspot.com/"
+  },
+  "pages": {
+    "home": "https://gadgetdoctorls.co.uk/",
+    "services": "https://gadgetdoctorls.co.uk/services",
+    "collection": "https://gadgetdoctorls.co.uk/collection",
+    "reviews": "https://gadgetdoctorls.co.uk/reviews",
+    "blog": "https://gadgetdoctorls.co.uk/blog",
+    "contact": "https://gadgetdoctorls.co.uk/contact",
+    "track": "https://gadgetdoctorls.co.uk/track"
+  }
+}

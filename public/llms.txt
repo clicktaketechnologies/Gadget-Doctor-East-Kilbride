@@ -1,0 +1,93 @@
+# Gadget Doctor East Kilbride
+
+> Fast & reliable electronics repair in East Kilbride, Scotland.
+> 4.6★ rated (92+ Google reviews) · 12+ years experience · 12-month warranty on all repairs
+
+## Business Info
+
+- **Name**: Gadget Doctor East Kilbride
+- **Address**: 14 Stroud Rd, EK Business Centre, East Kilbride, Glasgow G75 0YA, Scotland
+- **Phone**: +44 7777 200175
+- **WhatsApp**: +44 7777 200175
+- **Email**: info@gadgetdoctorscotland.co.uk
+- **Website**: https://gadgetdoctorls.co.uk
+- **Google Maps**: https://maps.app.goo.gl/vsvyX7oc9MFpnEDS6
+- **GMB Profile**: https://g.co/kgs/bRysLQB
+- **Rating**: 4.6 stars (92+ reviews)
+- **Opening Hours**: Mon-Thu 09:30-15:00, Fri 09:30-14:30, Sat 10:00-14:00, Sun Closed
+
+## Services
+
+1. **Mobile Phone Repair** — iPhone, Samsung, Google Pixel, all brands. Screen, battery, charging port, water damage, camera, speaker.
+2. **Tablet & iPad Repair** — iPad Pro/Air/mini, Samsung Galaxy Tab. Screen, battery, charging port.
+3. **Laptop Repair** — HP, Dell, Lenovo, ASUS, Acer. Screen, keyboard, SSD upgrades, OS fixes, liquid damage.
+4. **MacBook Repair** — MacBook Air/Pro M1/M2/M3. Screen, logic board, battery, liquid damage, keyboard/trackpad.
+5. **Computer Repair** — Desktops & all-in-ones. Diagnostics, virus removal, hardware upgrades, Windows reinstall.
+6. **Custom Computer Builds** — Gaming PCs, workstations, budget PCs, ITX builds. Designed, assembled, stress-tested.
+7. **Game Console Repair** — PS5, PS4, Xbox Series X/S, Nintendo Switch. HDMI port, overheating, drive faults.
+8. **Apple Watch Repairs** — Series, SE, Ultra. Screen, battery, charging, water damage.
+
+## Additional Services
+
+- **Doorstep Collection Service** — Free pickup & return across East Kilbride, Busby, Eaglesham, Cambuslang, Rutherglen, Carmunnock, Giffnock
+- **Data Recovery** — Hard drives, SSDs, USB drives, SD cards, phone storage
+- **Ticket Tracking** — Track repair status online by ticket ID
+
+## Key Pages
+
+- [Home](https://gadgetdoctorls.co.uk/)
+- [Services](https://gadgetdoctorls.co.uk/services)
+- [Doorstep Collection](https://gadgetdoctorls.co.uk/collection)
+- [Reviews](https://gadgetdoctorls.co.uk/reviews)
+- [Blog](https://gadgetdoctorls.co.uk/blog)
+- [Contact](https://gadgetdoctorls.co.uk/contact)
+- [Track Repair](https://gadgetdoctorls.co.uk/track)
+- [Sitemap](https://gadgetdoctorls.co.uk/sitemap.xml)
+
+## Blog Posts
+
+- [Cracked iPhone Screen Repair Guide](https://gadgetdoctorls.co.uk/blog?slug=cracked-iphone-screen-repair-guide)
+- [PS5 HDMI Port Repair Explained](https://gadgetdoctorls.co.uk/blog?slug=ps5-hdmi-port-repair-explained)
+- [MacBook Water Damage: What to Do](https://gadgetdoctorls.co.uk/blog?slug=macbook-water-damage-what-to-do)
+- [Custom Gaming PC Build Guide](https://gadgetdoctorls.co.uk/blog?slug=custom-gaming-pc-build-guide)
+
+## Social Media
+
+- Facebook: https://www.facebook.com/GadgetDoctorEastKilbride/
+- Instagram: https://www.instagram.com/gadgetdoctoreastkilbride
+- TikTok: https://www.tiktok.com/@gadgetdoctoreastkilbride
+- YouTube: https://www.youtube.com/@gadgetdoctoreastkilbride
+- Pinterest: https://uk.pinterest.com/gadgetdoctoreastkilbride/
+- LinkedIn: https://www.linkedin.com/company/gadget-doctor-east-kilbride
+- Blog: https://gadgetdoctoreastkilbride.blogspot.com/
+
+## Technical Info
+
+- **Platform**: Next.js 16 (React 19, TypeScript, Tailwind CSS)
+- **Frontend**: Firebase Hosting (static export)
+- **Backend**: Render (Node.js Docker)
+- **Database**: PostgreSQL (Supabase)
+- **Analytics**: Firebase Analytics
+- **Brand Colors**: Primary #E31E24 (red), Secondary #4A90E2 (blue)
+
+## Target Keywords
+
+- phone repair East Kilbride
+- iPhone repair Glasgow
+- MacBook repair East Kilbride
+- PS5 repair Scotland
+- console repair East Kilbride
+- laptop repair East Kilbride
+- custom gaming PC Scotland
+- Apple Watch repair East Kilbride
+- tablet repair East Kilbride
+- data recovery East Kilbride
+- doorstep collection repair East Kilbride
+
+## Service Areas
+
+East Kilbride, Busby, Eaglesham, Cambuslang, Rutherglen, Carmunnock, Giffnock
+
+---
+
+*Powered by [ClickTake Technologies](https://www.clicktaketech.com)*

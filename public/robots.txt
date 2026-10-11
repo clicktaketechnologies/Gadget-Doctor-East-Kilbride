@@ -1,16 +1,97 @@
 User-agent: Googlebot
 Allow: /
+Allow: /services
+Allow: /collection
+Allow: /reviews
+Allow: /blog
+Allow: /contact
+Allow: /track
+Allow: /sitemap.xml
+Allow: /robots.txt
+Allow: /llms.txt
+Disallow: /admin
+Disallow: /superadmin
+Disallow: /api/
 
 User-agent: Bingbot
 Allow: /
+Disallow: /admin
+Disallow: /superadmin
+Disallow: /api/
+
+User-agent: Applebot
+Allow: /
+Disallow: /admin
+Disallow: /superadmin
+Disallow: /api/
+
+User-agent: DuckDuckBot
+Allow: /
+Disallow: /admin
+Disallow: /superadmin
+Disallow: /api/
 
 User-agent: Twitterbot
 Allow: /
+Allow: /images/
+Allow: /gadget-doctor-logo.jpg
 
 User-agent: facebookexternalhit
 Allow: /
+Allow: /images/
+Allow: /gadget-doctor-logo.jpg
+
+User-agent: LinkedInBot
+Allow: /
+Allow: /images/
+
+User-agent: WhatsApp
+Allow: /
+Allow: /images/
+
+User-agent: GPTBot
+Allow: /
+Allow: /llms.txt
+Disallow: /admin
+Disallow: /superadmin
+Disallow: /api/
+
+User-agent: Claude-Web
+Allow: /
+Allow: /llms.txt
+Disallow: /admin
+Disallow: /superadmin
+Disallow: /api/
+
+User-agent: PerplexityBot
+Allow: /
+Allow: /llms.txt
+Disallow: /admin
+Disallow: /superadmin
+Disallow: /api/
+
+User-agent: Google-Extended
+Allow: /
+Allow: /llms.txt
+
+User-agent: Bytespider
+Allow: /
+
+User-agent: CCBot
+Allow: /
+Allow: /llms.txt
 
 User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /superadmin
+Disallow: /api/
 
+# Sitemaps
 Sitemap: https://gadgetdoctorls.co.uk/sitemap.xml
+
+# LLMs.txt for AI ranking
+# https://gadgetdoctorls.co.uk/llms.txt
+
+# Crawl delay (be polite)
+Crawl-delay: 1
