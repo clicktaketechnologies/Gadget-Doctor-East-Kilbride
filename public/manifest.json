@@ -1,8 +1,8 @@
 {
   "name": "Gadget Doctor East Kilbride",
   "description": "Fast & reliable electronics repair in East Kilbride, Scotland. 4.6★ rated with 92+ Google reviews. 12-month warranty on all repairs.",
-  "url": "https://gadgetdoctorls.web.app",
-  "logo": "https://gadgetdoctorls.web.app/gadget-doctor-logo.jpg",
+  "url": "https://www.gadgetdoctorls.co.uk",
+  "logo": "https://www.gadgetdoctorls.co.uk/gadget-doctor-logo.jpg",
   "phone": "+44 7777 200175",
   "email": "info@gadgetdoctorscotland.co.uk",
   "address": {
@@ -48,12 +48,12 @@
     "blog": "https://gadgetdoctoreastkilbride.blogspot.com/"
   },
   "pages": {
-    "home": "https://gadgetdoctorls.web.app/",
-    "services": "https://gadgetdoctorls.web.app/services",
-    "collection": "https://gadgetdoctorls.web.app/collection",
-    "reviews": "https://gadgetdoctorls.web.app/reviews",
-    "blog": "https://gadgetdoctorls.web.app/blog",
-    "contact": "https://gadgetdoctorls.web.app/contact",
-    "track": "https://gadgetdoctorls.web.app/track"
+    "home": "https://www.gadgetdoctorls.co.uk/",
+    "services": "https://www.gadgetdoctorls.co.uk/services",
+    "collection": "https://www.gadgetdoctorls.co.uk/collection",
+    "reviews": "https://www.gadgetdoctorls.co.uk/reviews",
+    "blog": "https://www.gadgetdoctorls.co.uk/blog",
+    "contact": "https://www.gadgetdoctorls.co.uk/contact",
+    "track": "https://www.gadgetdoctorls.co.uk/track"
   }
 }

@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     google: "H-OKElcx2vleyf5JmpMgN3in5UqGlIwjV8z7KRqM7SA",
   },
   // Canonical URL — prevents duplicate content issues
-  metadataBase: new URL("https://gadgetdoctorls.web.app"),
+  metadataBase: new URL("https://www.gadgetdoctorls.co.uk"),
   alternates: {
     canonical: "/",
   },
@@ -123,12 +123,12 @@ export default async function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": ["LocalBusiness", "ElectronicsRepairService"],
-              "@id": "https://gadgetdoctorls.web.app/#business",
+              "@id": "https://www.gadgetdoctorls.co.uk/#business",
               name: "Gadget Doctor East Kilbride",
               description: "Fast & reliable electronics repair in East Kilbride. Expert phone, laptop, MacBook, games console, Apple Watch and custom PC repairs with a 12-month warranty.",
-              image: "https://gadgetdoctorls.web.app/gadget-doctor-logo.jpg",
-              logo: "https://gadgetdoctorls.web.app/gadget-doctor-logo.jpg",
-              url: "https://gadgetdoctorls.web.app/",
+              image: "https://www.gadgetdoctorls.co.uk/gadget-doctor-logo.jpg",
+              logo: "https://www.gadgetdoctorls.co.uk/gadget-doctor-logo.jpg",
+              url: "https://www.gadgetdoctorls.co.uk/",
               telephone: "+44 7777 200175",
               email: "info@gadgetdoctorscotland.co.uk",
               priceRange: "££",
@@ -218,9 +218,9 @@ export default async function RootLayout({
               "@context": "https://schema.org",
               "@type": "BreadcrumbList",
               itemListElement: [
-                { "@type": "ListItem", position: 1, name: "Home", item: "https://gadgetdoctorls.web.app/" },
-                { "@type": "ListItem", position: 2, name: "Services", item: "https://gadgetdoctorls.web.app/services" },
-                { "@type": "ListItem", position: 3, name: "Book Repair", item: "https://gadgetdoctorls.web.app/" },
+                { "@type": "ListItem", position: 1, name: "Home", item: "https://www.gadgetdoctorls.co.uk/" },
+                { "@type": "ListItem", position: 2, name: "Services", item: "https://www.gadgetdoctorls.co.uk/services" },
+                { "@type": "ListItem", position: 3, name: "Book Repair", item: "https://www.gadgetdoctorls.co.uk/" },
               ],
             }),
           }}
@@ -232,12 +232,12 @@ export default async function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              url: "https://gadgetdoctorls.web.app/",
+              url: "https://www.gadgetdoctorls.co.uk/",
               name: "Gadget Doctor East Kilbride",
-              publisher: { "@id": "https://gadgetdoctorls.web.app/#business" },
+              publisher: { "@id": "https://www.gadgetdoctorls.co.uk/#business" },
               potentialAction: {
                 "@type": "SearchAction",
-                target: "https://gadgetdoctorls.web.app/?q={query}",
+                target: "https://www.gadgetdoctorls.co.uk/?q={query}",
                 "query-input": "required name=query",
               },
             }),
