@@ -57,7 +57,7 @@ export function ContactSection() {
         <div className="relative mb-10 overflow-hidden rounded-3xl border border-border">
           <img
             src="/images/contact-shop.jpg"
-            alt="Gadget Doctor East Kilbride workshop front"
+            alt="Gadget Doctor East Kilbride repair shop front on Stroud Road"
             loading="lazy"
             className="h-44 w-full object-cover sm:h-56 lg:h-64"
           />

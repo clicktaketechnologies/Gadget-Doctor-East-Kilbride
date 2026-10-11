@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://gadgetdoctorls.web.app/sitemap.xml
+Sitemap: https://gadgetdoctorls.co.uk/sitemap.xml

@@ -146,7 +146,7 @@ function WhyChooseUs() {
             Why Choose Us
           </span>
           <h2 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-            The Gadget Doctor Difference
+            Why East Kilbride Chooses Gadget Doctor for Electronics Repair
           </h2>
           <p className="mt-2 text-sm text-muted-foreground sm:text-base">
             We&apos;ve earned our 4.6★ reputation by treating every device like

@@ -138,7 +138,7 @@ export function ServicesSection() {
       <div className="relative mb-10 overflow-hidden rounded-3xl border border-border">
         <img
           src="/images/services-grid.jpg"
-          alt="Gadget Doctor repair services — phones, laptops, consoles and more"
+          alt="Electronics repair services in East Kilbride — iPhone, Samsung, MacBook, PS5, Xbox and laptop repairs"
           loading="lazy"
           className="h-48 w-full object-cover sm:h-64 lg:h-72"
         />

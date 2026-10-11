@@ -90,7 +90,7 @@ export function CollectionSection() {
         <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-card">
           <img
             src="/images/collection-van.jpg"
-            alt="Gadget Doctor doorstep collection van"
+            alt="Gadget Doctor doorstep collection van for phone and laptop repair in East Kilbride"
             loading="lazy"
             className="absolute inset-0 h-full w-full object-cover opacity-30"
           />

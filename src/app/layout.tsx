@@ -39,7 +39,7 @@ export const metadata: Metadata = {
     google: "H-OKElcx2vleyf5JmpMgN3in5UqGlIwjV8z7KRqM7SA",
   },
   // Canonical URL — prevents duplicate content issues
-  metadataBase: new URL("https://gadgetdoctorls.web.app"),
+  metadataBase: new URL("https://gadgetdoctorls.co.uk"),
   alternates: {
     canonical: "/",
   },
@@ -116,24 +116,29 @@ export default async function RootLayout({
         {/* ServerMetaTags renders all custom header code as raw HTML */}
         {headerCode && <ServerMetaTags html={headerCode} />}
 
-        {/* LocalBusiness structured data for Google rich results */}
+        {/* LocalBusiness + ElectronicsRepairService structured data */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "LocalBusiness",
+              "@type": ["LocalBusiness", "ElectronicsRepairService"],
+              "@id": "https://gadgetdoctorls.co.uk/#business",
               name: "Gadget Doctor East Kilbride",
-              description: "Fast & reliable electronics repair in East Kilbride. Phone, laptop, MacBook, console, Apple Watch and custom PC repairs.",
-              image: "https://gadgetdoctorls.web.app/gadget-doctor-logo.jpg",
-              url: "https://gadgetdoctorls.web.app/",
+              description: "Fast & reliable electronics repair in East Kilbride. Expert phone, laptop, MacBook, games console, Apple Watch and custom PC repairs with a 12-month warranty.",
+              image: "https://gadgetdoctorls.co.uk/gadget-doctor-logo.jpg",
+              logo: "https://gadgetdoctorls.co.uk/gadget-doctor-logo.jpg",
+              url: "https://gadgetdoctorls.co.uk/",
               telephone: "+44 7777 200175",
+              email: "info@gadgetdoctorscotland.co.uk",
               priceRange: "££",
+              currenciesAccepted: "GBP",
+              paymentAccepted: "Cash, Credit Card, Debit Card",
               address: {
                 "@type": "PostalAddress",
                 streetAddress: "14 Stroud Rd, EK Business Centre",
                 addressLocality: "East Kilbride",
-                addressRegion: "Glasgow",
+                addressRegion: "South Lanarkshire",
                 postalCode: "G75 0YA",
                 addressCountry: "GB",
               },
@@ -142,6 +147,7 @@ export default async function RootLayout({
                 latitude: 55.7477,
                 longitude: -4.2259,
               },
+              hasMap: "https://maps.app.goo.gl/vsvyX7oc9MFpnEDS6",
               openingHoursSpecification: [
                 {
                   "@type": "OpeningHoursSpecification",
@@ -166,11 +172,74 @@ export default async function RootLayout({
                 "@type": "AggregateRating",
                 ratingValue: "4.6",
                 reviewCount: "92",
+                bestRating: "5",
+                worstRating: "1",
               },
               areaServed: [
-                "East Kilbride", "Busby", "Eaglesham", "Cambuslang",
-                "Rutherglen", "Carmunnock", "Giffnock",
+                { "@type": "City", name: "East Kilbride" },
+                { "@type": "City", name: "Busby" },
+                { "@type": "City", name: "Eaglesham" },
+                { "@type": "City", name: "Cambuslang" },
+                { "@type": "City", name: "Rutherglen" },
+                { "@type": "City", name: "Carmunnock" },
+                { "@type": "City", name: "Giffnock" },
               ],
+              sameAs: [
+                "https://www.facebook.com/GadgetDoctorEastKilbride/",
+                "https://www.instagram.com/gadgetdoctoreastkilbride",
+                "https://www.tiktok.com/@gadgetdoctoreastkilbride",
+                "https://www.youtube.com/@gadgetdoctoreastkilbride",
+                "https://uk.pinterest.com/gadgetdoctoreastkilbride/",
+                "https://www.linkedin.com/company/gadget-doctor-east-kilbride",
+                "https://gadgetdoctoreastkilbride.blogspot.com/",
+              ],
+              hasOfferCatalog: {
+                "@type": "OfferCatalog",
+                name: "Repair Services",
+                itemListElement: [
+                  { "@type": "Offer", itemOffered: { "@type": "Service", name: "Mobile Phone Repair" } },
+                  { "@type": "Offer", itemOffered: { "@type": "Service", name: "Tablet & iPad Repair" } },
+                  { "@type": "Offer", itemOffered: { "@type": "Service", name: "Laptop Repair" } },
+                  { "@type": "Offer", itemOffered: { "@type": "Service", name: "MacBook Repair" } },
+                  { "@type": "Offer", itemOffered: { "@type": "Service", name: "Computer Repair" } },
+                  { "@type": "Offer", itemOffered: { "@type": "Service", name: "Custom Computer Builds" } },
+                  { "@type": "Offer", itemOffered: { "@type": "Service", name: "Game Console Repair" } },
+                  { "@type": "Offer", itemOffered: { "@type": "Service", name: "Apple Watch Repairs" } },
+                ],
+              },
+            }),
+          }}
+        />
+        {/* BreadcrumbList structured data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                { "@type": "ListItem", position: 1, name: "Home", item: "https://gadgetdoctorls.co.uk/" },
+                { "@type": "ListItem", position: 2, name: "Services", item: "https://gadgetdoctorls.co.uk/services" },
+                { "@type": "ListItem", position: 3, name: "Book Repair", item: "https://gadgetdoctorls.co.uk/" },
+              ],
+            }),
+          }}
+        />
+        {/* WebSite structured data for sitelinks search box */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              url: "https://gadgetdoctorls.co.uk/",
+              name: "Gadget Doctor East Kilbride",
+              publisher: { "@id": "https://gadgetdoctorls.co.uk/#business" },
+              potentialAction: {
+                "@type": "SearchAction",
+                target: "https://gadgetdoctorls.co.uk/?q={query}",
+                "query-input": "required name=query",
+              },
             }),
           }}
         />

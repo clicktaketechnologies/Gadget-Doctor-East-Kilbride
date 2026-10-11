@@ -123,7 +123,7 @@ export function FeaturedServices() {
               Most Booked
             </span>
             <h2 className="mt-3 text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
-              Featured Repairs
+              Trusted Repair Services in East Kilbride
             </h2>
             <p className="mt-2 max-w-xl text-sm text-muted-foreground sm:text-base">
               Our most-requested fixes — book in seconds with transparent
