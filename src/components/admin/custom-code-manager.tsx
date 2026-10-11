@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Code2, Save, Loader2, Check, AlertCircle, Trash2, ShieldCheck, Search } from "lucide-react";
+import { Code2, Save, Loader2, Check, AlertCircle, Trash2, ShieldCheck, Search, Zap } from "lucide-react";
 import { useSettings, useUpdateSettings } from "@/lib/api-hooks";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 export function CustomCodeManager() {
   const settingsQ = useSettings();
@@ -19,6 +20,8 @@ export function CustomCodeManager() {
   const [bingVerification, setBingVerification] = useState("");
   const [customMetaTags, setCustomMetaTags] = useState("");
   const [loaded, setLoaded] = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [testResult, setTestResult] = useState<{ ok: boolean; google: boolean; bing: boolean; message: string } | null>(null);
 
   // Initialize from server data (key-remount pattern)
   useEffect(() => {
@@ -86,6 +89,43 @@ ${headerCode.trim()}`);
     setGoogleVerification("");
     setBingVerification("");
     setCustomMetaTags("");
+    setTestResult(null);
+  };
+
+  // Test verification — fetches the live site HTML and checks for meta tags
+  const handleTest = async () => {
+    setTesting(true);
+    setTestResult(null);
+    try {
+      const testUrl = "https://gadgetdoctorls.web.app/";
+      const res = await fetch(testUrl);
+      const html = await res.text();
+
+      const hasGoogle = googleVerification
+        ? html.includes(googleVerification) || html.includes("google-site-verification")
+        : true; // skip if not set
+      const hasBing = bingVerification
+        ? html.includes(bingVerification) || html.includes("msvalidate.01")
+        : true;
+
+      setTestResult({
+        ok: hasGoogle && hasBing,
+        google: hasGoogle,
+        bing: hasBing,
+        message:
+          hasGoogle && hasBing
+            ? "✅ All verification tags found in the live HTML! Google can verify your site."
+            : `⚠️ Some tags not found in live HTML. Tags must be in the raw HTML source (not just JavaScript-injected). Make sure you saved the code and the site has been redeployed.`
+      });
+    } catch (e) {
+      setTestResult({
+        ok: false,
+        google: false,
+        bing: false,
+        message: `❌ Failed to fetch the site: ${e instanceof Error ? e.message : "unknown error"}`,
+      });
+    }
+    setTesting(false);
   };
 
   return (
@@ -184,6 +224,72 @@ ${headerCode.trim()}`);
           </p>
         </div>
       </Card>
+
+      {/* Test Verification */}
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <div className="text-xs text-muted-foreground">
+            Test if your verification tags are visible in the live HTML source
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleTest}
+            disabled={testing}
+            className="gap-2"
+          >
+            {testing ? (
+              <>
+                <Loader2 className="size-3.5 animate-spin" />
+                Testing…
+              </>
+            ) : (
+              <>
+                <Zap className="size-3.5" />
+                Test Verification
+              </>
+            )}
+          </Button>
+        </div>
+        {testResult && (
+          <div
+            className={cn(
+              "rounded-lg border p-3 text-sm",
+              testResult.ok
+                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                : "border-amber-500/30 bg-amber-500/10 text-amber-300"
+            )}
+          >
+            <div className="flex items-start gap-2">
+              {testResult.ok ? (
+                <Check className="size-4 shrink-0 mt-0.5" />
+              ) : (
+                <AlertCircle className="size-4 shrink-0 mt-0.5" />
+              )}
+              <div className="flex-1">
+                <p className="font-medium">{testResult.message}</p>
+                {googleVerification && (
+                  <p className="mt-1 text-xs">
+                    Google: {testResult.google ? "✅ Found" : "❌ Not found in HTML"}
+                  </p>
+                )}
+                {bingVerification && (
+                  <p className="mt-1 text-xs">
+                    Bing: {testResult.bing ? "✅ Found" : "❌ Not found in HTML"}
+                  </p>
+                )}
+                {!testResult.ok && (
+                  <p className="mt-2 text-xs text-amber-300/80">
+                    💡 After saving, wait for Render to redeploy (3-5 min),
+                    then test again. The tags are server-rendered into the
+                    raw HTML on Render, not client-injected.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Header Code */}
       <Card className="glass flex flex-col gap-3 p-5">

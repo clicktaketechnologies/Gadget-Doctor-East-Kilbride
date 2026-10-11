@@ -6,6 +6,7 @@ import { Providers } from "@/components/providers";
 import { FirebaseAnalytics } from "@/components/firebase-analytics";
 import { FaviconUpdater } from "@/components/favicon-updater";
 import { CustomCodeInjector } from "@/components/custom-code-injector";
+import { ServerMetaTags } from "@/components/server-meta-tags";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -40,14 +41,46 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+// Fetch site settings server-side to inject meta tags into the raw HTML
+// (Google Search Console verification requires meta tags in the HTML source,
+// not injected via JavaScript)
+async function getSiteSettings() {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "";
+    const res = await fetch(`${baseUrl}/api/settings`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSiteSettings();
+  const headerCode = settings?.customHeaderCode || "";
+
+  // Extract verification meta tags from the header code
+  const googleMatch = headerCode.match(/google-site-verification[^>]*content=["']([^"']+)["']/i);
+  const bingMatch = headerCode.match(/msvalidate\.01[^>]*content=["']([^"']+)["']/i);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Server-rendered meta tags (visible to Google crawlers in raw HTML) */}
+        {googleMatch && (
+          <meta name="google-site-verification" content={googleMatch[1]} />
+        )}
+        {bingMatch && (
+          <meta name="msvalidate.01" content={bingMatch[1]} />
+        )}
+        {/* ServerMetaTags renders all custom header code as raw HTML */}
+        {headerCode && <ServerMetaTags html={headerCode} />}
         {/* Firebase Analytics — initialises on the client */}
         <FirebaseAnalytics />
       </head>
