@@ -10,7 +10,7 @@
 - **Phone**: +44 7777 200175
 - **WhatsApp**: +44 7777 200175
 - **Email**: info@gadgetdoctorscotland.co.uk
-- **Website**: https://gadgetdoctorls.co.uk
+- **Website**: https://gadgetdoctorls.web.app
 - **Google Maps**: https://maps.app.goo.gl/vsvyX7oc9MFpnEDS6
 - **GMB Profile**: https://g.co/kgs/bRysLQB
 - **Rating**: 4.6 stars (92+ reviews)
@@ -35,21 +35,21 @@
 
 ## Key Pages
 
-- [Home](https://gadgetdoctorls.co.uk/)
-- [Services](https://gadgetdoctorls.co.uk/services)
-- [Doorstep Collection](https://gadgetdoctorls.co.uk/collection)
-- [Reviews](https://gadgetdoctorls.co.uk/reviews)
-- [Blog](https://gadgetdoctorls.co.uk/blog)
-- [Contact](https://gadgetdoctorls.co.uk/contact)
-- [Track Repair](https://gadgetdoctorls.co.uk/track)
-- [Sitemap](https://gadgetdoctorls.co.uk/sitemap.xml)
+- [Home](https://gadgetdoctorls.web.app/)
+- [Services](https://gadgetdoctorls.web.app/services)
+- [Doorstep Collection](https://gadgetdoctorls.web.app/collection)
+- [Reviews](https://gadgetdoctorls.web.app/reviews)
+- [Blog](https://gadgetdoctorls.web.app/blog)
+- [Contact](https://gadgetdoctorls.web.app/contact)
+- [Track Repair](https://gadgetdoctorls.web.app/track)
+- [Sitemap](https://gadgetdoctorls.web.app/sitemap.xml)
 
 ## Blog Posts
 
-- [Cracked iPhone Screen Repair Guide](https://gadgetdoctorls.co.uk/blog?slug=cracked-iphone-screen-repair-guide)
-- [PS5 HDMI Port Repair Explained](https://gadgetdoctorls.co.uk/blog?slug=ps5-hdmi-port-repair-explained)
-- [MacBook Water Damage: What to Do](https://gadgetdoctorls.co.uk/blog?slug=macbook-water-damage-what-to-do)
-- [Custom Gaming PC Build Guide](https://gadgetdoctorls.co.uk/blog?slug=custom-gaming-pc-build-guide)
+- [Cracked iPhone Screen Repair Guide](https://gadgetdoctorls.web.app/blog?slug=cracked-iphone-screen-repair-guide)
+- [PS5 HDMI Port Repair Explained](https://gadgetdoctorls.web.app/blog?slug=ps5-hdmi-port-repair-explained)
+- [MacBook Water Damage: What to Do](https://gadgetdoctorls.web.app/blog?slug=macbook-water-damage-what-to-do)
+- [Custom Gaming PC Build Guide](https://gadgetdoctorls.web.app/blog?slug=custom-gaming-pc-build-guide)
 
 ## Social Media
 

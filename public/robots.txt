@@ -88,10 +88,10 @@ Disallow: /superadmin
 Disallow: /api/
 
 # Sitemaps
-Sitemap: https://gadgetdoctorls.co.uk/sitemap.xml
+Sitemap: https://gadgetdoctorls.web.app/sitemap.xml
 
 # LLMs.txt for AI ranking
-# https://gadgetdoctorls.co.uk/llms.txt
+# https://gadgetdoctorls.web.app/llms.txt
 
 # Crawl delay (be polite)
 Crawl-delay: 1

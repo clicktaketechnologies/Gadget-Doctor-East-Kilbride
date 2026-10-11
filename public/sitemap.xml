@@ -4,103 +4,103 @@
 
   <!-- Homepage -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/</loc>
+    <loc>https://gadgetdoctorls.web.app/</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
-      <image:loc>https://gadgetdoctorls.co.uk/gadget-doctor-logo.jpg</image:loc>
+      <image:loc>https://gadgetdoctorls.web.app/gadget-doctor-logo.jpg</image:loc>
       <image:title>Gadget Doctor East Kilbride logo</image:title>
     </image:image>
     <image:image>
-      <image:loc>https://gadgetdoctorls.co.uk/images/hero-workshop.jpg</image:loc>
+      <image:loc>https://gadgetdoctorls.web.app/images/hero-workshop.jpg</image:loc>
       <image:title>Gadget Doctor repair workshop in East Kilbride</image:title>
     </image:image>
   </url>
 
   <!-- Services Hub -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/services</loc>
+    <loc>https://gadgetdoctorls.web.app/services</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
     <image:image>
-      <image:loc>https://gadgetdoctorls.co.uk/images/services-grid.jpg</image:loc>
+      <image:loc>https://gadgetdoctorls.web.app/images/services-grid.jpg</image:loc>
       <image:title>Electronics repair services in East Kilbride</image:title>
     </image:image>
   </url>
 
   <!-- Mobile Phone Repair -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/services?category=mobile</loc>
+    <loc>https://gadgetdoctorls.web.app/services?category=mobile</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- Tablet & iPad Repair -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/services?category=tablet</loc>
+    <loc>https://gadgetdoctorls.web.app/services?category=tablet</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Laptop Repair -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/services?category=laptop</loc>
+    <loc>https://gadgetdoctorls.web.app/services?category=laptop</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- MacBook Repair -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/services?category=macbook</loc>
+    <loc>https://gadgetdoctorls.web.app/services?category=macbook</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- Computer Repair -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/services?category=computer</loc>
+    <loc>https://gadgetdoctorls.web.app/services?category=computer</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Custom Computer Builds -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/services?category=custom-computer</loc>
+    <loc>https://gadgetdoctorls.web.app/services?category=custom-computer</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Game Console Repair -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/services?category=console</loc>
+    <loc>https://gadgetdoctorls.web.app/services?category=console</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
   <!-- Apple Watch Repairs -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/services?category=apple-watch</loc>
+    <loc>https://gadgetdoctorls.web.app/services?category=apple-watch</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Doorstep Collection Service -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/collection</loc>
+    <loc>https://gadgetdoctorls.web.app/collection</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
-      <image:loc>https://gadgetdoctorls.co.uk/images/collection-van.jpg</image:loc>
+      <image:loc>https://gadgetdoctorls.web.app/images/collection-van.jpg</image:loc>
       <image:title>Doorstep collection van for electronics repair in East Kilbride</image:title>
     </image:image>
   </url>
 
   <!-- Customer Reviews -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/reviews</loc>
+    <loc>https://gadgetdoctorls.web.app/reviews</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -108,7 +108,7 @@
 
   <!-- Blog -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/blog</loc>
+    <loc>https://gadgetdoctorls.web.app/blog</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -116,47 +116,47 @@
 
   <!-- Blog: iPhone Screen Repair Guide -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/blog?slug=cracked-iphone-screen-repair-guide</loc>
+    <loc>https://gadgetdoctorls.web.app/blog?slug=cracked-iphone-screen-repair-guide</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <!-- Blog: PS5 HDMI Repair -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/blog?slug=ps5-hdmi-port-repair-explained</loc>
+    <loc>https://gadgetdoctorls.web.app/blog?slug=ps5-hdmi-port-repair-explained</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <!-- Blog: MacBook Water Damage -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/blog?slug=macbook-water-damage-what-to-do</loc>
+    <loc>https://gadgetdoctorls.web.app/blog?slug=macbook-water-damage-what-to-do</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <!-- Blog: Custom Gaming PC -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/blog?slug=custom-gaming-pc-build-guide</loc>
+    <loc>https://gadgetdoctorls.web.app/blog?slug=custom-gaming-pc-build-guide</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
 
   <!-- Contact -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/contact</loc>
+    <loc>https://gadgetdoctorls.web.app/contact</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
     <image:image>
-      <image:loc>https://gadgetdoctorls.co.uk/images/contact-shop.jpg</image:loc>
+      <image:loc>https://gadgetdoctorls.web.app/images/contact-shop.jpg</image:loc>
       <image:title>Gadget Doctor East Kilbride repair shop front on Stroud Road</image:title>
     </image:image>
   </url>
 
   <!-- Track Repair -->
   <url>
-    <loc>https://gadgetdoctorls.co.uk/track</loc>
+    <loc>https://gadgetdoctorls.web.app/track</loc>
     <lastmod>2025-01-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

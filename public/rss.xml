@@ -1,15 +1,15 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Gadget Doctor East Kilbride — Repair Blog</title>
-    <link>https://gadgetdoctorls.co.uk/blog</link>
+    <link>https://gadgetdoctorls.web.app/blog</link>
     <description>Expert repair tips, guides and news from Gadget Doctor East Kilbride. iPhone, MacBook, PS5, Xbox, laptop and custom PC repair advice.</description>
     <language>en-gb</language>
     <lastBuildDate>Wed, 15 Jan 2025 09:30:00 +0000</lastBuildDate>
-    <atom:link href="https://gadgetdoctorls.co.uk/rss.xml" rel="self" type="application/rss+xml"/>
+    <atom:link href="https://gadgetdoctorls.web.app/rss.xml" rel="self" type="application/rss+xml"/>
 
     <item>
       <title>Cracked iPhone Screen? Here's What You Need to Know</title>
-      <link>https://gadgetdoctorls.co.uk/blog?slug=cracked-iphone-screen-repair-guide</link>
+      <link>https://gadgetdoctorls.web.app/blog?slug=cracked-iphone-screen-repair-guide</link>
       <description>From repair options to costs and turnaround times — everything you need to know before getting your iPhone screen fixed in East Kilbride.</description>
       <guid isPermaLink="false">gd-iphone-screen-guide</guid>
       <pubDate>Wed, 15 Jan 2025 09:30:00 +0000</pubDate>
@@ -18,7 +18,7 @@
 
     <item>
       <title>PS5 HDMI Port Repair: Why It Happens and How We Fix It</title>
-      <link>https://gadgetdoctorls.co.uk/blog?slug=ps5-hdmi-port-repair-explained</link>
+      <link>https://gadgetdoctorls.web.app/blog?slug=ps5-hdmi-port-repair-explained</link>
       <description>No signal on your TV? A broken HDMI port is the most common PS5 fault. Here's how we repair it and what it costs.</description>
       <guid isPermaLink="false">gd-ps5-hdmi</guid>
       <pubDate>Tue, 14 Jan 2025 09:30:00 +0000</pubDate>
@@ -27,7 +27,7 @@
 
     <item>
       <title>Spilled Water on Your MacBook? Do This Immediately</title>
-      <link>https://gadgetdoctorls.co.uk/blog?slug=macbook-water-damage-what-to-do</link>
+      <link>https://gadgetdoctorls.web.app/blog?slug=macbook-water-damage-what-to-do</link>
       <description>Liquid damage can kill a MacBook fast. Follow these steps to minimise damage and increase the chances of a successful repair.</description>
       <guid isPermaLink="false">gd-macbook-water</guid>
       <pubDate>Mon, 13 Jan 2025 09:30:00 +0000</pubDate>
@@ -36,7 +36,7 @@
 
     <item>
       <title>Building a Custom Gaming PC: Where to Start</title>
-      <link>https://gadgetdoctorls.co.uk/blog?slug=custom-gaming-pc-build-guide</link>
+      <link>https://gadgetdoctorls.web.app/blog?slug=custom-gaming-pc-build-guide</link>
       <description>Thinking about a custom gaming PC build? Here's how to plan your budget and what to expect from Gadget Doctor.</description>
       <guid isPermaLink="false">gd-custom-pc</guid>
       <pubDate>Sun, 12 Jan 2025 09:30:00 +0000</pubDate>
