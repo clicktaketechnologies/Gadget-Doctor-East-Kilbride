@@ -14,6 +14,7 @@ import {
   Mail,
   UserCog,
   UserPlus,
+  Code2,
   type LucideIcon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -45,6 +46,7 @@ const NAV_ITEMS: NavItem[] = [
   { id: "blog", label: "Blog", icon: FileText },
   { id: "pages", label: "Pages", icon: FileEdit },
   { id: "email", label: "Email", icon: Mail },
+  { id: "custom-code", label: "Custom Code", icon: Code2 },
   { id: "settings", label: "Settings", icon: UserCog },
 ];
 

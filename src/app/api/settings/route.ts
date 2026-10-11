@@ -39,6 +39,8 @@ export async function PATCH(req: NextRequest) {
     announcementEnabled?: boolean;
     announcementText?: string | null;
     ticketIdVisible?: boolean;
+    customHeaderCode?: string;
+    customFooterCode?: string;
   };
 
   const data: Record<string, unknown> = {};
@@ -52,6 +54,10 @@ export async function PATCH(req: NextRequest) {
     data.announcementText = body.announcementText;
   if (body.ticketIdVisible !== undefined)
     data.ticketIdVisible = body.ticketIdVisible;
+  if (body.customHeaderCode !== undefined)
+    data.customHeaderCode = body.customHeaderCode;
+  if (body.customFooterCode !== undefined)
+    data.customFooterCode = body.customFooterCode;
 
   let s = await db.siteSettings.findUnique({ where: { id: "singleton" } });
   if (!s) {

@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Providers } from "@/components/providers";
 import { FirebaseAnalytics } from "@/components/firebase-analytics";
 import { FaviconUpdater } from "@/components/favicon-updater";
+import { CustomCodeInjector } from "@/components/custom-code-injector";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -57,6 +58,7 @@ export default function RootLayout({
           {children}
           <Toaster />
           <FaviconUpdater />
+          <CustomCodeInjector />
         </Providers>
       </body>
     </html>

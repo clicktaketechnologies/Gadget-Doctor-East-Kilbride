@@ -73,6 +73,8 @@ export interface SiteSettings {
   announcementEnabled: boolean;
   announcementText: string | null;
   ticketIdVisible: boolean;
+  customHeaderCode: string;
+  customFooterCode: string;
 }
 
 export interface BusinessHours {

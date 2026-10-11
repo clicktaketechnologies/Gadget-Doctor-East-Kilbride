@@ -27,6 +27,7 @@ export type AdminModule =
   | "blog"
   | "pages"
   | "email"
+  | "custom-code"
   | "settings";
 
 interface AppState {

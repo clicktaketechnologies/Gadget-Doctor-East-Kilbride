@@ -15,6 +15,7 @@ import { BrandingManager } from "./branding-manager";
 import { BlogManager } from "./blog-manager";
 import { PagesEditor } from "./pages-editor";
 import { EmailSettings } from "./email-settings";
+import { CustomCodeManager } from "./custom-code-manager";
 import { AdminSettings } from "./admin-settings";
 
 export function AdminPanel() {
@@ -66,6 +67,7 @@ export function AdminPanel() {
           {adminModule === "blog" && <BlogManager />}
           {adminModule === "pages" && <PagesEditor />}
           {adminModule === "email" && <EmailSettings />}
+          {adminModule === "custom-code" && <CustomCodeManager />}
           {adminModule === "settings" && <AdminSettings />}
         </main>
       </div>

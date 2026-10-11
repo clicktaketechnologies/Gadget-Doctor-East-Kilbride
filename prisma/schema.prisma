@@ -75,6 +75,8 @@ model SiteSettings {
   announcementEnabled     Boolean @default(false)
   announcementText        String?
   ticketIdVisible         Boolean @default(true) // show/hide ticket ID on public booking form + track page
+  customHeaderCode        String  @default("") // custom HTML/CSS/JS injected into <head>
+  customFooterCode        String  @default("") // custom HTML/CSS/JS injected before </body>
 }
 
 model Branding {
