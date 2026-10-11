@@ -32,7 +32,13 @@ export const metadata: Metadata = {
     "data recovery",
   ],
   icons: {
-    icon: "/logo.svg",
+    icon: "/gadget-doctor-logo.jpg",
+  },
+  // Google Search Console verification — hardcoded so it's in the raw HTML
+  // on both Firebase (static export) and Render (SSR).
+  // This works on gadgetdoctorls.web.app, gadgetdoctorls.co.uk, and Render.
+  verification: {
+    google: "H-OKElcx2vleyf5JmpMgN3in5UqGlIwjV8z7KRqM7SA",
   },
   openGraph: {
     title: "Gadget Doctor East Kilbride",
