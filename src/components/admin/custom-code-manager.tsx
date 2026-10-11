@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Code2, Save, Loader2, Check, AlertCircle, Trash2 } from "lucide-react";
+import { Code2, Save, Loader2, Check, AlertCircle, Trash2, ShieldCheck, Search } from "lucide-react";
 import { useSettings, useUpdateSettings } from "@/lib/api-hooks";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,9 @@ export function CustomCodeManager() {
 
   const [headerCode, setHeaderCode] = useState("");
   const [footerCode, setFooterCode] = useState("");
+  const [googleVerification, setGoogleVerification] = useState("");
+  const [bingVerification, setBingVerification] = useState("");
+  const [customMetaTags, setCustomMetaTags] = useState("");
   const [loaded, setLoaded] = useState(false);
 
   // Initialize from server data (key-remount pattern)
@@ -36,13 +39,35 @@ export function CustomCodeManager() {
     );
   }
 
+  // Build the combined header code: verification tags + custom header code
+  const buildHeaderCode = () => {
+    const parts = [];
+    if (googleVerification.trim()) {
+      parts.push(`<!-- Google Search Console Verification -->
+<meta name="google-site-verification" content="${googleVerification.trim()}" />`);
+    }
+    if (bingVerification.trim()) {
+      parts.push(`<!-- Bing Webmaster Tools Verification -->
+<meta name="msvalidate.01" content="${bingVerification.trim()}" />`);
+    }
+    if (customMetaTags.trim()) {
+      parts.push(`<!-- Custom Meta Tags -->
+${customMetaTags.trim()}`);
+    }
+    if (headerCode.trim()) {
+      parts.push(`<!-- Custom Header Code -->
+${headerCode.trim()}`);
+    }
+    return parts.join("\n\n");
+  };
+
   const dirty =
-    headerCode !== (settingsQ.data.customHeaderCode ?? "") ||
+    buildHeaderCode() !== (settingsQ.data.customHeaderCode ?? "") ||
     footerCode !== (settingsQ.data.customFooterCode ?? "");
 
   const handleSave = () => {
     updateMutation.mutate({
-      customHeaderCode: headerCode,
+      customHeaderCode: buildHeaderCode(),
       customFooterCode: footerCode,
     });
   };
@@ -50,11 +75,17 @@ export function CustomCodeManager() {
   const handleReset = () => {
     setHeaderCode(settingsQ.data?.customHeaderCode ?? "");
     setFooterCode(settingsQ.data?.customFooterCode ?? "");
+    setGoogleVerification("");
+    setBingVerification("");
+    setCustomMetaTags("");
   };
 
   const handleClear = () => {
     setHeaderCode("");
     setFooterCode("");
+    setGoogleVerification("");
+    setBingVerification("");
+    setCustomMetaTags("");
   };
 
   return (
@@ -80,6 +111,79 @@ export function CustomCodeManager() {
           </p>
         </div>
       </div>
+
+      {/* Site Verification */}
+      <Card className="glass flex flex-col gap-3 p-5">
+        <div className="flex items-start gap-3">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/30">
+            <ShieldCheck className="size-5" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-foreground">
+              Site Verification Tags
+            </h3>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Verify your site ownership with Google Search Console, Bing
+              Webmaster Tools, and other search engines. Paste only the
+              verification code value (not the full HTML tag).
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <Label htmlFor="google-verify" className="text-xs">
+              🔍 Google Search Console verification
+            </Label>
+            <Textarea
+              id="google-verify"
+              placeholder="Paste the content value from: <meta name='google-site-verification' content='THIS_PART' />"
+              value={googleVerification}
+              onChange={(e) => setGoogleVerification(e.target.value)}
+              rows={2}
+              className="font-mono text-xs"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Google Search Console → Settings → Verification → HTML tag → copy the content value
+            </p>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="bing-verify" className="text-xs">
+              🔎 Bing Webmaster Tools verification
+            </Label>
+            <Textarea
+              id="bing-verify"
+              placeholder="Paste the content value from: <meta name='msvalidate.01' content='THIS_PART' />"
+              value={bingVerification}
+              onChange={(e) => setBingVerification(e.target.value)}
+              rows={2}
+              className="font-mono text-xs"
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Bing Webmaster Tools → Configure → Verify → Meta tag → copy the content value
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="custom-meta" className="text-xs">
+            🏷️ Custom meta tags (paste full tags)
+          </Label>
+          <Textarea
+            id="custom-meta"
+            placeholder={`<!-- Example: -->
+<meta name="yandex-verification" content="..." />
+<meta name="p:domain_verify" content="..." />`}
+            value={customMetaTags}
+            onChange={(e) => setCustomMetaTags(e.target.value)}
+            rows={3}
+            className="font-mono text-xs"
+          />
+          <p className="text-[11px] text-muted-foreground">
+            For Yandex, Pinterest, Alexa, or any other verification meta tags — paste the full &lt;meta&gt; tag here
+          </p>
+        </div>
+      </Card>
 
       {/* Header Code */}
       <Card className="glass flex flex-col gap-3 p-5">
@@ -218,12 +322,14 @@ export function CustomCodeManager() {
         <ul className="grid grid-cols-1 gap-1 text-xs text-muted-foreground sm:grid-cols-2">
           <li>📊 Google Analytics 4 (GA4)</li>
           <li>🔵 Facebook / Meta Pixel</li>
-          <li>🔍 Google Search Console verification</li>
+          <li>🔍 Google Search Console HTML tag verification</li>
+          <li>🔎 Bing Webmaster Tools verification</li>
           <li>🎨 Custom CSS (&lt;style&gt; tags)</li>
           <li>💬 Live chat widgets (Tawk.to, Intercom)</li>
           <li>📈 Conversion tracking pixels</li>
           <li>🏷️ Schema.org structured data</li>
           <li>🔔 OneSignal push notifications</li>
+          <li>🌐 Yandex / Pinterest / Alexa verification</li>
         </ul>
       </Card>
     </div>
