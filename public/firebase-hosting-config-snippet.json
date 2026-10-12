@@ -1,0 +1,16 @@
+{
+  "_comment": "Paste these 'redirects' entries into the 'hosting' array of your firebase.json. They fix: (1) apex -> www 301 canonicalization [Ahrefs W3], (2) /favicon.ico 404 [Ahrefs N1]. Note: apex->www redirect requires the apex domain to also be added to Firebase Hosting in the console.",
+  "redirects": [
+    {
+      "source": "/favicon.ico",
+      "destination": "/gadget-doctor-logo.jpg",
+      "type": 302
+    },
+    {
+      "source": "/",
+      "destination": "https://www.gadgetdoctorls.co.uk",
+      "type": 301
+    }
+  ],
+  "_note_apex_redirect": "For the apex (gadgetdoctorls.co.uk) -> www redirect, the apex domain MUST be added as a second site in Firebase Console (Hosting) and a redirect rule set there with: source /**, destination https://www.gadgetdoctorls.co.uk{path}, type 301. The snippet above only handles the /favicon.ico redirect on the www site."
+}

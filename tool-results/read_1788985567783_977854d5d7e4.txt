@@ -1,0 +1,943 @@
+     1→"use client";
+     2→
+     3→import { useState } from "react";
+     4→import {
+     5→  Save,
+     6→  Loader2,
+     7→  RotateCcw,
+     8→  Plus,
+     9→  Trash2,
+    10→  AlertCircle,
+    11→  Building2,
+    12→  Palette,
+    13→  Phone,
+    14→  Mail,
+    15→  Globe,
+    16→  MapPin,
+    17→  Clock,
+    18→  Share2,
+    19→  MapPinned,
+    20→  Star,
+    21→  Check,
+    22→  ExternalLink,
+    23→} from "lucide-react";
+    24→import { useBranding, useUpdateBranding } from "@/lib/api-hooks";
+    25→import { SOCIAL_LINKS } from "@/lib/brand";
+    26→import { Icon } from "@/components/icon";
+    27→import type { Branding, BusinessHours, SocialLinks, UpdateBrandingInput } from "@/lib/types";
+    28→import { cn } from "@/lib/utils";
+    29→import { Card } from "@/components/ui/card";
+    30→import { Button } from "@/components/ui/button";
+    31→import { Input } from "@/components/ui/input";
+    32→import { Label } from "@/components/ui/label";
+    33→import { Textarea } from "@/components/ui/textarea";
+    34→import { Separator } from "@/components/ui/separator";
+    35→import { Skeleton } from "@/components/ui/skeleton";
+    36→
+    37→export function BrandingManager() {
+    38→  const brandingQ = useBranding();
+    39→  const updateMutation = useUpdateBranding();
+    40→
+    41→  if (brandingQ.isLoading) {
+    42→    return (
+    43→      <div className="space-y-4">
+    44→        <Skeleton className="h-32 rounded-2xl" />
+    45→        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+    46→          <Skeleton className="h-64 rounded-2xl" />
+    47→          <Skeleton className="h-64 rounded-2xl" />
+    48→        </div>
+    49→        <Skeleton className="h-72 rounded-2xl" />
+    50→      </div>
+    51→    );
+    52→  }
+    53→
+    54→  if (brandingQ.isError || !brandingQ.data) {
+    55→    return (
+    56→      <Card className="glass flex flex-col items-center justify-center gap-3 p-12 text-center">
+    57→        <AlertCircle className="size-8 text-rose-400" />
+    58→        <div>
+    59→          <div className="text-sm font-semibold text-foreground">
+    60→            Couldn&apos;t load branding
+    61→          </div>
+    62→          <div className="mt-1 text-xs text-muted-foreground">
+    63→            {brandingQ.error?.message ?? "Please try again in a moment."}
+    64→          </div>
+    65→        </div>
+    66→        <Button variant="outline" size="sm" onClick={() => brandingQ.refetch()}>
+    67→          Retry
+    68→        </Button>
+    69→      </Card>
+    70→    );
+    71→  }
+    72→
+    73→  return (
+    74→    <BrandingForm
+    75→      key={brandingQ.data.id ?? "none"}
+    76→      branding={brandingQ.data}
+    77→      updateMutation={updateMutation}
+    78→    />
+    79→  );
+    80→}
+    81→
+    82→function deepEqual(a: unknown, b: unknown): boolean {
+    83→  return JSON.stringify(a) === JSON.stringify(b);
+    84→}
+    85→
+    86→function BrandingForm({
+    87→  branding,
+    88→  updateMutation,
+    89→}: {
+    90→  branding: Branding;
+    91→  updateMutation: ReturnType<typeof useUpdateBranding>;
+    92→}) {
+    93→  // ----- Local form state, initialized once per mount (key-remount on branding.id) -----
+    94→  const [businessName, setBusinessName] = useState(branding.businessName);
+    95→  const [tagline, setTagline] = useState(branding.tagline);
+    96→  const [about, setAbout] = useState(branding.about);
+    97→  const [logoUrl, setLogoUrl] = useState(branding.logoUrl);
+    98→  const [primaryColor, setPrimaryColor] = useState(branding.primaryColor);
+    99→  const [secondaryColor, setSecondaryColor] = useState(branding.secondaryColor);
+   100→  const [phone, setPhone] = useState(branding.phone);
+   101→  const [whatsapp, setWhatsapp] = useState(branding.whatsapp);
+   102→  const [email, setEmail] = useState(branding.email);
+   103→  const [website, setWebsite] = useState(branding.website);
+   104→  const [gmbProfile, setGmbProfile] = useState(branding.gmbProfile);
+   105→  const [address, setAddress] = useState(branding.address);
+   106→  const [mapLink, setMapLink] = useState(branding.mapLink);
+   107→  const [mapEmbed, setMapEmbed] = useState(branding.mapEmbed);
+   108→  const [hours, setHours] = useState<BusinessHours[]>(
+   109→    branding.hours.map((h) => ({ ...h }))
+   110→  );
+   111→  const [socials, setSocials] = useState<SocialLinks>({ ...branding.socials });
+   112→  const [targetAreas, setTargetAreas] = useState<string[]>([...branding.targetAreas]);
+   113→  const [rating, setRating] = useState<string>(String(branding.rating));
+   114→  const [reviewCount, setReviewCount] = useState<string>(String(branding.reviewCount));
+   115→  const [yearsExperience, setYearsExperience] = useState<string>(
+   116→    String(branding.yearsExperience)
+   117→  );
+   118→  const [savedFlash, setSavedFlash] = useState(false);
+   119→
+   120→  // ----- Build current snapshot + dirty check -----
+   121→  const currentSnapshot: UpdateBrandingInput = {
+   122→    businessName,
+   123→    tagline,
+   124→    about,
+   125→    logoUrl,
+   126→    primaryColor,
+   127→    secondaryColor,
+   128→    phone,
+   129→    whatsapp,
+   130→    email,
+   131→    website,
+   132→    gmbProfile,
+   133→    mapLink,
+   134→    mapEmbed,
+   135→    address,
+   136→    hours,
+   137→    socials,
+   138→    targetAreas,
+   139→    rating: Number(rating) || 0,
+   140→    reviewCount: Number(reviewCount) || 0,
+   141→    yearsExperience: Number(yearsExperience) || 0,
+   142→  };
+   143→
+   144→  const originalSnapshot: UpdateBrandingInput = {
+   145→    businessName: branding.businessName,
+   146→    tagline: branding.tagline,
+   147→    about: branding.about,
+   148→    logoUrl: branding.logoUrl,
+   149→    primaryColor: branding.primaryColor,
+   150→    secondaryColor: branding.secondaryColor,
+   151→    phone: branding.phone,
+   152→    whatsapp: branding.whatsapp,
+   153→    email: branding.email,
+   154→    website: branding.website,
+   155→    gmbProfile: branding.gmbProfile,
+   156→    mapLink: branding.mapLink,
+   157→    mapEmbed: branding.mapEmbed,
+   158→    address: branding.address,
+   159→    hours: branding.hours,
+   160→    socials: branding.socials,
+   161→    targetAreas: branding.targetAreas,
+   162→    rating: branding.rating,
+   163→    reviewCount: branding.reviewCount,
+   164→    yearsExperience: branding.yearsExperience,
+   165→  };
+   166→
+   167→  const isDirty = !deepEqual(currentSnapshot, originalSnapshot);
+   168→
+   169→  const handleSave = () => {
+   170→    if (!isDirty || updateMutation.isPending) return;
+   171→    updateMutation.mutate(currentSnapshot, {
+   172→      onSuccess: () => {
+   173→        setSavedFlash(true);
+   174→        window.setTimeout(() => setSavedFlash(false), 1800);
+   175→      },
+   176→    });
+   177→  };
+   178→
+   179→  const handleReset = () => {
+   180→    setBusinessName(branding.businessName);
+   181→    setTagline(branding.tagline);
+   182→    setAbout(branding.about);
+   183→    setLogoUrl(branding.logoUrl);
+   184→    setPrimaryColor(branding.primaryColor);
+   185→    setSecondaryColor(branding.secondaryColor);
+   186→    setPhone(branding.phone);
+   187→    setWhatsapp(branding.whatsapp);
+   188→    setEmail(branding.email);
+   189→    setWebsite(branding.website);
+   190→    setGmbProfile(branding.gmbProfile);
+   191→    setAddress(branding.address);
+   192→    setMapLink(branding.mapLink);
+   193→    setMapEmbed(branding.mapEmbed);
+   194→    setHours(branding.hours.map((h) => ({ ...h })));
+   195→    setSocials({ ...branding.socials });
+   196→    setTargetAreas([...branding.targetAreas]);
+   197→    setRating(String(branding.rating));
+   198→    setReviewCount(String(branding.reviewCount));
+   199→    setYearsExperience(String(branding.yearsExperience));
+   200→  };
+   201→
+   202→  // ----- Hours helpers -----
+   203→  const updateHour = (i: number, field: keyof BusinessHours, value: string) => {
+   204→    setHours((prev) =>
+   205→      prev.map((h, idx) => (idx === i ? { ...h, [field]: value } : h))
+   206→    );
+   207→  };
+   208→  const addHour = () =>
+   209→    setHours((prev) => [...prev, { day: "", time: "" }]);
+   210→  const removeHour = (i: number) =>
+   211→    setHours((prev) => prev.filter((_, idx) => idx !== i));
+   212→
+   213→  // ----- Socials helpers -----
+   214→  const updateSocial = (key: string, value: string) => {
+   215→    setSocials((prev) => ({ ...prev, [key]: value }));
+   216→  };
+   217→
+   218→  // ----- Target areas helpers -----
+   219→  const updateArea = (i: number, value: string) => {
+   220→    setTargetAreas((prev) => prev.map((a, idx) => (idx === i ? value : a)));
+   221→  };
+   222→  const addArea = () => setTargetAreas((prev) => [...prev, ""]);
+   223→  const removeArea = (i: number) =>
+   224→    setTargetAreas((prev) => prev.filter((_, idx) => idx !== i));
+   225→
+   226→  return (
+   227→    <div className="space-y-5 pb-24">
+   228→      {/* Header bar */}
+   229→      <div className="flex flex-wrap items-end justify-between gap-3">
+   230→        <div>
+   231→          <h2 className="text-lg font-semibold text-foreground">Branding</h2>
+   232→          <p className="text-sm text-muted-foreground">
+   233→            Manage your business identity, contact details, hours and service
+   234→            areas — all live on the public site.
+   235→          </p>
+   236→        </div>
+   237→        <div className="flex items-center gap-2">
+   238→          <Button
+   239→            variant="outline"
+   240→            size="sm"
+   241→            onClick={handleReset}
+   242→            disabled={!isDirty || updateMutation.isPending}
+   243→            className="gap-1.5"
+   244→          >
+   245→            <RotateCcw className="size-3.5" />
+   246→            Reset
+   247→          </Button>
+   248→          <Button
+   249→            onClick={handleSave}
+   250→            disabled={!isDirty || updateMutation.isPending}
+   251→            className="gap-1.5"
+   252→          >
+   253→            {updateMutation.isPending ? (
+   254→              <>
+   255→                <Loader2 className="size-4 animate-spin" />
+   256→                Saving…
+   257→              </>
+   258→            ) : savedFlash ? (
+   259→              <>
+   260→                <Check className="size-4" />
+   261→                Saved
+   262→              </>
+   263→            ) : (
+   264→              <>
+   265→                <Save className="size-4" />
+   266→                Save Changes
+   267→              </>
+   268→            )}
+   269→          </Button>
+   270→        </div>
+   271→      </div>
+   272→
+   273→      {/* Error banner */}
+   274→      {updateMutation.isError && (
+   275→        <div
+   276→          role="alert"
+   277→          className="flex items-center gap-2 rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2.5 text-sm text-rose-300"
+   278→        >
+   279→          <AlertCircle className="size-4 shrink-0" />
+   280→          <span>
+   281→            {updateMutation.error?.message ?? "Failed to save branding."}
+   282→          </span>
+   283→        </div>
+   284→      )}
+   285→
+   286→      {/* Live preview card */}
+   287→      <Card className="glass overflow-hidden p-0">
+   288→        <div className="flex flex-col items-center gap-5 p-6 sm:flex-row sm:items-center">
+   289→          <div className="flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white p-2 shadow-md shadow-primary/20 ring-1 ring-border/60">
+   290→            {logoUrl ? (
+   291→              <img
+   292→                src={logoUrl}
+   293→                alt={`${businessName || "Business"} logo`}
+   294→                className="h-full w-full object-contain"
+   295→                onError={(e) => {
+   296→                  (e.currentTarget as HTMLImageElement).style.display = "none";
+   297→                }}
+   298→              />
+   299→            ) : (
+   300→              <Building2 className="size-8 text-muted-foreground" />
+   301→            )}
+   302→          </div>
+   303→          <div className="min-w-0 flex-1 text-center sm:text-left">
+   304→            <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
+   305→              <h3 className="text-xl font-bold text-foreground">
+   306→                {businessName || "Your business name"}
+   307→              </h3>
+   308→              <span
+   309→                className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold"
+   310→                style={{
+   311→                  background: `${primaryColor}22`,
+   312→                  color: primaryColor,
+   313→                  border: `1px solid ${primaryColor}55`,
+   314→                }}
+   315→              >
+   316→                <Star className="size-3 fill-current" />
+   317→                {rating || "0.0"}
+   318→              </span>
+   319→            </div>
+   320→            <p className="mt-1 text-sm text-muted-foreground">
+   321→              {tagline || "Your tagline will appear here"}
+   322→            </p>
+   323→            <div className="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground sm:justify-start">
+   324→              {phone && (
+   325→                <span className="inline-flex items-center gap-1">
+   326→                  <Phone className="size-3" />
+   327→                  {phone}
+   328→                </span>
+   329→              )}
+   330→              {email && (
+   331→                <span className="inline-flex items-center gap-1">
+   332→                  <Mail className="size-3" />
+   333→                  {email}
+   334→                </span>
+   335→              )}
+   336→              {website && (
+   337→                <span className="inline-flex items-center gap-1">
+   338→                  <Globe className="size-3" />
+   339→                  {website.replace(/^https?:\/\//, "")}
+   340→                </span>
+   341→              )}
+   342→            </div>
+   343→          </div>
+   344→          <div className="flex shrink-0 gap-2">
+   345→            <span
+   346→              className="size-9 rounded-lg ring-1 ring-border/60"
+   347→              style={{ background: primaryColor }}
+   348→              title={`Primary: ${primaryColor}`}
+   349→            />
+   350→            <span
+   351→              className="size-9 rounded-lg ring-1 ring-border/60"
+   352→              style={{ background: secondaryColor }}
+   353→              title={`Accent: ${secondaryColor}`}
+   354→            />
+   355→          </div>
+   356→        </div>
+   357→      </Card>
+   358→
+   359→      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+   360→        {/* 1. Identity */}
+   361→        <SectionCard
+   362→          icon={Building2}
+   363→          title="Identity"
+   364→          subtitle="The core of your brand"
+   365→        >
+   366→          <div className="space-y-4">
+   367→            <Field label="Business name" htmlFor="br-name">
+   368→              <Input
+   369→                id="br-name"
+   370→                value={businessName}
+   371→                onChange={(e) => setBusinessName(e.target.value)}
+   372→                placeholder="Gadget Doctor East Kilbride"
+   373→              />
+   374→            </Field>
+   375→            <Field label="Tagline" htmlFor="br-tagline">
+   376→              <Input
+   377→                id="br-tagline"
+   378→                value={tagline}
+   379→                onChange={(e) => setTagline(e.target.value)}
+   380→                placeholder="Fast & Reliable Electronics Repair"
+   381→              />
+   382→            </Field>
+   383→            <Field
+   384→              label="About"
+   385→              htmlFor="br-about"
+   386→              hint="Shown on the home page hero and about sections."
+   387→            >
+   388→              <Textarea
+   389→                id="br-about"
+   390→                rows={5}
+   391→                value={about}
+   392→                onChange={(e) => setAbout(e.target.value)}
+   393→                placeholder="A short paragraph about your business, expertise and what makes you different."
+   394→              />
+   395→            </Field>
+   396→            <Field
+   397→              label="Logo URL"
+   398→              htmlFor="br-logo"
+   399→              hint="Use a square image. Shown in a white rounded container."
+   400→            >
+   401→              <div className="flex items-center gap-3">
+   402→                <div className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white p-1.5 ring-1 ring-border/60">
+   403→                  {logoUrl ? (
+   404→                    <img
+   405→                      src={logoUrl}
+   406→                      alt="Logo preview"
+   407→                      className="h-full w-full object-contain"
+   408→                      onError={(e) => {
+   409→                        (e.currentTarget as HTMLImageElement).style.display =
+   410→                          "none";
+   411→                      }}
+   412→                    />
+   413→                  ) : (
+   414→                    <Building2 className="size-6 text-muted-foreground" />
+   415→                  )}
+   416→                </div>
+   417→                <Input
+   418→                  id="br-logo"
+   419→                  value={logoUrl}
+   420→                  onChange={(e) => setLogoUrl(e.target.value)}
+   421→                  placeholder="/gadget-doctor-logo.jpg"
+   422→                  className="flex-1"
+   423→                />
+   424→              </div>
+   425→            </Field>
+   426→          </div>
+   427→        </SectionCard>
+   428→
+   429→        {/* 2. Brand Colors */}
+   430→        <SectionCard
+   431→          icon={Palette}
+   432→          title="Brand Colors"
+   433→          subtitle="Stored for reference and future use"
+   434→        >
+   435→          <div className="space-y-4">
+   436→            <ColorField
+   437→              label="Primary color"
+   438→              hint="Used for primary CTAs and accents across the site."
+   439→              value={primaryColor}
+   440→              onChange={setPrimaryColor}
+   441→              id="br-primary-color"
+   442→            />
+   443→            <ColorField
+   444→              label="Secondary / accent color"
+   445→              hint="Used for highlights, links and secondary accents."
+   446→              value={secondaryColor}
+   447→              onChange={setSecondaryColor}
+   448→              id="br-secondary-color"
+   449→            />
+   450→            <div className="rounded-lg border border-border/60 bg-secondary/20 p-3 text-xs text-muted-foreground">
+   451→              <strong className="text-foreground">Note:</strong> Changing these
+   452→              here stores them in the database for reference. The active theme
+   453→              colors are baked into the design system and apply on the next
+   454→              deploy.
+   455→            </div>
+   456→            <div className="flex items-center gap-2">
+   457→              <span
+   458→                className="h-10 flex-1 rounded-lg ring-1 ring-border/60"
+   459→                style={{ background: primaryColor }}
+   460→              />
+   461→              <span
+   462→                className="h-10 flex-1 rounded-lg ring-1 ring-border/60"
+   463→                style={{ background: secondaryColor }}
+   464→              />
+   465→            </div>
+   466→          </div>
+   467→        </SectionCard>
+   468→
+   469→        {/* 3. Contact */}
+   470→        <SectionCard
+   471→          icon={Phone}
+   472→          title="Contact"
+   473→          subtitle="How customers reach you"
+   474→        >
+   475→          <div className="space-y-4">
+   476→            <Field label="Phone" htmlFor="br-phone">
+   477→              <Input
+   478→                id="br-phone"
+   479→                value={phone}
+   480→                onChange={(e) => setPhone(e.target.value)}
+   481→                placeholder="+44 1355 458135"
+   482→              />
+   483→            </Field>
+   484→            <Field label="WhatsApp" htmlFor="br-whatsapp">
+   485→              <Input
+   486→                id="br-whatsapp"
+   487→                value={whatsapp}
+   488→                onChange={(e) => setWhatsapp(e.target.value)}
+   489→                placeholder="+44 1355 458135"
+   490→              />
+   491→            </Field>
+   492→            <Field label="Email" htmlFor="br-email">
+   493→              <Input
+   494→                id="br-email"
+   495→                type="email"
+   496→                value={email}
+   497→                onChange={(e) => setEmail(e.target.value)}
+   498→                placeholder="info@gadgetdoctor.co.uk"
+   499→              />
+   500→            </Field>
+   501→            <Field label="Website" htmlFor="br-website">
+   502→              <Input
+   503→                id="br-website"
+   504→                value={website}
+   505→                onChange={(e) => setWebsite(e.target.value)}
+   506→                placeholder="https://www.gadgetdoctoreastkilbride.co.uk"
+   507→              />
+   508→            </Field>
+   509→            <Field label="Google Business Profile URL" htmlFor="br-gmb">
+   510→              <Input
+   511→                id="br-gmb"
+   512→                value={gmbProfile}
+   513→                onChange={(e) => setGmbProfile(e.target.value)}
+   514→                placeholder="https://g.co/kgs/..."
+   515→              />
+   516→            </Field>
+   517→          </div>
+   518→        </SectionCard>
+   519→
+   520→        {/* 4. Location */}
+   521→        <SectionCard
+   522→          icon={MapPin}
+   523→          title="Location"
+   524→          subtitle="Address & map embed"
+   525→        >
+   526→          <div className="space-y-4">
+   527→            <Field label="Address" htmlFor="br-address">
+   528→              <Textarea
+   529→                id="br-address"
+   530→                rows={2}
+   531→                value={address}
+   532→                onChange={(e) => setAddress(e.target.value)}
+   533→                placeholder="14 Stroud Rd, East Kilbride, G75 0YA, Scotland"
+   534→              />
+   535→            </Field>
+   536→            <Field
+   537→              label="Map link (Get Directions)"
+   538→              htmlFor="br-maplink"
+   539→            >
+   540→              <Input
+   541→                id="br-maplink"
+   542→                value={mapLink}
+   543→                onChange={(e) => setMapLink(e.target.value)}
+   544→                placeholder="https://maps.app.goo.gl/..."
+   545→              />
+   546→            </Field>
+   547→            <Field
+   548→              label="Map embed URL"
+   549→              htmlFor="br-mapembed"
+   550→              hint="Used for the live iframe preview below."
+   551→            >
+   552→              <Input
+   553→                id="br-mapembed"
+   554→                value={mapEmbed}
+   555→                onChange={(e) => setMapEmbed(e.target.value)}
+   556→                placeholder="https://www.google.com/maps?q=...&output=embed"
+   557→              />
+   558→            </Field>
+   559→            {mapEmbed ? (
+   560→              <div>
+   561→                <div className="mb-1.5 text-xs uppercase tracking-wider text-muted-foreground">
+   562→                  Live map preview
+   563→                </div>
+   564→                <div className="overflow-hidden rounded-lg border border-border/60 ring-1 ring-border/60">
+   565→                  <iframe
+   566→                    title="Map preview"
+   567→                    src={mapEmbed}
+   568→                    className="h-[200px] w-full bg-secondary/20"
+   569→                    loading="lazy"
+   570→                    referrerPolicy="no-referrer-when-downgrade"
+   571→                  />
+   572→                </div>
+   573→              </div>
+   574→            ) : (
+   575→              <div className="flex h-32 items-center justify-center rounded-lg border border-dashed border-border/60 text-xs text-muted-foreground">
+   576→                Add a map embed URL to see a preview.
+   577→              </div>
+   578→            )}
+   579→          </div>
+   580→        </SectionCard>
+   581→
+   582→        {/* 5. Opening Hours */}
+   583→        <SectionCard
+   584→          icon={Clock}
+   585→          title="Opening Hours"
+   586→          subtitle="Weekly schedule"
+   587→          full
+   588→        >
+   589→          <div className="space-y-2.5">
+   590→            {hours.length === 0 ? (
+   591→              <div className="flex h-24 items-center justify-center rounded-lg border border-dashed border-border/60 text-xs text-muted-foreground">
+   592→                No hours set. Add a row below.
+   593→              </div>
+   594→            ) : (
+   595→              hours.map((h, i) => (
+   596→                <div
+   597→                  key={i}
+   598→                  className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1.5fr_auto] sm:items-center"
+   599→                >
+   600→                  <Input
+   601→                    aria-label={`Day ${i + 1}`}
+   602→                    value={h.day}
+   603→                    onChange={(e) => updateHour(i, "day", e.target.value)}
+   604→                    placeholder="Monday – Thursday"
+   605→                  />
+   606→                  <Input
+   607→                    aria-label={`Hours ${i + 1}`}
+   608→                    value={h.time}
+   609→                    onChange={(e) => updateHour(i, "time", e.target.value)}
+   610→                    placeholder="09:30 AM – 03:00 PM"
+   611→                  />
+   612→                  <Button
+   613→                    type="button"
+   614→                    variant="ghost"
+   615→                    size="icon"
+   616→                    className="size-9 justify-self-start text-rose-300 hover:bg-rose-500/10 hover:text-rose-200 sm:justify-self-end"
+   617→                    onClick={() => removeHour(i)}
+   618→                    aria-label={`Remove hour row ${i + 1}`}
+   619→                    disabled={updateMutation.isPending}
+   620→                  >
+   621→                    <Trash2 className="size-4" />
+   622→                  </Button>
+   623→                </div>
+   624→              ))
+   625→            )}
+   626→            <Button
+   627→              type="button"
+   628→              variant="outline"
+   629→              size="sm"
+   630→              onClick={addHour}
+   631→              className="mt-1 gap-1.5"
+   632→            >
+   633→              <Plus className="size-3.5" />
+   634→              Add hour row
+   635→            </Button>
+   636→          </div>
+   637→        </SectionCard>
+   638→
+   639→        {/* 6. Social Media */}
+   640→        <SectionCard
+   641→          icon={Share2}
+   642→          title="Social Media"
+   643→          subtitle="Links to your profiles"
+   644→          full
+   645→        >
+   646→          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+   647→            {SOCIAL_LINKS.map((s) => (
+   648→              <Field
+   649→                key={s.key}
+   650→                label={s.label}
+   651→                htmlFor={`br-social-${s.key}`}
+   652→              >
+   653→                <div className="relative">
+   654→                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-primary">
+   655→                    <Icon name={s.icon} className="size-4" />
+   656→                  </span>
+   657→                  <Input
+   658→                    id={`br-social-${s.key}`}
+   659→                    value={socials[s.key] ?? ""}
+   660→                    onChange={(e) => updateSocial(s.key, e.target.value)}
+   661→                    placeholder={`https://${s.key}.com/your-page`}
+   662→                    className="pl-9"
+   663→                  />
+   664→                </div>
+   665→              </Field>
+   666→            ))}
+   667→          </div>
+   668→        </SectionCard>
+   669→
+   670→        {/* 7. Target Areas */}
+   671→        <SectionCard
+   672→          icon={MapPinned}
+   673→          title="Target Areas"
+   674→          subtitle="Locations you serve"
+   675→          full
+   676→        >
+   677→          <div className="space-y-2.5">
+   678→            {targetAreas.length === 0 ? (
+   679→              <div className="flex h-24 items-center justify-center rounded-lg border border-dashed border-border/60 text-xs text-muted-foreground">
+   680→                No service areas yet. Add one below.
+   681→              </div>
+   682→            ) : (
+   683→              targetAreas.map((area, i) => (
+   684→                <div
+   685→                  key={i}
+   686→                  className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto] sm:items-center"
+   687→                >
+   688→                  <Input
+   689→                    aria-label={`Service area ${i + 1}`}
+   690→                    value={area}
+   691→                    onChange={(e) => updateArea(i, e.target.value)}
+   692→                    placeholder="e.g. East Kilbride"
+   693→                  />
+   694→                  <Button
+   695→                    type="button"
+   696→                    variant="ghost"
+   697→                    size="icon"
+   698→                    className="size-9 justify-self-start text-rose-300 hover:bg-rose-500/10 hover:text-rose-200 sm:justify-self-end"
+   699→                    onClick={() => removeArea(i)}
+   700→                    aria-label={`Remove area ${i + 1}`}
+   701→                    disabled={updateMutation.isPending}
+   702→                  >
+   703→                    <Trash2 className="size-4" />
+   704→                  </Button>
+   705→                </div>
+   706→              ))
+   707→            )}
+   708→            <Button
+   709→              type="button"
+   710→              variant="outline"
+   711→              size="sm"
+   712→              onClick={addArea}
+   713→              className="mt-1 gap-1.5"
+   714→            >
+   715→              <Plus className="size-3.5" />
+   716→              Add area
+   717→            </Button>
+   718→          </div>
+   719→        </SectionCard>
+   720→
+   721→        {/* 8. Stats */}
+   722→        <SectionCard
+   723→          icon={Star}
+   724→          title="Stats"
+   725→          subtitle="Trust signals shown across the site"
+   726→          full
+   727→        >
+   728→          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+   729→            <Field label="Google rating" htmlFor="br-rating" hint="0.0 – 5.0">
+   730→              <Input
+   731→                id="br-rating"
+   732→                type="number"
+   733→                min="0"
+   734→                max="5"
+   735→                step="0.1"
+   736→                value={rating}
+   737→                onChange={(e) => setRating(e.target.value)}
+   738→                placeholder="4.6"
+   739→              />
+   740→            </Field>
+   741→            <Field label="Review count" htmlFor="br-reviews">
+   742→              <Input
+   743→                id="br-reviews"
+   744→                type="number"
+   745→                min="0"
+   746→                step="1"
+   747→                value={reviewCount}
+   748→                onChange={(e) => setReviewCount(e.target.value)}
+   749→                placeholder="92"
+   750→              />
+   751→            </Field>
+   752→            <Field label="Years of experience" htmlFor="br-years">
+   753→              <Input
+   754→                id="br-years"
+   755→                type="number"
+   756→                min="0"
+   757→                step="1"
+   758→                value={yearsExperience}
+   759→                onChange={(e) => setYearsExperience(e.target.value)}
+   760→                placeholder="12"
+   761→              />
+   762→            </Field>
+   763→          </div>
+   764→        </SectionCard>
+   765→      </div>
+   766→
+   767→      {/* Sticky save bar */}
+   768→      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 lg:left-[260px]">
+   769→        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 md:px-8">
+   770→          <div className="flex min-w-0 items-center gap-2 text-sm">
+   771→            {isDirty ? (
+   772→              <>
+   773→                <span className="size-2 shrink-0 rounded-full bg-amber-400" />
+   774→                <span className="truncate text-muted-foreground">
+   775→                  You have unsaved changes
+   776→                </span>
+   777→              </>
+   778→            ) : savedFlash ? (
+   779→              <>
+   780→                <span className="size-2 shrink-0 rounded-full bg-emerald-400" />
+   781→                <span className="truncate text-emerald-300">
+   782→                  All changes saved
+   783→                </span>
+   784→              </>
+   785→            ) : (
+   786→              <>
+   787→                <span className="size-2 shrink-0 rounded-full bg-emerald-400" />
+   788→                <span className="truncate text-muted-foreground">
+   789→                  All changes saved
+   790→                </span>
+   791→              </>
+   792→            )}
+   793→          </div>
+   794→          <div className="flex shrink-0 items-center gap-2">
+   795→            <a
+   796→              href={website || "#"}
+   797→              target="_blank"
+   798→              rel="noopener noreferrer"
+   799→              className="hidden items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground sm:inline-flex"
+   800→            >
+   801→              View live site
+   802→              <ExternalLink className="size-3" />
+   803→            </a>
+   804→            <Button
+   805→              variant="outline"
+   806→              size="sm"
+   807→              onClick={handleReset}
+   808→              disabled={!isDirty || updateMutation.isPending}
+   809→              className="gap-1.5"
+   810→            >
+   811→              <RotateCcw className="size-3.5" />
+   812→              Reset
+   813→            </Button>
+   814→            <Button
+   815→              size="sm"
+   816→              onClick={handleSave}
+   817→              disabled={!isDirty || updateMutation.isPending}
+   818→              className="gap-1.5"
+   819→            >
+   820→              {updateMutation.isPending ? (
+   821→                <>
+   822→                  <Loader2 className="size-4 animate-spin" />
+   823→                  Saving…
+   824→                </>
+   825→              ) : savedFlash ? (
+   826→                <>
+   827→                  <Check className="size-4" />
+   828→                  Saved
+   829→                </>
+   830→              ) : (
+   831→                <>
+   832→                  <Save className="size-4" />
+   833→                  Save Changes
+   834→                </>
+   835→              )}
+   836→            </Button>
+   837→          </div>
+   838→        </div>
+   839→      </div>
+   840→    </div>
+   841→  );
+   842→}
+   843→
+   844→// ---------- Helper sub-components ----------
+   845→
+   846→function SectionCard({
+   847→  icon: IconCmp,
+   848→  title,
+   849→  subtitle,
+   850→  children,
+   851→  full,
+   852→}: {
+   853→  icon: React.ComponentType<{ className?: string }>;
+   854→  title: string;
+   855→  subtitle?: string;
+   856→  children: React.ReactNode;
+   857→  full?: boolean;
+   858→}) {
+   859→  return (
+   860→    <Card className={cn("glass flex flex-col p-5", full && "lg:col-span-2")}>
+   861→      <div className="mb-4 flex items-start gap-3">
+   862→        <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/30">
+   863→          <IconCmp className="size-5" />
+   864→        </div>
+   865→        <div className="min-w-0">
+   866→          <h3 className="text-sm font-semibold text-foreground">{title}</h3>
+   867→          {subtitle && (
+   868→            <p className="mt-0.5 text-xs text-muted-foreground">{subtitle}</p>
+   869→          )}
+   870→        </div>
+   871→      </div>
+   872→      <Separator className="mb-4" />
+   873→      {children}
+   874→    </Card>
+   875→  );
+   876→}
+   877→
+   878→function Field({
+   879→  label,
+   880→  htmlFor,
+   881→  hint,
+   882→  children,
+   883→}: {
+   884→  label: string;
+   885→  htmlFor: string;
+   886→  hint?: string;
+   887→  children: React.ReactNode;
+   888→}) {
+   889→  return (
+   890→    <div className="space-y-1.5">
+   891→      <Label htmlFor={htmlFor} className="text-xs font-medium text-foreground">
+   892→        {label}
+   893→      </Label>
+   894→      {children}
+   895→      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+   896→    </div>
+   897→  );
+   898→}
+   899→
+   900→function ColorField({
+   901→  label,
+   902→  hint,
+   903→  value,
+   904→  onChange,
+   905→  id,
+   906→}: {
+   907→  label: string;
+   908→  hint?: string;
+   909→  value: string;
+   910→  onChange: (v: string) => void;
+   911→  id: string;
+   912→}) {
+   913→  return (
+   914→    <div className="space-y-1.5">
+   915→      <Label htmlFor={id} className="text-xs font-medium text-foreground">
+   916→        {label}
+   917→      </Label>
+   918→      <div className="flex items-center gap-2">
+   919→        <div className="relative size-10 shrink-0 overflow-hidden rounded-lg ring-1 ring-border/60">
+   920→          <input
+   921→            id={`${id}-picker`}
+   922→            type="color"
+   923→            value={value}
+   924→            onChange={(e) => onChange(e.target.value)}
+   925→            className="absolute -inset-2 size-[calc(100%+1rem)] cursor-pointer border-0 bg-transparent p-0"
+   926→            aria-label={`${label} color picker`}
+   927→          />
+   928→        </div>
+   929→        <Input
+   930→          id={id}
+   931→          value={value}
+   932→          onChange={(e) => onChange(e.target.value)}
+   933→          placeholder="#E31E24"
+   934→          className="flex-1 font-mono text-sm"
+   935→        />
+   936→      </div>
+   937→      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+   938→    </div>
+   939→  );
+   940→}
+   941→
+   942→export default BrandingManager;
+   943→

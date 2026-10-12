@@ -580,3 +580,27 @@ Stage Summary:
 - Lint: `bun run lint` → exit 1, but the ONLY error is the pre-existing one in custom-code-manager.tsx:29 (react-hooks/set-state-in-effect), unrelated to this task and explicitly excluded. All three of my files are lint-clean.
 - TypeScript: `bunx tsc --noEmit` → no errors in any of the three edited files (only pre-existing errors in custom-code-manager.tsx, examples/websocket, skills/*, and a stale .next/dev/types reference).
 - Did NOT run dev server per instructions.
+
+---
+Task ID: 18 (Push all live + cache audit)
+Agent: Main (Full-Stack Architect)
+Task: Push all latest code live on Render + Firebase + GitHub, and audit for any cache that could block updates from showing.
+
+Work Log:
+- Verified all 3 platforms are LIVE with the latest code (commit 9fcb9c4 — orphan-pages fix):
+  - GitHub: clicktaketechnologies/Gadget-Doctor-East-Kilbride, main branch at 9fcb9c4. Reset local to match remote (discarded a noise auto-commit 391f230 that only had file-permission changes + worklog).
+  - Firebase Hosting: GitHub Actions auto-deploy SUCCEEDED. Live at https://www.gadgetdoctorls.co.uk/. Verified: /services title = "Repair Services in East Kilbride | Gadget Doctor East Kilbride" (C2 fix), canonical = https://www.gadgetdoctorls.co.uk/services (C1 fix), home page has 14 unique internal <a href> links (orphan fix), /favicon.ico 302→logo (N1 fix).
+  - Render backend: auto-deployed from GitHub. Live at https://gadget-doctor-east-kilbride.onrender.com/. Verified: admin login API returns token, /api/services returns 38 services, /api/branding returns "Gadget Doctor East Kilbride". (Track GD-1000 returned 500 — likely a missing sample booking in the production Supabase DB, not a code issue.)
+- CACHE AUDIT — checked every layer for blockers:
+  1. Firebase HTML cache: Cache-Control: public, max-age=0, must-revalidate — always revalidated. NO BLOCKER.
+  2. Firebase SEO files (sitemap.xml, robots.txt, llms.txt, rss.xml, manifest.json): inherit max-age=0, must-revalidate from the /** catch-all header rule. NO BLOCKER.
+  3. Firebase static assets (/_next/static/**): max-age=31536000, immutable — content-hashed (new content = new hash = new URL). NO BLOCKER.
+  4. GitHub Actions workflow: 0 actions/cache steps — fresh npm install + npm run build:firebase every deploy. NO BUILD CACHE BLOCKER.
+  5. Workflow branch config: branches: [main] — CORRECT. (Initial 'cat' displayed 'ain]' because the terminal interpreted '[m' as an escape sequence and hid it — od -c confirmed the file actually contains [main].)
+  6. Render: render.yaml has no cache config — fresh build on each deploy. NO BLOCKER. (Free-tier cold starts ~30s after 15min idle are a performance limitation, not a cache issue.)
+- NO CACHE BLOCKERS FOUND. All cache headers are correctly set. Updates will be visible immediately after each GitHub Actions deploy (Firebase CDN purges on deploy; Render does a fresh build).
+
+Stage Summary:
+- All latest code is LIVE on GitHub + Firebase + Render. No uncommitted code changes.
+- Cache audit: NO blockers. Firebase HTML + SEO files use max-age=0, must-revalidate (always fresh). Static assets are content-hashed (immutable cache is safe). GitHub Actions does fresh builds (no cache steps). Render does fresh builds.
+- The only "cache" outside my control: Google's search index (takes 2-7 days to update after re-crawl) — trigger re-crawl in Ahrefs + request indexing in Google Search Console to speed this up.

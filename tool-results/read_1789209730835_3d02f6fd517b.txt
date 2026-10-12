@@ -1,0 +1,786 @@
+     1→"use client";
+     2→
+     3→import { useMemo, useState } from "react";
+     4→import {
+     5→  Check,
+     6→  CheckCircle2,
+     7→  ChevronLeft,
+     8→  ChevronRight,
+     9→  Truck,
+    10→  Store,
+    11→  Loader2,
+    12→  Sparkles,
+    13→  CalendarCheck,
+    14→  Mail,
+    15→  Phone,
+    16→  User,
+    17→  MapPin,
+    18→  Clock,
+    19→} from "lucide-react";
+    20→import {
+    21→  Dialog,
+    22→  DialogContent,
+    23→  DialogTitle,
+    24→  DialogDescription,
+    25→} from "@/components/ui/dialog";
+    26→import { Button } from "@/components/ui/button";
+    27→import { Input } from "@/components/ui/input";
+    28→import { Label } from "@/components/ui/label";
+    29→import { Textarea } from "@/components/ui/textarea";
+    30→import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+    31→import { Badge } from "@/components/ui/badge";
+    32→import {
+    33→  Select,
+    34→  SelectContent,
+    35→  SelectItem,
+    36→  SelectTrigger,
+    37→  SelectValue,
+    38→} from "@/components/ui/select";
+    39→import { Icon } from "@/components/icon";
+    40→import { useAppStore } from "@/lib/store";
+    41→import { useServices, useCreateBooking, useSettings } from "@/lib/api-hooks";
+    42→import {
+    43→  BRAND,
+    44→  SERVICE_CATEGORIES,
+    45→  DEVICE_MODELS,
+    46→  COMMON_ISSUES,
+    47→} from "@/lib/brand";
+    48→import type { ServiceCategory } from "@/lib/types";
+    49→import { cn } from "@/lib/utils";
+    50→
+    51→const TOTAL_STEPS = 4;
+    52→
+    53→const TIME_SLOTS = [
+    54→  "09:30 AM",
+    55→  "10:30 AM",
+    56→  "11:30 AM",
+    57→  "12:30 PM",
+    58→  "01:30 PM",
+    59→  "02:30 PM",
+    60→] as const;
+    61→
+    62→/** Today's date as yyyy-mm-dd, used as the min for the preferred date input. */
+    63→function todayISO(): string {
+    64→  const d = new Date();
+    65→  const y = d.getFullYear();
+    66→  const m = String(d.getMonth() + 1).padStart(2, "0");
+    67→  const day = String(d.getDate()).padStart(2, "0");
+    68→  return `${y}-${m}-${day}`;
+    69→}
+    70→
+    71→function StepDots({
+    72→  step,
+    73→  total = TOTAL_STEPS,
+    74→}: {
+    75→  step: number;
+    76→  total?: number;
+    77→}) {
+    78→  return (
+    79→    <div className="flex items-center gap-1.5">
+    80→      {Array.from({ length: total }).map((_, i) => {
+    81→        const n = i + 1;
+    82→        const done = n < step;
+    83→        const active = n === step;
+    84→        return (
+    85→          <div
+    86→            key={n}
+    87→            className={cn(
+    88→              "h-1.5 rounded-full transition-all",
+    89→              done
+    90→                ? "w-6 bg-primary"
+    91→                : active
+    92→                ? "w-8 bg-primary"
+    93→                : "w-6 bg-muted"
+    94→            )}
+    95→          />
+    96→        );
+    97→      })}
+    98→    </div>
+    99→  );
+   100→}
+   101→
+   102→interface BookingFormProps {
+   103→  initialCategory: string | null;
+   104→  onClose: () => void;
+   105→}
+   106→
+   107→function BookingForm({ initialCategory, onClose }: BookingFormProps) {
+   108→  const mutation = useCreateBooking();
+   109→  const { data: settings } = useSettings();
+   110→  const collectionEnabled = settings?.collectionEnabled ?? true;
+   111→
+   112→  const [step, setStep] = useState(1);
+   113→  const [category, setCategory] = useState<string>(initialCategory ?? "");
+   114→  const [deviceModel, setDeviceModel] = useState("");
+   115→  const [issues, setIssues] = useState<string[]>([]);
+   116→  const [description, setDescription] = useState("");
+   117→  // Force dropoff when collection is disabled
+   118→  const [collection, setCollection] = useState<"dropoff" | "collection">(
+   119→    collectionEnabled ? "dropoff" : "dropoff"
+   120→  );
+   121→  const [address, setAddress] = useState("");
+   122→  const [name, setName] = useState("");
+   123→  const [email, setEmail] = useState("");
+   124→  const [phone, setPhone] = useState("");
+   125→  const [bookingDate, setBookingDate] = useState<string>("");
+   126→  const [bookingTime, setBookingTime] = useState<string>("");
+   127→
+   128→  const submitted = mutation.isSuccess;
+   129→  const ticketId = mutation.data?.ticketId;
+   130→
+   131→  // Total steps adapt to collection availability (skip the collection
+   132→  // step entirely when the master toggle is off).
+   133→  const totalSteps = collectionEnabled ? 4 : 3;
+   134→
+   135→  const toggleIssue = (issue: string) => {
+   136→    setIssues((prev) =>
+   137→      prev.includes(issue)
+   138→        ? prev.filter((i) => i !== issue)
+   139→        : [...prev, issue]
+   140→    );
+   141→  };
+   142→
+   143→  const canNext = useMemo(() => {
+   144→    if (step === 1) return !!category;
+   145→    if (step === 2) return !!deviceModel && (issues.length > 0 || description.trim().length > 0);
+   146→    // Step 3 is only the collection page when enabled; otherwise step 3 IS the contact page.
+   147→    if (collectionEnabled && step === 3)
+   148→      return collection === "dropoff" || (collection === "collection" && address.trim().length > 4);
+   149→    const contactStep = collectionEnabled ? 4 : 3;
+   150→    if (step === contactStep)
+   151→      return (
+   152→        name.trim().length > 1 &&
+   153→        /.+@.+\..+/.test(email) &&
+   154→        phone.replace(/\s+/g, "").length >= 7
+   155→      );
+   156→    return false;
+   157→  }, [step, category, deviceModel, issues, description, collection, address, name, email, phone, collectionEnabled]);
+   158→
+   159→  const handleSubmit = () => {
+   160→    if (!canNext || mutation.isPending) return;
+   161→    const issueText = [
+   162→      issues.length > 0 ? `Issues: ${issues.join(", ")}` : null,
+   163→      description.trim() ? `Details: ${description.trim()}` : null,
+   164→    ]
+   165→      .filter(Boolean)
+   166→      .join("\n");
+   167→    mutation.mutate({
+   168→      customerName: name.trim(),
+   169→      email: email.trim(),
+   170→      phone: phone.trim(),
+   171→      deviceType: category,
+   172→      deviceModel,
+   173→      issue: issueText || "No specific issue described",
+   174→      needsCollection: collectionEnabled && collection === "collection",
+   175→      collectionAddr:
+   176→        collectionEnabled && collection === "collection"
+   177→          ? address.trim()
+   178→          : undefined,
+   179→      bookingDate: bookingDate || undefined,
+   180→      bookingTime: bookingTime || undefined,
+   181→    });
+   182→  };
+   183→
+   184→  if (submitted && ticketId) {
+   185→    return (
+   186→      <SuccessView
+   187→        ticketId={ticketId}
+   188→        name={name}
+   189→        collection={collection}
+   190→        onClose={onClose}
+   191→      />
+   192→    );
+   193→  }
+   194→
+   195→  const next = () => setStep((s) => Math.min(totalSteps, s + 1));
+   196→  const back = () => setStep((s) => Math.max(1, s - 1));
+   197→
+   198→  return (
+   199→    <div className="flex flex-col">
+   200→      {/* Stepper header */}
+   201→      <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-4 sm:px-6">
+   202→        <div>
+   203→          <DialogTitle className="text-base font-bold">
+   204→            Book a Repair
+   205→          </DialogTitle>
+   206→          <DialogDescription className="text-xs">
+   207→            Step {step} of {totalSteps} ·{" "}
+   208→            {step === 1
+   209→              ? "Choose device type"
+   210→              : step === 2
+   211→              ? "Describe the problem"
+   212→              : step === 3 && collectionEnabled
+   213→              ? "Collection preference"
+   214→              : "Your contact details"}
+   215→          </DialogDescription>
+   216→        </div>
+   217→        <StepDots step={step} total={totalSteps} />
+   218→      </div>
+   219→
+   220→      {/* Body */}
+   221→      <div className="custom-scroll max-h-[60vh] overflow-y-auto px-5 py-5 sm:px-6">
+   222→        {/* Step 1: Device type */}
+   223→        {step === 1 && (
+   224→          <div>
+   225→            <p className="text-sm text-muted-foreground">
+   226→              What kind of device needs fixing? Pick a category to begin.
+   227→            </p>
+   228→            <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+   229→              {SERVICE_CATEGORIES.map((c) => {
+   230→                const active = category === c.value;
+   231→                return (
+   232→                  <button
+   233→                    key={c.value}
+   234→                    type="button"
+   235→                    onClick={() => setCategory(c.value)}
+   236→                    className={cn(
+   237→                      "group flex flex-col items-start gap-2 rounded-xl border p-3 text-left transition-all",
+   238→                      active
+   239→                        ? "border-primary bg-primary/10 shadow-md shadow-primary/20"
+   240→                        : "border-border bg-card hover:border-primary/40 hover:bg-card/60"
+   241→                    )}
+   242→                  >
+   243→                    <span
+   244→                      className={cn(
+   245→                        "grid size-10 place-items-center rounded-lg transition-colors",
+   246→                        active
+   247→                          ? "bg-primary text-primary-foreground"
+   248→                          : "bg-primary/10 text-primary"
+   249→                      )}
+   250→                    >
+   251→                      <Icon name={c.icon} className="size-5" />
+   252→                    </span>
+   253→                    <span className="text-sm font-semibold text-foreground">
+   254→                      {c.label}
+   255→                    </span>
+   256→                    {active && (
+   257→                      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-primary">
+   258→                        <Check className="size-3" />
+   259→                        Selected
+   260→                      </span>
+   261→                    )}
+   262→                  </button>
+   263→                );
+   264→              })}
+   265→            </div>
+   266→          </div>
+   267→        )}
+   268→
+   269→        {/* Step 2: Problem description */}
+   270→        {step === 2 && (
+   271→          <div className="space-y-5">
+   272→            <div>
+   273→              <Label className="mb-1.5">Device Model</Label>
+   274→              <Select value={deviceModel} onValueChange={setDeviceModel}>
+   275→                <SelectTrigger className="w-full">
+   276→                  <SelectValue placeholder="Pick your model…" />
+   277→                </SelectTrigger>
+   278→                <SelectContent>
+   279→                  {(DEVICE_MODELS[category as ServiceCategory] ?? []).map(
+   280→                    (m) => (
+   281→                      <SelectItem key={m} value={m}>
+   282→                        {m}
+   283→                      </SelectItem>
+   284→                    )
+   285→                  )}
+   286→                </SelectContent>
+   287→              </Select>
+   288→            </div>
+   289→
+   290→            <div>
+   291→              <Label className="mb-2">What&apos;s wrong with it?</Label>
+   292→              <div className="flex flex-wrap gap-2">
+   293→                {COMMON_ISSUES.map((issue) => {
+   294→                  const active = issues.includes(issue);
+   295→                  return (
+   296→                    <button
+   297→                      key={issue}
+   298→                      type="button"
+   299→                      onClick={() => toggleIssue(issue)}
+   300→                      className={cn(
+   301→                        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-all",
+   302→                        active
+   303→                          ? "border-primary bg-primary/15 text-primary"
+   304→                          : "border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-foreground"
+   305→                      )}
+   306→                    >
+   307→                      {active && <Check className="size-3" />}
+   308→                      {issue}
+   309→                    </button>
+   310→                  );
+   311→                })}
+   312→              </div>
+   313→              <p className="mt-1.5 text-[11px] text-muted-foreground">
+   314→                Select all that apply — you can add more detail below.
+   315→              </p>
+   316→            </div>
+   317→
+   318→            <div>
+   319→              <Label htmlFor="bk-desc" className="mb-1.5">
+   320→                Anything else we should know?{" "}
+   321→                <span className="text-muted-foreground">(optional)</span>
+   322→              </Label>
+   323→              <Textarea
+   324→                id="bk-desc"
+   325→                value={description}
+   326→                onChange={(e) => setDescription(e.target.value)}
+   327→                placeholder="e.g. Dropped it yesterday, screen went black, makes a faint buzzing sound…"
+   328→                maxLength={600}
+   329→                className="min-h-24"
+   330→              />
+   331→              <p className="mt-1 text-right text-[11px] text-muted-foreground">
+   332→                {description.length}/600
+   333→              </p>
+   334→            </div>
+   335→          </div>
+   336→        )}
+   337→
+   338→        {/* Step 3: Collection preference (skipped when collection disabled) */}
+   339→        {step === 3 && collectionEnabled && (
+   340→          <div className="space-y-4">
+   341→            <p className="text-sm text-muted-foreground">
+   342→              How would you like to get your device to us?
+   343→            </p>
+   344→            <RadioGroup
+   345→              value={collection}
+   346→              onValueChange={(v) => setCollection(v as "dropoff" | "collection")}
+   347→              className="grid gap-2.5 sm:grid-cols-2"
+   348→            >
+   349→              <label
+   350→                htmlFor="r-dropoff"
+   351→                className={cn(
+   352→                  "flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all",
+   353→                  collection === "dropoff"
+   354→                    ? "border-primary bg-primary/10 shadow-md shadow-primary/20"
+   355→                    : "border-border bg-card hover:border-primary/30"
+   356→                )}
+   357→              >
+   358→                <RadioGroupItem
+   359→                  id="r-dropoff"
+   360→                  value="dropoff"
+   361→                  className="mt-0.5"
+   362→                />
+   363→                <div className="flex-1">
+   364→                  <div className="flex items-center gap-2">
+   365→                    <Store className="size-4 text-primary" />
+   366→                    <span className="text-sm font-semibold text-foreground">
+   367→                      Drop off at shop
+   368→                    </span>
+   369→                  </div>
+   370→                  <p className="mt-1 text-xs text-muted-foreground">
+   371→                    Bring it to our East Kilbride workshop. Ready same-day in
+   372→                    most cases.
+   373→                  </p>
+   374→                </div>
+   375→              </label>
+   376→              <label
+   377→                htmlFor="r-collection"
+   378→                className={cn(
+   379→                  "flex cursor-pointer items-start gap-3 rounded-xl border p-4 transition-all",
+   380→                  collection === "collection"
+   381→                    ? "border-accent/60 bg-accent/10 shadow-md shadow-accent/20"
+   382→                    : "border-border bg-card hover:border-accent/30"
+   383→                )}
+   384→              >
+   385→                <RadioGroupItem
+   386→                  id="r-collection"
+   387→                  value="collection"
+   388→                  className="mt-0.5"
+   389→                />
+   390→                <div className="flex-1">
+   391→                  <div className="flex items-center gap-2">
+   392→                    <Truck className="size-4 text-accent" />
+   393→                    <span className="text-sm font-semibold text-foreground">
+   394→                      Doorstep collection
+   395→                    </span>
+   396→                  </div>
+   397→                  <p className="mt-1 text-xs text-muted-foreground">
+   398→                    We pick it up, fix it, and return it — across East
+   399→                    Kilbride.
+   400→                  </p>
+   401→                </div>
+   402→              </label>
+   403→            </RadioGroup>
+   404→
+   405→            {collection === "collection" && (
+   406→              <div className="rounded-xl border border-accent/30 bg-accent/5 p-4">
+   407→                <Label
+   408→                  htmlFor="bk-addr"
+   409→                  className="mb-1.5 flex items-center gap-1.5"
+   410→                >
+   411→                  <MapPin className="size-3.5 text-accent" />
+   412→                  Collection Address
+   413→                </Label>
+   414→                <Textarea
+   415→                  id="bk-addr"
+   416→                  value={address}
+   417→                  onChange={(e) => setAddress(e.target.value)}
+   418→                  placeholder="Full address including postcode — e.g. 14 Stroud Rd, East Kilbride, G75 0YA"
+   419→                  maxLength={300}
+   420→                  className="min-h-20"
+   421→                />
+   422→                <p className="mt-1.5 text-[11px] text-accent-foreground/80">
+   423→                  We&apos;ll call to confirm a pickup time within the hour.
+   424→                </p>
+   425→              </div>
+   426→            )}
+   427→          </div>
+   428→        )}
+   429→
+   430→        {/* Contact step (step 4 when collection enabled, step 3 when disabled) */}
+   431→        {((collectionEnabled && step === 4) || (!collectionEnabled && step === 3)) && (
+   432→          <div className="space-y-5">
+   433→            {/* Summary */}
+   434→            <div className="rounded-xl border border-border bg-background/40 p-4">
+   435→              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+   436→                Booking Summary
+   437→              </p>
+   438→              <dl className="mt-3 space-y-2 text-sm">
+   439→                <div className="flex items-center justify-between gap-2">
+   440→                  <dt className="text-muted-foreground">Device type</dt>
+   441→                  <dd className="font-medium text-foreground">
+   442→                    {SERVICE_CATEGORIES.find((c) => c.value === category)?.label}
+   443→                  </dd>
+   444→                </div>
+   445→                <div className="flex items-center justify-between gap-2">
+   446→                  <dt className="text-muted-foreground">Model</dt>
+   447→                  <dd className="text-right font-medium text-foreground">
+   448→                    {deviceModel}
+   449→                  </dd>
+   450→                </div>
+   451→                {issues.length > 0 && (
+   452→                  <div className="flex flex-col gap-1.5">
+   453→                    <dt className="text-muted-foreground">Issues</dt>
+   454→                    <dd className="flex flex-wrap gap-1">
+   455→                      {issues.map((i) => (
+   456→                        <Badge
+   457→                          key={i}
+   458→                          variant="outline"
+   459→                          className="text-[10px] font-normal text-foreground"
+   460→                        >
+   461→                          {i}
+   462→                        </Badge>
+   463→                      ))}
+   464→                    </dd>
+   465→                  </div>
+   466→                )}
+   467→                <div className="flex items-center justify-between gap-2">
+   468→                  <dt className="text-muted-foreground">Delivery</dt>
+   469→                  <dd className="font-medium text-foreground">
+   470→                    {collectionEnabled && collection === "collection" ? (
+   471→                      <span className="inline-flex items-center gap-1">
+   472→                        <Truck className="size-3.5 text-accent" />
+   473→                        Doorstep pickup
+   474→                      </span>
+   475→                    ) : (
+   476→                      <span className="inline-flex items-center gap-1">
+   477→                        <Store className="size-3.5 text-primary" />
+   478→                        Drop off at shop
+   479→                      </span>
+   480→                    )}
+   481→                  </dd>
+   482→                </div>
+   483→                {(bookingDate || bookingTime) && (
+   484→                  <div className="flex items-center justify-between gap-2">
+   485→                    <dt className="text-muted-foreground">Preferred slot</dt>
+   486→                    <dd className="font-medium text-foreground">
+   487→                      <span className="inline-flex items-center gap-1.5">
+   488→                        <CalendarCheck className="size-3.5 text-primary" />
+   489→                        {bookingDate
+   490→                          ? new Date(bookingDate).toLocaleDateString("en-GB", {
+   491→                              day: "2-digit",
+   492→                              month: "short",
+   493→                            })
+   494→                          : "Any date"}
+   495→                        {bookingTime && (
+   496→                          <>
+   497→                            <span className="text-muted-foreground">·</span>
+   498→                            <Clock className="size-3.5 text-accent" />
+   499→                            {bookingTime}
+   500→                          </>
+   501→                        )}
+   502→                      </span>
+   503→                    </dd>
+   504→                  </div>
+   505→                )}
+   506→              </dl>
+   507→            </div>
+   508→
+   509→            {/* Contact fields */}
+   510→            <div className="grid gap-4">
+   511→              <div>
+   512→                <Label htmlFor="bk-name" className="mb-1.5">
+   513→                  Full Name
+   514→                </Label>
+   515→                <div className="relative">
+   516→                  <User className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+   517→                  <Input
+   518→                    id="bk-name"
+   519→                    value={name}
+   520→                    onChange={(e) => setName(e.target.value)}
+   521→                    placeholder="John Smith"
+   522→                    className="pl-9"
+   523→                    autoComplete="name"
+   524→                  />
+   525→                </div>
+   526→              </div>
+   527→              <div className="grid gap-4 sm:grid-cols-2">
+   528→                <div>
+   529→                  <Label htmlFor="bk-email" className="mb-1.5">
+   530→                    Email
+   531→                  </Label>
+   532→                  <div className="relative">
+   533→                    <Mail className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+   534→                    <Input
+   535→                      id="bk-email"
+   536→                      type="email"
+   537→                      value={email}
+   538→                      onChange={(e) => setEmail(e.target.value)}
+   539→                      placeholder="you@example.com"
+   540→                      className="pl-9"
+   541→                      autoComplete="email"
+   542→                    />
+   543→                  </div>
+   544→                </div>
+   545→                <div>
+   546→                  <Label htmlFor="bk-phone" className="mb-1.5">
+   547→                    Phone
+   548→                  </Label>
+   549→                  <div className="relative">
+   550→                    <Phone className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+   551→                    <Input
+   552→                      id="bk-phone"
+   553→                      type="tel"
+   554→                      value={phone}
+   555→                      onChange={(e) => setPhone(e.target.value)}
+   556→                      placeholder="07777 200175"
+   557→                      className="pl-9"
+   558→                      autoComplete="tel"
+   559→                    />
+   560→                  </div>
+   561→                </div>
+   562→              </div>
+   563→
+   564→              {/* Preferred date & time (optional) */}
+   565→              <div className="rounded-xl border border-border bg-background/40 p-4">
+   566→                <div className="flex items-center justify-between gap-2">
+   567→                  <Label className="flex items-center gap-1.5 text-foreground">
+   568→                    <CalendarCheck className="size-3.5 text-primary" />
+   569→                    Preferred date &amp; time
+   570→                  </Label>
+   571→                  <span className="text-[11px] text-muted-foreground">
+   572→                    Optional — we&apos;ll do our best to accommodate.
+   573→                  </span>
+   574→                </div>
+   575→                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+   576→                  <div>
+   577→                    <Label
+   578→                      htmlFor="bk-date"
+   579→                      className="mb-1.5 text-xs text-muted-foreground"
+   580→                    >
+   581→                      Date
+   582→                    </Label>
+   583→                    <Input
+   584→                      id="bk-date"
+   585→                      type="date"
+   586→                      value={bookingDate}
+   587→                      min={todayISO()}
+   588→                      onChange={(e) => setBookingDate(e.target.value)}
+   589→                      className="[color-scheme:dark]"
+   590→                      aria-label="Preferred booking date"
+   591→                    />
+   592→                  </div>
+   593→                  <div>
+   594→                    <Label
+   595→                      htmlFor="bk-time"
+   596→                      className="mb-1.5 text-xs text-muted-foreground"
+   597→                    >
+   598→                      Time slot
+   599→                    </Label>
+   600→                    <Select value={bookingTime} onValueChange={setBookingTime}>
+   601→                      <SelectTrigger
+   602→                        id="bk-time"
+   603→                        className="w-full"
+   604→                        aria-label="Preferred booking time"
+   605→                      >
+   606→                        <SelectValue placeholder="Any time" />
+   607→                      </SelectTrigger>
+   608→                      <SelectContent>
+   609→                        {TIME_SLOTS.map((t) => (
+   610→                          <SelectItem key={t} value={t}>
+   611→                            {t}
+   612→                          </SelectItem>
+   613→                        ))}
+   614→                      </SelectContent>
+   615→                    </Select>
+   616→                  </div>
+   617→                </div>
+   618→              </div>
+   619→            </div>
+   620→
+   621→            {mutation.isError && (
+   622→              <div className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+   623→                <p className="font-medium">
+   624→                  Something went wrong submitting your booking.
+   625→                </p>
+   626→                <p className="mt-1 text-xs text-rose-300/80">
+   627→                  Error: {mutation.error?.message || "Unknown error"}
+   628→                </p>
+   629→                <p className="mt-1 text-xs text-rose-300/60">
+   630→                  Please try again or call us on +44 7777 200175.
+   631→                </p>
+   632→              </div>
+   633→            )}
+   634→          </div>
+   635→        )}
+   636→      </div>
+   637→
+   638→      {/* Footer nav */}
+   639→      <div className="flex items-center justify-between gap-2 border-t border-border px-5 py-4 sm:px-6">
+   640→        <Button
+   641→          type="button"
+   642→          variant="ghost"
+   643→          onClick={back}
+   644→          disabled={step === 1 || mutation.isPending}
+   645→          className="text-muted-foreground"
+   646→        >
+   647→          <ChevronLeft className="size-4" />
+   648→          Back
+   649→        </Button>
+   650→        {step < totalSteps ? (
+   651→          <Button
+   652→            type="button"
+   653→            onClick={next}
+   654→            disabled={!canNext}
+   655→            className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/20"
+   656→          >
+   657→            Continue
+   658→            <ChevronRight className="size-4" />
+   659→          </Button>
+   660→        ) : (
+   661→          <Button
+   662→            type="button"
+   663→            onClick={handleSubmit}
+   664→            disabled={!canNext || mutation.isPending}
+   665→            className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/20"
+   666→          >
+   667→            {mutation.isPending ? (
+   668→              <>
+   669→                <Loader2 className="size-4 animate-spin" />
+   670→                Submitting…
+   671→              </>
+   672→            ) : (
+   673→              <>
+   674→                <CalendarCheck className="size-4" />
+   675→                Submit Booking
+   676→              </>
+   677→            )}
+   678→          </Button>
+   679→        )}
+   680→      </div>
+   681→    </div>
+   682→  );
+   683→}
+   684→
+   685→function SuccessView({
+   686→  ticketId,
+   687→  name,
+   688→  collection,
+   689→  onClose,
+   690→}: {
+   691→  ticketId: string;
+   692→  name: string;
+   693→  collection: "dropoff" | "collection";
+   694→  onClose: () => void;
+   695→}) {
+   696→  return (
+   697→    <div className="px-6 py-8 text-center sm:px-10">
+   698→      <div className="relative mx-auto grid size-16 place-items-center rounded-full bg-emerald-500/15 text-emerald-400">
+   699→        <CheckCircle2 className="size-8" />
+   700→        <span className="absolute inset-0 animate-ping rounded-full border border-emerald-500/40" />
+   701→      </div>
+   702→      <DialogTitle className="mt-5 text-xl font-bold text-foreground">
+   703→        Booking confirmed, {name.split(" ")[0] || "there"}!
+   704→      </DialogTitle>
+   705→      <DialogDescription className="mt-2 text-sm text-muted-foreground">
+   706→        We&apos;ve received your repair request and our team will be in touch
+   707→        shortly to confirm your{" "}
+   708→        {collection === "collection" ? "pickup time" : "drop-off time"}.
+   709→      </DialogDescription>
+   710→
+   711→      <div className="mx-auto mt-6 max-w-xs rounded-xl border border-border bg-card p-4">
+   712→        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+   713→          Your Ticket ID
+   714→        </p>
+   715→        <p className="mt-1 font-mono text-2xl font-bold text-primary">
+   716→          {ticketId}
+   717→        </p>
+   718→        <p className="mt-1 text-xs text-muted-foreground">
+   719→          Save this — quote it when you visit or call us.
+   720→        </p>
+   721→      </div>
+   722→
+   723→      <div className="mx-auto mt-5 flex max-w-sm items-center justify-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-4 py-2 text-xs text-muted-foreground">
+   724→        <Sparkles className="size-3.5 text-primary" />
+   725→        Average response time: under 1 hour during opening hours
+   726→      </div>
+   727→
+   728→      <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+   729→        <Button
+   730→          asChild
+   731→          variant="outline"
+   732→          className="border-primary/30 bg-background/40 text-foreground hover:border-primary/60"
+   733→        >
+   734→          <a href={`tel:${BRAND.phones[0].replace(/\s+/g, "")}`}>
+   735→            <Phone className="size-4 text-primary" />
+   736→            Call the shop
+   737→          </a>
+   738→        </Button>
+   739→        <Button
+   740→          onClick={onClose}
+   741→          className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-lg shadow-primary/20"
+   742→        >
+   743→          Done
+   744→        </Button>
+   745→      </div>
+   746→    </div>
+   747→  );
+   748→}
+   749→
+   750→export function BookingModal() {
+   751→  const bookingOpen = useAppStore((s) => s.bookingOpen);
+   752→  const bookingPreset = useAppStore((s) => s.bookingPreset);
+   753→  const closeBooking = useAppStore((s) => s.closeBooking);
+   754→  const { data: services } = useServices(true);
+   755→
+   756→  // Look up the service by preset slug to derive the category
+   757→  const initialCategory = useMemo(() => {
+   758→    if (!bookingPreset?.serviceSlug || !services) return null;
+   759→    const svc = services.find((s) => s.slug === bookingPreset.serviceSlug);
+   760→    if (svc) return svc.category;
+   761→    // Allow direct deviceType override
+   762→    if (bookingPreset.deviceType) return bookingPreset.deviceType;
+   763→    return null;
+   764→  }, [bookingPreset, services]);
+   765→
+   766→  return (
+   767→    <Dialog
+   768→      open={bookingOpen}
+   769→      onOpenChange={(o) => {
+   770→        if (!o) closeBooking();
+   771→      }}
+   772→    >
+   773→      <DialogContent className="glass-strong max-h-[90vh] gap-0 overflow-hidden border-border p-0 sm:max-w-lg">
+   774→        {/* key-remount: fresh local state every time preset changes / modal reopens */}
+   775→        <BookingForm
+   776→          key={bookingPreset?.serviceSlug ?? bookingPreset?.deviceType ?? "none"}
+   777→          initialCategory={initialCategory}
+   778→          onClose={closeBooking}
+   779→        />
+   780→      </DialogContent>
+   781→    </Dialog>
+   782→  );
+   783→}
+   784→
+   785→export default BookingModal;
+   786→
