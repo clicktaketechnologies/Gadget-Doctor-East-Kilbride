@@ -10,7 +10,7 @@ export const BRAND = {
   phones: ["+44 7777 200175"],
   whatsapp: "+44 7777 200175",
   email: "info@gadgetdoctorscotland.co.uk",
-  website: "https://www.gadgetdoctoreastkilbride.co.uk",
+  website: "https://www.gadgetdoctorls.co.uk",
   gmbProfile: "https://g.co/kgs/bRysLQB",
   rating: 4.6,
   reviewCount: 92,
