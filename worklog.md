@@ -514,3 +514,34 @@ Stage Summary:
 - Customers can now optionally pick a preferred date + time slot when booking a repair.
 - Admins can filter the bookings table by date range, jump to Today / This Week, and see the requested booking date + time as a dedicated column.
 - New admin "Settings" module at /admin → Settings: change password (validated, with API error display) and a Branding quick-access card that summarises live branding and links into the Branding editor.
+
+---
+Task ID: 15 (Push Ahrefs fixes live to Firebase via GitHub)
+Agent: Main (Full-Stack Architect)
+Task: Push the approved Ahrefs Site Audit fixes (Task 14) live to Firebase Hosting via the GitHub repo (clicktaketechnologies/Gadget-Doctor-East-Kilbride) + GitHub Actions auto-deploy.
+
+Work Log:
+- Discovered this sandbox had NO git remote, NO firebase CLI, NO firebase.json — could not deploy directly. User provided a GitHub PAT (ghp_***).
+- Verified the token via the GitHub API (user: HAFIZFARHAN630) and located the repo: clicktaketechnologies/Gadget-Doctor-East-Kilbride.
+- CRITICAL: before force-pushing, checked the remote repo's file tree via the GitHub API and found it has deployment infrastructure NOT present in the sandbox: .github/workflows/deploy-firebase.yml (auto-deploy), Dockerfile, render.yaml (Render backend), scripts/build-firebase.mjs (custom build script), .firebaserc, src/lib/firebase.ts, src/components/firebase-analytics.tsx, firebase-public/. A force-push would have destroyed all of this.
+- Safe approach: saved my 16 SEO-fix files to /tmp, fetched origin/main, reset local main to match the remote (1276 files — the real deployed codebase). Then overlaid my fixes on top.
+- MERGED (not overwrote) store.ts — the remote has 3 admin modules my sandbox version lacked (walk-in, custom-code, settings). Wrote a merged store.ts that preserves all remote AdminModule types + adds my installUrlSync()/pathnameToPage()/pushState/popstate URL sync.
+- Added the favicon redirect to the remote's EXISTING firebase.json (preserving the admin→Render redirects + individual SPA rewrites + SEO file headers).
+- Added <SeoHead/> + installUrlSync() to the remote's public-site.tsx (identical structure to sandbox version — clean edit).
+- Pushed commit df20554 — GitHub Actions run FAILED.
+- Build error 1: "Page /[...slug] is missing generateStaticParams()" — the catch-all route is dynamic but output:export requires generateStaticParams. Added it (returns all 19 public deep-link paths: /services, /services/<8 categories>, /collection, /reviews, /contact, /track, /blog, /blog/<slugs>). Blog slugs fetched from DB with fallback to hardcoded seed slugs. Pushed fd182c7 — FAILED.
+- Build error 2: "export const dynamic = force-static not configured on route /favicon.ico with output:export" — the favicon route handler used NextResponse.redirect() which is inherently dynamic. Removed src/app/favicon.ico/route.ts (the firebase.json redirect handles the favicon→logo redirect at the Hosting level, so the route handler was redundant). Pushed 28ea601 — FAILED.
+- Build error 3: "Export encountered an error on /[...slug]/page: /blog/cracked-iphone-screen-repair-guide" — the generateMetadata function's db.blogPost.findUnique() threw because the build environment has no DATABASE_URL. Wrapped the generateMetadata DB query in try/catch (falls back to generic "Blog | Gadget Doctor" metadata at build time; client-side SeoHead still updates post-hydration). Pushed 2bbb518 — SUCCESS ✓.
+- Post-deploy verification found a CRITICAL domain mismatch: the canonical URLs pointed to gadgetdoctoreastkilbride.co.uk (from BRAND.website in brand.ts) which does NOT resolve (DNS failure — 000). The live site is on gadgetdoctorls.co.uk. This would have broken the C1 canonical fix (canonicals pointing to a dead domain). Fixed brand.ts: website → "https://www.gadgetdoctorls.co.uk". Pushed 935d586 — SUCCESS ✓.
+
+Stage Summary — LIVE on https://www.gadgetdoctorls.co.uk/ (verified):
+- C1 (duplicate canonical) — FIXED: /services canonical = https://www.gadgetdoctorls.co.uk/services (self-referential, was homepage before). /contact = https://www.gadgetdoctorls.co.uk/contact. /track = https://www.gadgetdoctorls.co.uk/track. ✓
+- C2 (duplicate title/description) — FIXED: /services title = "Repair Services in East Kilbride | Gadget Doctor East Kilbride" (was home title). /contact = "Contact Us | Gadget Doctor East Kilbride". /track = "Track Your Repair | Gadget Doctor East Kilbride". ✓
+- W1 (sitemap URL mismatch) — FIXED: path-based URLs deployed. ✓
+- N1 (favicon.ico 404) — FIXED: 302 → /gadget-doctor-logo.jpg (verified live). ✓
+- N3 (verification token) — was already correct on remote. ✓
+- N4 (SEO files) — were already present on remote. ✓
+- 5 commits pushed to GitHub (df20554 → 935d586), all via the PAT. GitHub Actions auto-deploy triggered on each push; the final 2 deploys succeeded.
+- Deployment infra PRESERVED: .github/workflows/deploy-firebase.yml, Dockerfile, render.yaml, scripts/build-firebase.mjs, .firebaserc, src/lib/firebase.ts all untouched.
+- store.ts admin modules PRESERVED: walk-in, custom-code, settings (merged, not overwritten).
+- firebase.json Render redirects PRESERVED: /admin, /admin/**, /superadmin → onrender.com (merged, not overwritten).
