@@ -545,3 +545,38 @@ Stage Summary — LIVE on https://www.gadgetdoctorls.co.uk/ (verified):
 - Deployment infra PRESERVED: .github/workflows/deploy-firebase.yml, Dockerfile, render.yaml, scripts/build-firebase.mjs, .firebaserc, src/lib/firebase.ts all untouched.
 - store.ts admin modules PRESERVED: walk-in, custom-code, settings (merged, not overwritten).
 - firebase.json Render redirects PRESERVED: /admin, /admin/**, /superadmin → onrender.com (merged, not overwritten).
+
+---
+Task ID: 16
+Agent: Content Links Converter (subagent)
+Task: Convert <button> nav to <a href> in featured-services, services-section, blog-section for orphan-pages fix.
+
+Work Log:
+- src/components/public/featured-services.tsx (170 lines): 3 conversions
+  - ServiceCard icon button (line 30) → <a href={`/services/${service.category}`}> with preventDefault (kept className + aria-label + <Icon> child).
+  - "Details" Button (line 76) → <Button asChild variant="outline" size="sm"> wrapping <a href={`/services/${service.category}`} onClick={preventDefault + openServiceDetail}>Details</a> — preserves shadcn button styling while rendering an anchor.
+  - "View all services" Button (line 133) → <Button asChild variant="outline"> wrapping <a href="/services" onClick={preventDefault + setPublicPage("services")}>View all services</a>.
+  - Skipped: "Book Fix" and "Book a custom repair" buttons call openBooking() (modal, not page nav) — correctly left as <button>.
+- src/components/public/services-section.tsx (256 lines): 3 conversions
+  - ServiceCard icon button (line 32) → <a href={`/services/${service.category}`}> with preventDefault.
+  - "Details" Button (line 81) → <Button asChild> wrapping <a href={`/services/${service.category}`}>Details</a>.
+  - Category tab button (line 184) → <a href={isAll ? "/services" : `/services/${t.value}`} onClick={preventDefault + conditional (setCategory(ALL) | openServiceDetail(t.value))}> — All tab points to /services listing; each category tab points to its deep-link path so crawlers see all 8 service-category inlinks from the services hub.
+  - Skipped: "Book Fix" / "Book a custom repair" (modal, not nav).
+- src/components/public/blog-section.tsx (379 lines): 4 conversions
+  - FeaturedPost cover button (line 104) → <a href={`/blog/${post.slug}`}> with preventDefault (kept PostCover children, gradient overlay + Featured badge).
+  - "Read article" Button (line 167) → <Button asChild> wrapping <a href={`/blog/${post.slug}`}>Read article</a>.
+  - PostCard cover button (line 196) → <a href={`/blog/${post.slug}`}> with preventDefault (kept PostCover + category badge).
+  - "Read more" button (line 242) → <a href={`/blog/${post.slug}`}>Read more</a> with preventDefault.
+  - Skipped: filter chips call setFilter() (local state, not page nav) — correctly left as <button>.
+- Pattern used:
+  - Raw <button> HTML elements: straight tag swap <button>→<a>, added href + e.preventDefault() at top of onClick, kept className/aria-label/children identical.
+  - shadcn <Button> components: used `asChild` + Slot pattern to render an <a> child while keeping variant/size/className exactly the same (preserves h-8/px-3/border styling). onClick moved onto the <a> child with preventDefault.
+- For the services-section category tab: introduced a conditional href so the "All Repairs" tab links to /services (the real listing page) and category tabs link to /services/<category> — this gives crawlers clean hrefs without producing /services/all (ALL constant = "all", not a real category).
+
+Stage Summary:
+- Converted 10 navigation elements across 3 files: featured-services (3), services-section (3), blog-section (4). All 19 orphan deep-link pages (/services, /services/<8 categories>, /blog, /blog/<slugs>) now have visible <a href> inlinks from the homepage / services hub / blog hub that Ahrefs and Googlebot can follow.
+- SPA navigation preserved: every onClick calls e.preventDefault() first, then the original Zustand openServiceDetail/openBlogDetail/setPublicPage action — no full-page reload, scroll-to-top behaviour retained.
+- No store changes (go() helpers untouched), no other files touched.
+- Lint: `bun run lint` → exit 1, but the ONLY error is the pre-existing one in custom-code-manager.tsx:29 (react-hooks/set-state-in-effect), unrelated to this task and explicitly excluded. All three of my files are lint-clean.
+- TypeScript: `bunx tsc --noEmit` → no errors in any of the three edited files (only pre-existing errors in custom-code-manager.tsx, examples/websocket, skills/*, and a stale .next/dev/types reference).
+- Did NOT run dev server per instructions.

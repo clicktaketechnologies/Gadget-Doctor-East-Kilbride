@@ -101,8 +101,10 @@ function FeaturedPost({ post }: { post: BlogPost }) {
       className="group relative overflow-hidden rounded-3xl border border-primary/30 bg-card shadow-xl shadow-primary/5"
     >
       <div className="grid gap-0 lg:grid-cols-2">
-        <button
-          onClick={() => {
+        <a
+          href={`/blog/${post.slug}`}
+          onClick={(e) => {
+            e.preventDefault();
             openBlogDetail(post.slug);
             if (typeof window !== "undefined")
               window.scrollTo({ top: 0, behavior: "smooth" });
@@ -120,7 +122,7 @@ function FeaturedPost({ post }: { post: BlogPost }) {
             <Sparkles className="size-3" />
             Featured
           </span>
-        </button>
+        </a>
         <div className="flex flex-col justify-center p-6 sm:p-8">
           <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             {post.category && (
@@ -165,15 +167,21 @@ function FeaturedPost({ post }: { post: BlogPost }) {
               {post.author || "Gadget Doctor"}
             </span>
             <Button
-              onClick={() => {
-                openBlogDetail(post.slug);
-                if (typeof window !== "undefined")
-                  window.scrollTo({ top: 0, behavior: "smooth" });
-              }}
+              asChild
               className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold shadow-md shadow-primary/20"
             >
-              Read article
-              <ArrowRight className="size-4" />
+              <a
+                href={`/blog/${post.slug}`}
+                onClick={(e) => {
+                  e.preventDefault();
+                  openBlogDetail(post.slug);
+                  if (typeof window !== "undefined")
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                }}
+              >
+                Read article
+                <ArrowRight className="size-4" />
+              </a>
             </Button>
           </div>
         </div>
@@ -193,8 +201,10 @@ function PostCard({ post, index }: { post: BlogPost; index: number }) {
       transition={{ duration: 0.35, delay: Math.min(index * 0.06, 0.3) }}
       className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5"
     >
-      <button
-        onClick={() => {
+      <a
+        href={`/blog/${post.slug}`}
+        onClick={(e) => {
+          e.preventDefault();
           openBlogDetail(post.slug);
           if (typeof window !== "undefined")
             window.scrollTo({ top: 0, behavior: "smooth" });
@@ -212,7 +222,7 @@ function PostCard({ post, index }: { post: BlogPost; index: number }) {
             {post.category}
           </span>
         )}
-      </button>
+      </a>
       <div className="flex flex-1 flex-col p-5">
         <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
           <Calendar className="size-3" />
@@ -239,8 +249,10 @@ function PostCard({ post, index }: { post: BlogPost; index: number }) {
             ))}
           </div>
         )}
-        <button
-          onClick={() => {
+        <a
+          href={`/blog/${post.slug}`}
+          onClick={(e) => {
+            e.preventDefault();
             openBlogDetail(post.slug);
             if (typeof window !== "undefined")
               window.scrollTo({ top: 0, behavior: "smooth" });
@@ -249,7 +261,7 @@ function PostCard({ post, index }: { post: BlogPost; index: number }) {
         >
           Read more
           <ArrowRight className="size-3.5" />
-        </button>
+        </a>
       </div>
     </motion.article>
   );

@@ -24,13 +24,13 @@ import { Icon } from "@/components/icon";
 import { cn } from "@/lib/utils";
 import { TicketTrackerWidget } from "./ticket-tracker-widget";
 
-const NAV: { label: string; page: PublicPage }[] = [
-  { label: "Home", page: "home" },
-  { label: "Services", page: "services" },
-  { label: "Blog", page: "blog" },
-  { label: "Reviews", page: "reviews" },
-  { label: "Track Repair", page: "track" },
-  { label: "Contact", page: "contact" },
+const NAV: { label: string; page: PublicPage; href: string }[] = [
+  { label: "Home", page: "home", href: "/" },
+  { label: "Services", page: "services", href: "/services" },
+  { label: "Blog", page: "blog", href: "/blog" },
+  { label: "Reviews", page: "reviews", href: "/reviews" },
+  { label: "Track Repair", page: "track", href: "/track" },
+  { label: "Contact", page: "contact", href: "/contact" },
 ];
 
 export function Header() {
@@ -103,8 +103,12 @@ export function Header() {
     <header className="glass sticky top-0 z-50 border-b border-border">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         {/* Logo */}
-        <button
-          onClick={() => go("home")}
+        <a
+          href="/"
+          onClick={(e) => {
+            e.preventDefault();
+            go("home");
+          }}
           className="group flex items-center gap-2.5 outline-none"
           aria-label={`${businessName} — Home`}
         >
@@ -134,7 +138,7 @@ export function Header() {
               East Kilbride
             </span>
           </span>
-        </button>
+        </a>
 
         {/* Desktop nav */}
         <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
@@ -142,6 +146,7 @@ export function Header() {
           <NavButton
             label="Home"
             active={publicPage === "home"}
+            href="/"
             onClick={() => go("home")}
           />
 
@@ -180,8 +185,10 @@ export function Header() {
                 role="menu"
                 className="custom-scroll absolute left-0 top-full z-50 mt-1 w-80 overflow-y-auto rounded-xl border border-border bg-card/95 p-1.5 shadow-2xl backdrop-blur-xl"
               >
-                <button
-                  onClick={() => {
+                <a
+                  href="/services"
+                  onClick={(e) => {
+                    e.preventDefault();
                     setServicesOpen(false);
                     go("services");
                   }}
@@ -199,12 +206,16 @@ export function Header() {
                       Browse the full repair menu
                     </p>
                   </div>
-                </button>
+                </a>
                 <div className="my-1 h-px bg-border" />
                 {SERVICE_CATEGORIES.map((c) => (
-                  <button
+                  <a
                     key={c.value}
-                    onClick={() => goToCategory(c.value)}
+                    href={`/services/${c.value}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      goToCategory(c.value);
+                    }}
                     className="flex w-full items-center gap-3 rounded-lg p-2.5 text-left transition-colors hover:bg-primary/10"
                     role="menuitem"
                   >
@@ -219,7 +230,7 @@ export function Header() {
                         {c.tagline}
                       </p>
                     </div>
-                  </button>
+                  </a>
                 ))}
               </div>
             )}
@@ -229,27 +240,32 @@ export function Header() {
             <NavButton
               label="Collection"
               active={publicPage === "collection"}
+              href="/collection"
               onClick={() => go("collection")}
             />
           )}
           <NavButton
             label="Blog"
             active={publicPage === "blog" || publicPage === "blog-detail"}
+            href="/blog"
             onClick={() => go("blog")}
           />
           <NavButton
             label="Reviews"
             active={publicPage === "reviews"}
+            href="/reviews"
             onClick={() => go("reviews")}
           />
           <NavButton
             label="Track Repair"
             active={publicPage === "track"}
+            href="/track"
             onClick={() => go("track")}
           />
           <NavButton
             label="Contact"
             active={publicPage === "contact"}
+            href="/contact"
             onClick={() => go("contact")}
           />
         </nav>
@@ -338,6 +354,7 @@ export function Header() {
                 <MobileNavButton
                   label="Home"
                   active={publicPage === "home"}
+                  href="/"
                   onClick={() => go("home")}
                 />
 
@@ -369,17 +386,25 @@ export function Header() {
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <div className="mt-1 flex flex-col gap-0.5 pl-3">
-                      <button
-                        onClick={() => go("services")}
+                      <a
+                        href="/services"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          go("services");
+                        }}
                         className="flex items-center gap-2 rounded-lg px-4 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
                       >
                         <ChevronDown className="size-3 rotate-[-90deg] text-primary" />
                         All Services
-                      </button>
+                      </a>
                       {SERVICE_CATEGORIES.map((c) => (
-                        <button
+                        <a
                           key={c.value}
-                          onClick={() => goToCategory(c.value)}
+                          href={`/services/${c.value}`}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            goToCategory(c.value);
+                          }}
                           className="flex items-center gap-2 rounded-lg px-4 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary"
                         >
                           <Icon
@@ -387,7 +412,7 @@ export function Header() {
                             className="size-3.5 text-primary"
                           />
                           {c.shortLabel}
-                        </button>
+                        </a>
                       ))}
                     </div>
                   </CollapsibleContent>
@@ -397,27 +422,32 @@ export function Header() {
                   <MobileNavButton
                     label="Collection"
                     active={publicPage === "collection"}
+                    href="/collection"
                     onClick={() => go("collection")}
                   />
                 )}
                 <MobileNavButton
                   label="Blog"
                   active={publicPage === "blog" || publicPage === "blog-detail"}
+                  href="/blog"
                   onClick={() => go("blog")}
                 />
                 <MobileNavButton
                   label="Reviews"
                   active={publicPage === "reviews"}
+                  href="/reviews"
                   onClick={() => go("reviews")}
                 />
                 <MobileNavButton
                   label="Track Repair"
                   active={publicPage === "track"}
+                  href="/track"
                   onClick={() => go("track")}
                 />
                 <MobileNavButton
                   label="Contact"
                   active={publicPage === "contact"}
+                  href="/contact"
                   onClick={() => go("contact")}
                 />
               </nav>
@@ -458,15 +488,25 @@ export function Header() {
 function NavButton({
   label,
   active,
+  href,
   onClick,
 }: {
   label: string;
   active: boolean;
+  href: string;
   onClick: () => void;
 }) {
+  // Render as <a href> so crawlers (Ahrefs/Googlebot) see internal links —
+  // fixes the 'orphan page' issue where deep links had 0 href inlinks.
+  // preventDefault keeps SPA navigation (no full page reload).
   return (
-    <button
-      onClick={onClick}
+    <a
+      href={href}
+      onClick={(e) => {
+        e.preventDefault();
+        onClick();
+      }}
+      aria-current={active ? "page" : undefined}
       className={cn(
         "relative rounded-md px-3 py-2 text-sm font-medium transition-colors",
         active
@@ -478,22 +518,29 @@ function NavButton({
       {active && (
         <span className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-primary" />
       )}
-    </button>
+    </a>
   );
 }
 
 function MobileNavButton({
   label,
   active,
+  href,
   onClick,
 }: {
   label: string;
   active: boolean;
+  href: string;
   onClick: () => void;
 }) {
   return (
-    <button
-      onClick={onClick}
+    <a
+      href={href}
+      onClick={(e) => {
+        e.preventDefault();
+        onClick();
+      }}
+      aria-current={active ? "page" : undefined}
       className={cn(
         "flex items-center justify-between rounded-lg px-4 py-3 text-left text-sm font-medium transition-colors",
         active
@@ -503,7 +550,7 @@ function MobileNavButton({
     >
       {label}
       {active && <span className="size-1.5 rounded-full bg-primary" />}
-    </button>
+    </a>
   );
 }
 

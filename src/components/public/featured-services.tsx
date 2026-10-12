@@ -27,8 +27,10 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
       className="group relative flex flex-col rounded-xl border border-border bg-card p-5 transition-all hover:-translate-y-1 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5"
     >
       <div className="flex items-start justify-between gap-3">
-        <button
-          onClick={() => {
+        <a
+          href={`/services/${service.category}`}
+          onClick={(e) => {
+            e.preventDefault();
             openServiceDetail(service.category);
             if (typeof window !== "undefined") {
               window.scrollTo({ top: 0, behavior: "smooth" });
@@ -38,7 +40,7 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
           aria-label={`View ${service.name} category details`}
         >
           <Icon name={service.icon} className="size-6" />
-        </button>
+        </a>
         {service.popular && (
           <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-300">
             <Star className="size-3 fill-amber-400 text-amber-400" />
@@ -74,17 +76,23 @@ function ServiceCard({ service, index }: { service: Service; index: number }) {
           Book Fix
         </Button>
         <Button
-          onClick={() => {
-            openServiceDetail(service.category);
-            if (typeof window !== "undefined") {
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }
-          }}
+          asChild
           variant="outline"
           size="sm"
           className="justify-center border-primary/30 bg-background/40 text-foreground hover:border-primary/60 hover:bg-primary/10"
         >
-          Details
+          <a
+            href={`/services/${service.category}`}
+            onClick={(e) => {
+              e.preventDefault();
+              openServiceDetail(service.category);
+              if (typeof window !== "undefined") {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }
+            }}
+          >
+            Details
+          </a>
         </Button>
       </div>
     </motion.article>
@@ -131,12 +139,20 @@ export function FeaturedServices() {
             </p>
           </div>
           <Button
+            asChild
             variant="outline"
-            onClick={() => setPublicPage("services")}
             className="border-primary/30 bg-background/40 text-foreground hover:border-primary/60 hover:bg-primary/10"
           >
-            View all services
-            <ArrowRight className="size-4" />
+            <a
+              href="/services"
+              onClick={(e) => {
+                e.preventDefault();
+                setPublicPage("services");
+              }}
+            >
+              View all services
+              <ArrowRight className="size-4" />
+            </a>
           </Button>
         </div>
 

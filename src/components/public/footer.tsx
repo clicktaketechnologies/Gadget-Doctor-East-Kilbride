@@ -16,13 +16,13 @@ import { Icon } from "@/components/icon";
 import { cn } from "@/lib/utils";
 import { TicketTrackerWidget } from "./ticket-tracker-widget";
 
-const NAV: { label: string; page: PublicPage }[] = [
-  { label: "Home", page: "home" },
-  { label: "Services", page: "services" },
-  { label: "Blog", page: "blog" },
-  { label: "Reviews", page: "reviews" },
-  { label: "Track Repair", page: "track" },
-  { label: "Contact", page: "contact" },
+const NAV: { label: string; page: PublicPage; href: string }[] = [
+  { label: "Home", page: "home", href: "/" },
+  { label: "Services", page: "services", href: "/services" },
+  { label: "Blog", page: "blog", href: "/blog" },
+  { label: "Reviews", page: "reviews", href: "/reviews" },
+  { label: "Track Repair", page: "track", href: "/track" },
+  { label: "Contact", page: "contact", href: "/contact" },
 ];
 
 export function Footer() {
@@ -136,22 +136,30 @@ export function Footer() {
             <ul className="mt-4 space-y-2.5">
               {NAV.map((item) => (
                 <li key={item.page}>
-                  <button
-                    onClick={() => go(item.page)}
+                  <a
+                    href={item.href}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      go(item.page);
+                    }}
                     className="text-sm text-muted-foreground transition-colors hover:text-primary"
                   >
                     {item.label}
-                  </button>
+                  </a>
                 </li>
               ))}
               {collectionEnabled && (
                 <li>
-                  <button
-                    onClick={() => go("collection")}
+                  <a
+                    href="/collection"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      go("collection");
+                    }}
                     className="text-sm text-muted-foreground transition-colors hover:text-primary"
                   >
                     Collection Service
-                  </button>
+                  </a>
                 </li>
               )}
             </ul>
@@ -165,8 +173,10 @@ export function Footer() {
             <ul className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-1">
               {SERVICE_CATEGORIES.map((c) => (
                 <li key={c.value}>
-                  <button
-                    onClick={() => {
+                  <a
+                    href={`/services/${c.value}`}
+                    onClick={(e) => {
+                      e.preventDefault();
                       openServiceDetail(c.value);
                       if (typeof window !== "undefined") {
                         window.scrollTo({ top: 0, behavior: "smooth" });
@@ -179,7 +189,7 @@ export function Footer() {
                       className="size-3.5 text-primary"
                     />
                     {c.label}
-                  </button>
+                  </a>
                 </li>
               ))}
             </ul>
