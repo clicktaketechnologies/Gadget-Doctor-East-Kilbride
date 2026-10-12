@@ -152,13 +152,19 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
   let blogPost: { title: string; excerpt: string; coverImage: string | null } | null = null;
   if (page === "blog-detail" && blogSlug) {
-    const post = await db.blogPost.findUnique({
-      where: { slug: blogSlug },
-      select: { title: true, excerpt: true, coverImage: true, published: true },
-    });
-    // Only serve metadata for published posts (don't leak draft titles)
-    if (post && post.published) {
-      blogPost = { title: post.title, excerpt: post.excerpt, coverImage: post.coverImage };
+    try {
+      const post = await db.blogPost.findUnique({
+        where: { slug: blogSlug },
+        select: { title: true, excerpt: true, coverImage: true, published: true },
+      });
+      // Only serve metadata for published posts (don't leak draft titles)
+      if (post && post.published) {
+        blogPost = { title: post.title, excerpt: post.excerpt, coverImage: post.coverImage };
+      }
+    } catch {
+      // DB unreachable at build time — fall back to generic blog metadata.
+      // The client-side SeoHead will still update the title post-hydration
+      // for JS-enabled visitors once the /api/blog endpoint responds.
     }
   }
 
