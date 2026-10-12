@@ -165,6 +165,53 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   return buildMetadata(page, category, blogSlug, blogPost, pathname);
 }
 
+/**
+ * generateStaticParams — required for `output: export` (static export to
+ * Firebase Hosting). Returns every public deep-link path so Next.js
+ * pre-renders each as a separate HTML file with its own per-page metadata
+ * (the C1/C2 fix — unique title + self-referential canonical per path).
+ *
+ * Blog slugs are fetched from the DB at build time; if the DB is unreachable
+ * (e.g. local build without a connection string), the known seed slugs are
+ * used as a fallback so the build never fails.
+ */
+const FALLBACK_BLOG_SLUGS = [
+  "cracked-iphone-screen-repair-guide",
+  "ps5-hdmi-port-repair-explained",
+  "macbook-water-damage-what-to-do",
+  "custom-gaming-pc-build-guide",
+];
+const SERVICE_CATEGORIES_VALUES = SERVICE_CATEGORIES.map((c) => c.value);
+
+export async function generateStaticParams() {
+  // Try to fetch published blog slugs from the DB for a complete sitemap.
+  let blogSlugs = FALLBACK_BLOG_SLUGS;
+  try {
+    const posts = await db.blogPost.findMany({
+      where: { published: true },
+      select: { slug: true },
+    });
+    if (posts.length > 0) {
+      blogSlugs = posts.map((p) => p.slug);
+    }
+  } catch {
+    // DB unreachable at build time — use the fallback slugs
+  }
+
+  const params: { slug: string[] }[] = [
+    { slug: ["services"] },
+    ...SERVICE_CATEGORIES_VALUES.map((c) => ({ slug: ["services", c] })),
+    { slug: ["collection"] },
+    { slug: ["reviews"] },
+    { slug: ["contact"] },
+    { slug: ["track"] },
+    { slug: ["blog"] },
+    ...blogSlugs.map((s) => ({ slug: ["blog", s] })),
+  ];
+
+  return params;
+}
+
 // Server-rendered shell — the client SPA does the actual page rendering
 // + reads window.location.pathname via the store's installUrlSync().
 export default function CatchAllPage() {
