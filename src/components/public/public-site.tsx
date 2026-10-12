@@ -21,7 +21,8 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Icon } from "@/components/icon";
-import { useAppStore, type PublicPage } from "@/lib/store";
+import { useAppStore, installUrlSync, type PublicPage } from "@/lib/store";
+import { SeoHead } from "./seo-head";
 import { useSettings, useReviews, useBranding } from "@/lib/api-hooks";
 import { BRAND, SERVICE_CATEGORIES } from "@/lib/brand";
 import { relativeTime } from "@/lib/format";
@@ -548,8 +549,20 @@ export function PublicSite() {
     }
   }, [publicPage, settings, setPublicPage]);
 
+  // 4XX + canonical fix: on first client mount, read window.location.pathname
+  // and render the matching page (so direct deep links like /services, /blog,
+  // /contact land on the correct content). Also keeps the URL in sync during
+  // SPA navigation and handles browser back/forward (popstate). Per-page SEO
+  // metadata (title/description/canonical) is handled server-side by
+  // generateMetadata in the catch-all route + client-side by <SeoHead>.
+  useEffect(() => {
+    const cleanup = installUrlSync();
+    return cleanup;
+  }, []);
+
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <SeoHead />
       <AnnouncementBanner />
       <Header />
       <main className="flex-1" key={page}>

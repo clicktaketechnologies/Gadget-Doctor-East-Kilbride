@@ -2,44 +2,11 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { pathnameToPage, type PublicPage } from "@/lib/seo-routes";
 
-// Detect the initial page from the URL path (for SPA routing)
-// Allows direct links like /services, /blog, /contact to load the right content
-function getInitialPage(): PublicPage {
-  if (typeof window === "undefined") return "home";
-  const path = window.location.pathname.replace(/\/$/, "").toLowerCase();
-  switch (path) {
-    case "/services":
-    case "/service-detail":
-      return "services";
-    case "/collection":
-      return "collection";
-    case "/reviews":
-      return "reviews";
-    case "/blog":
-    case "/blog-detail":
-      return "blog";
-    case "/contact":
-      return "contact";
-    case "/track":
-      return "track";
-    default:
-      return "home";
-  }
-}
+export type { PublicPage } from "@/lib/seo-routes";
 
 export type AppView = "public" | "admin";
-
-export type PublicPage =
-  | "home"
-  | "services"
-  | "service-detail"
-  | "collection"
-  | "reviews"
-  | "contact"
-  | "blog"
-  | "blog-detail"
-  | "track";
 
 export type AdminModule =
   | "overview"
@@ -84,24 +51,87 @@ interface AppState {
 
   bookingOpen: boolean;
   setBookingOpen: (o: boolean) => void;
+
+  /** Read window.location.pathname on first client render and sync state. */
+  syncFromUrl: () => void;
+}
+
+/** Inverse of pathnameToPage — build a URL path for a given page. */
+function pageToPathname(
+  page: PublicPage,
+  category: string | null,
+  blogSlug: string | null
+): string {
+  switch (page) {
+    case "home":
+      return "/";
+    case "services":
+      return "/services";
+    case "service-detail":
+      return category ? `/services/${category}` : "/services";
+    case "collection":
+      return "/collection";
+    case "reviews":
+      return "/reviews";
+    case "contact":
+      return "/contact";
+    case "track":
+      return "/track";
+    case "blog":
+      return "/blog";
+    case "blog-detail":
+      return blogSlug ? `/blog/${blogSlug}` : "/blog";
+    default:
+      return "/";
+  }
 }
 
 export const useAppStore = create<AppState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       view: "public",
       setView: (view) => set({ view }),
 
-      publicPage: getInitialPage(),
-      setPublicPage: (publicPage) => set({ publicPage }),
+      // Default to home; installUrlSync() sets the correct page from the URL
+      // on first client mount (so direct links like /services work).
+      publicPage: "home",
+      setPublicPage: (publicPage) => {
+        set({ publicPage });
+        // Keep the browser URL in sync so deep links + back/forward work.
+        const st = get();
+        const path = pageToPathname(
+          publicPage,
+          st.activeServiceCategory,
+          st.activeBlogSlug
+        );
+        if (typeof window !== "undefined" && window.location.pathname !== path) {
+          window.history.pushState({ page: publicPage }, "", path);
+        }
+      },
 
       activeServiceCategory: null,
-      openServiceDetail: (category) =>
-        set({ publicPage: "service-detail", activeServiceCategory: category }),
+      openServiceDetail: (category) => {
+        set({ publicPage: "service-detail", activeServiceCategory: category });
+        if (typeof window !== "undefined") {
+          window.history.pushState(
+            { page: "service-detail", category },
+            "",
+            `/services/${category}`
+          );
+        }
+      },
 
       activeBlogSlug: null,
-      openBlogDetail: (slug) =>
-        set({ publicPage: "blog-detail", activeBlogSlug: slug }),
+      openBlogDetail: (slug) => {
+        set({ publicPage: "blog-detail", activeBlogSlug: slug });
+        if (typeof window !== "undefined") {
+          window.history.pushState(
+            { page: "blog-detail", slug },
+            "",
+            `/blog/${slug}`
+          );
+        }
+      },
 
       adminToken: null,
       adminName: null,
@@ -117,6 +147,18 @@ export const useAppStore = create<AppState>()(
       openBooking: (preset) => set({ bookingOpen: true, bookingPreset: preset ?? null }),
       closeBooking: () => set({ bookingOpen: false, bookingPreset: null }),
       setBookingOpen: (bookingOpen) => set({ bookingOpen }),
+
+      syncFromUrl: () => {
+        if (typeof window === "undefined") return;
+        const { page, category, blogSlug } = pathnameToPage(
+          window.location.pathname
+        );
+        set({
+          publicPage: page,
+          activeServiceCategory: category ?? null,
+          activeBlogSlug: blogSlug ?? null,
+        });
+      },
     }),
     {
       name: "gd-app-store",
@@ -133,3 +175,20 @@ export const useAppStore = create<AppState>()(
     }
   )
 );
+
+/**
+ * Install a one-time popstate listener + initial sync so that back/forward
+ * navigation and direct deep links land on the right page. Safe to call once
+ * from a top-level client component.
+ */
+export function installUrlSync(): () => void {
+  if (typeof window === "undefined") return () => {};
+
+  // Sync state from the URL on first load (handles direct deep links + refresh)
+  useAppStore.getState().syncFromUrl();
+
+  const onPop = () => useAppStore.getState().syncFromUrl();
+  window.addEventListener("popstate", onPop);
+
+  return () => window.removeEventListener("popstate", onPop);
+}

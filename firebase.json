@@ -4,6 +4,11 @@
     "ignore": ["**/.*"],
     "redirects": [
       {
+        "source": "/favicon.ico",
+        "destination": "/gadget-doctor-logo.jpg",
+        "type": 302
+      },
+      {
         "source": "/admin",
         "destination": "https://gadget-doctor-east-kilbride.onrender.com/admin",
         "type": 302
