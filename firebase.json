@@ -19,6 +19,48 @@
         "type": 302
       }
     ],
+    "rewrites": [
+      {
+        "source": "/services",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/services/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/collection",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/reviews",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/blog",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/blog/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/contact",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/track",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/track/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/service-detail",
+        "destination": "/index.html"
+      }
+    ],
     "headers": [
       {
         "source": "/**",

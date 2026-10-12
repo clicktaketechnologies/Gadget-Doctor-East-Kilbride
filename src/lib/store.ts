@@ -3,6 +3,31 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
+// Detect the initial page from the URL path (for SPA routing)
+// Allows direct links like /services, /blog, /contact to load the right content
+function getInitialPage(): PublicPage {
+  if (typeof window === "undefined") return "home";
+  const path = window.location.pathname.replace(/\/$/, "").toLowerCase();
+  switch (path) {
+    case "/services":
+    case "/service-detail":
+      return "services";
+    case "/collection":
+      return "collection";
+    case "/reviews":
+      return "reviews";
+    case "/blog":
+    case "/blog-detail":
+      return "blog";
+    case "/contact":
+      return "contact";
+    case "/track":
+      return "track";
+    default:
+      return "home";
+  }
+}
+
 export type AppView = "public" | "admin";
 
 export type PublicPage =
@@ -67,7 +92,7 @@ export const useAppStore = create<AppState>()(
       view: "public",
       setView: (view) => set({ view }),
 
-      publicPage: "home",
+      publicPage: getInitialPage(),
       setPublicPage: (publicPage) => set({ publicPage }),
 
       activeServiceCategory: null,
@@ -97,7 +122,8 @@ export const useAppStore = create<AppState>()(
       name: "gd-app-store",
       partialize: (s) => ({
         view: s.view,
-        publicPage: s.publicPage,
+        // Don't persist publicPage — we detect it from the URL on each load
+        // so direct links like /services work correctly
         activeServiceCategory: s.activeServiceCategory,
         activeBlogSlug: s.activeBlogSlug,
         adminToken: s.adminToken,
