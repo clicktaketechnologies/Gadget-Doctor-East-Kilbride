@@ -22,6 +22,86 @@
         "source": "/superadmin",
         "destination": "https://gadget-doctor-east-kilbride.onrender.com/admin",
         "type": 302
+      },
+      {
+        "source": "/about-us",
+        "destination": "/contact",
+        "type": 301
+      },
+      {
+        "source": "/about",
+        "destination": "/contact",
+        "type": 301
+      },
+      {
+        "source": "/locations",
+        "destination": "/contact",
+        "type": 301
+      },
+      {
+        "source": "/location",
+        "destination": "/contact",
+        "type": 301
+      },
+      {
+        "source": "/gadget-doctor-east-kilbride-branch",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/our-services",
+        "destination": "/services",
+        "type": 301
+      },
+      {
+        "source": "/prices",
+        "destination": "/services",
+        "type": 301
+      },
+      {
+        "source": "/price-list",
+        "destination": "/services",
+        "type": 301
+      },
+      {
+        "source": "/booking",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/book",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/book-repair",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/appointments",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/repair-tracking",
+        "destination": "/track",
+        "type": 301
+      },
+      {
+        "source": "/track-repair",
+        "destination": "/track",
+        "type": 301
+      },
+      {
+        "source": "/customer-reviews",
+        "destination": "/reviews",
+        "type": 301
+      },
+      {
+        "source": "/testimonials",
+        "destination": "/reviews",
+        "type": 301
       }
     ],
     "rewrites": [
