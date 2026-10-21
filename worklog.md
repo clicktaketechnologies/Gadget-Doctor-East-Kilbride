@@ -604,3 +604,32 @@ Stage Summary:
 - All latest code is LIVE on GitHub + Firebase + Render. No uncommitted code changes.
 - Cache audit: NO blockers. Firebase HTML + SEO files use max-age=0, must-revalidate (always fresh). Static assets are content-hashed (immutable cache is safe). GitHub Actions does fresh builds (no cache steps). Render does fresh builds.
 - The only "cache" outside my control: Google's search index (takes 2-7 days to update after re-crawl) — trigger re-crawl in Ahrefs + request indexing in Google Search Console to speed this up.
+
+---
+Task ID: 20 (Upgraded 404 page + 301 redirects for broken links)
+Agent: Main (Full-Stack Architect)
+Task: (a) Add 301 redirects for old cPanel paths that 404 (/about-us, /locations, /gadget-doctor-east-kilbride-branch). (b) Create a proper branded 404 page with a prominent "Go to Home" button.
+
+Work Log:
+- PART A — 301 redirects (commit ece645b + c5edd89): added 16 redirect rules to firebase.json for old paths that were returning 404: /about-us, /about, /location, /locations -> /contact; /gadget-doctor-east-kilbride-branch -> /; /our-services, /prices, /price-list -> /services; /booking, /book, /book-repair, /appointments -> /; /repair-tracking, /track-repair -> /track; /customer-reviews, /testimonials -> /reviews. All 301 (permanent, preserves SEO equity). Firebase cleanUrls normalizes trailing slashes. Verified LIVE: all 3 reported URLs now 301 to their relevant pages.
+- PART B — upgraded 404 page (commit f495d73): rewrote src/app/not-found.tsx from a minimal 7-line page into a full branded 404 experience:
+  - Gadget Doctor logo + business name (clickable to home)
+  - Large red "404" + "Not Found" heading (as the user requested)
+  - Helpful message explaining the page doesn't exist / may have moved
+  - Prominent primary CTA: "Go to Home" button (shadcn Button, size=lg, with Home + ArrowRight icons)
+  - 3 quick-link cards to popular pages: Browse Services (/services), Track Your Repair (/track), Contact Us (/contact)
+  - Footer help line with clickable phone number (tel: link)
+  - Decorative background glow using the brand primary color (#E31E24)
+  - noindex, follow (Google de-indexes the 404 but follows the links to preserve crawl equity)
+- Two build failures during deploy: the favicon.ico route handler had been re-added in a later commit (broke output:export). Deleted it again (commit c5edd89) — the firebase.json /favicon.ico -> logo 302 redirect handles it at the Hosting level.
+- Verified LIVE on https://www.gadgetdoctorls.co.uk/this-page-does-not-exist-at-all:
+  - HTTP 404 status ✓
+  - Title: "Page Not Found — Gadget Doctor East Kilbride" ✓
+  - "404" + "Not Found" heading + "Go to Home" button present ✓
+  - robots: noindex meta tag ✓
+  - Internal links to /, /services, /track, /contact present (crawlers can follow) ✓
+
+Stage Summary:
+- 16 old cPanel paths now 301-redirect to their relevant new pages (no more 404 for known old paths).
+- Genuinely unknown paths render a branded 404 page with a prominent "Go to Home" button + 3 quick-link cards (Services, Track, Contact) + clickable phone.
+- The 404 page is noindex,follow so Google de-indexes it but still crawls the links — preserving SEO equity.
