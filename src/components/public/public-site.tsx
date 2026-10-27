@@ -115,8 +115,8 @@ function WhyChooseUs() {
   const items = [
     {
       icon: ShieldCheck,
-      title: "12-Month Warranty",
-      desc: "Every repair is backed by a full year's warranty on parts and labour — no quibbles.",
+      title: "Genuine-Grade Parts",
+      desc: "OEM-equivalent components, rigorously tested — never cheap knock-offs that fail in a month.",
       color: "from-cyan-500/20 to-cyan-500/5",
     },
     {

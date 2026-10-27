@@ -125,7 +125,7 @@ export default async function RootLayout({
               "@type": ["LocalBusiness", "ElectronicsRepairService"],
               "@id": "https://www.gadgetdoctorls.co.uk/#business",
               name: "Gadget Doctor East Kilbride",
-              description: "Fast & reliable electronics repair in East Kilbride. Expert phone, laptop, MacBook, games console, Apple Watch and custom PC repairs with a 12-month warranty.",
+              description: "Fast & reliable electronics repair in East Kilbride. Expert phone, laptop, MacBook, games console, Apple Watch and custom PC repairs with same-day service.",
               image: "https://www.gadgetdoctorls.co.uk/gadget-doctor-logo.jpg",
               logo: "https://www.gadgetdoctorls.co.uk/gadget-doctor-logo.jpg",
               url: "https://www.gadgetdoctorls.co.uk/",
@@ -151,21 +151,15 @@ export default async function RootLayout({
               openingHoursSpecification: [
                 {
                   "@type": "OpeningHoursSpecification",
-                  dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday"],
-                  opens: "09:30",
-                  closes: "15:00",
-                },
-                {
-                  "@type": "OpeningHoursSpecification",
-                  dayOfWeek: "Friday",
-                  opens: "09:30",
-                  closes: "14:30",
+                  dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                  opens: "10:00",
+                  closes: "17:00",
                 },
                 {
                   "@type": "OpeningHoursSpecification",
                   dayOfWeek: "Saturday",
-                  opens: "10:00",
-                  closes: "14:00",
+                  opens: "11:00",
+                  closes: "15:00",
                 },
               ],
               aggregateRating: {

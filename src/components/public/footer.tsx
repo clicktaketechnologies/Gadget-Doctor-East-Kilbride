@@ -338,6 +338,12 @@ export function Footer() {
               </a>
             )}
             <span className="hidden sm:inline">Registered in Scotland</span>
+            <a
+              href="/terms"
+              className="transition-colors hover:text-primary"
+            >
+              Terms &amp; Conditions
+            </a>
             <span className="flex items-center gap-1.5">
               <span className="size-1.5 rounded-full bg-emerald-400" />
               All systems operational

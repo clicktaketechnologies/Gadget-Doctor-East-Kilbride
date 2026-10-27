@@ -68,8 +68,9 @@ export const DEVICE_LABELS: Record<string, string> = {
   "custom-computer": "Custom PC",
   console: "Console",
   "apple-watch": "Apple Watch",
-  phone: "Mobile",
   ghd: "GHD",
+  "hair-dryer": "Hair Dryer",
+  phone: "Mobile",
   "data-recovery": "Data Recovery",
 };
 

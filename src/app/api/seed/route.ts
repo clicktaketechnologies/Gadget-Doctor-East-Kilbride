@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
         businessName: BRAND.fullName,
         tagline: BRAND.tagline,
         about:
-          "Gadget Doctor East Kilbride is your local one-stop electronics repair shop. From cracked phone screens and dead MacBooks to PS5 HDMI ports, custom gaming PCs and Apple Watch batteries — our certified technicians fix it all with honest pricing, genuine-grade parts and a 12-month warranty on every repair. Pop into the workshop, call us, or use our free doorstep collection across East Kilbride, Busby, Eaglesham, Cambuslang, Rutherglen, Carmunnock and Giffnock.",
+          "Gadget Doctor East Kilbride is your local one-stop electronics repair shop. From cracked phone screens and dead MacBooks to PS5 HDMI ports, custom gaming PCs and Apple Watch batteries — our certified technicians fix it all with honest pricing and genuine-grade parts. Pop into the workshop, call us, or use our free doorstep collection across East Kilbride, Busby, Eaglesham, Cambuslang, Rutherglen, Carmunnock and Giffnock.",
         logoUrl: BRAND.logoUrl,
         primaryColor: BRAND.primaryColor,
         secondaryColor: BRAND.secondaryColor,
@@ -128,6 +128,20 @@ export async function POST(req: NextRequest) {
       { slug: "watch-battery", name: "Apple Watch Battery Service", category: "apple-watch", description: "Battery replacement to restore all-day battery life.", icon: "BatteryCharging", priceFrom: 6900, priceTo: 11900, turnaround: "1-2 days", popular: false },
       { slug: "watch-charging", name: "Apple Watch Charging Repair", category: "apple-watch", description: "Charging coil and back-glass repair.", icon: "Plug", priceFrom: 7900, priceTo: 13900, turnaround: "1-2 days", popular: false },
       { slug: "watch-water", name: "Apple Watch Water Damage", category: "apple-watch", description: "Diagnostic and component-level water damage recovery.", icon: "Droplets", priceFrom: 7900, priceTo: 15900, turnaround: "2-3 days", popular: false },
+
+      // ---- GHD Repair ----
+      { slug: "ghd-cable", name: "GHD Cable & Plug Repair", category: "ghd", description: "Faulty or damaged cable and plug replacement for all GHD models.", icon: "Plug", priceFrom: 1500, priceTo: 3500, turnaround: "Same day", popular: true },
+      { slug: "ghd-heater", name: "GHD Heater Element Replacement", category: "ghd", description: "Dead or intermittent plates? Heating element replacement.", icon: "Zap", priceFrom: 2500, priceTo: 5500, turnaround: "1-2 days", popular: false },
+      { slug: "ghd-plates", name: "GHD Plate Replacement", category: "ghd", description: "Cracked or worn ceramic plates replaced with genuine-grade parts.", icon: "Square", priceFrom: 2500, priceTo: 5500, turnaround: "1-2 days", popular: false },
+      { slug: "ghd-power", name: "GHD Power / No Heat Repair", category: "ghd", description: "Won't turn on or won't heat up? Full diagnostics and board-level repair.", icon: "Zap", priceFrom: 2000, priceTo: 5500, turnaround: "1-2 days", popular: true },
+      { slug: "ghd-sensor", name: "GHD Sensor / PCB Repair", category: "ghd", description: "Erratic temperature, flashing light or sleep-mode faults fixed.", icon: "Cpu", priceFrom: 2500, priceTo: 6500, turnaround: "1-2 days", popular: false },
+
+      // ---- Hair Dryer Repair ----
+      { slug: "hair-dryer-motor", name: "Hair Dryer Motor Repair", category: "hair-dryer", description: "Motor not spinning, weak airflow or noisy operation? Motor replacement.", icon: "Fan", priceFrom: 2500, priceTo: 6500, turnaround: "1-2 days", popular: true },
+      { slug: "hair-dryer-element", name: "Hair Dryer Heating Element", category: "hair-dryer", description: "No heat or overheating? Heating element diagnostics and replacement.", icon: "Zap", priceFrom: 2500, priceTo: 5500, turnaround: "1-2 days", popular: false },
+      { slug: "hair-dryer-cable", name: "Hair Dryer Cable & Plug", category: "hair-dryer", description: "Frayed or broken cable? Genuine replacement cable fitted.", icon: "Plug", priceFrom: 1500, priceTo: 3500, turnaround: "Same day", popular: false },
+      { slug: "hair-dryer-power", name: "Hair Dryer Power / No Power", category: "hair-dryer", description: "Won't turn on? PCB, switch and power diagnostics.", icon: "Zap", priceFrom: 2000, priceTo: 5500, turnaround: "1-2 days", popular: false },
+      { slug: "hair-dryer-switch", name: "Hair Dryer Switch / Button Repair", category: "hair-dryer", description: "Stuck or broken switches, speed/heat selector repair.", icon: "ToggleLeft", priceFrom: 1500, priceTo: 3500, turnaround: "Same day", popular: false },
     ];
 
     await db.service.createMany({
@@ -202,7 +216,7 @@ export async function POST(req: NextRequest) {
         slug: "cracked-iphone-screen-repair-guide",
         title: "Cracked iPhone Screen? Here's What You Need to Know",
         excerpt: "From repair options to costs and turnaround times — everything you need to know before getting your iPhone screen fixed in East Kilbride.",
-        content: "A cracked iPhone screen is one of the most common repairs we see at Gadget Doctor East Kilbride. The good news? Most screens can be replaced in under an hour.\n\n## Should you repair or replace?\n\nUnless your phone is several generations old, repairing the screen is almost always cheaper than upgrading. A screen repair for an iPhone 13 or 14 typically costs between £69 and £149 — far less than a new handset.\n\n## What affects the price?\n\n- **Model**: newer Pro Max models use expensive OLED panels.\n- **Part quality**: we use genuine-grade parts backed by a 12-month warranty.\n- **Additional damage**: if the touch layer or frame is damaged, the cost may be slightly higher.\n\n## How long does it take?\n\nMost iPhone screen repairs are completed in 30–60 minutes. You can drop in, or use our doorstep collection service across East Kilbride.\n\nReady to book? Use the 'Book Repair' button on any page or call us on +44 7777 200175.",
+        content: "A cracked iPhone screen is one of the most common repairs we see at Gadget Doctor East Kilbride. The good news? Most screens can be replaced in under an hour.\n\n## Should you repair or replace?\n\nUnless your phone is several generations old, repairing the screen is almost always cheaper than upgrading. A screen repair for an iPhone 13 or 14 typically costs between £69 and £149 — far less than a new handset.\n\n## What affects the price?\n\n- **Model**: newer Pro Max models use expensive OLED panels.\n- **Part quality**: we use genuine-grade parts, rigorously tested.\n- **Additional damage**: if the touch layer or frame is damaged, the cost may be slightly higher.\n\n## How long does it take?\n\nMost iPhone screen repairs are completed in 30–60 minutes. You can drop in, or use our doorstep collection service across East Kilbride.\n\nReady to book? Use the 'Book Repair' button on any page or call us on +44 7777 200175.",
         coverImage: "/images/services-grid.jpg",
         category: "Guides",
         tags: "iPhone,screen repair,guide",
@@ -214,7 +228,7 @@ export async function POST(req: NextRequest) {
         slug: "ps5-hdmi-port-repair-explained",
         title: "PS5 HDMI Port Repair: Why It Happens and How We Fix It",
         excerpt: "No signal on your TV? A broken HDMI port is the most common PS5 fault. Here's how we repair it and what it costs.",
-        content: "If your PlayStation 5 powers on but shows 'No Signal' on your TV, the HDMI port is the usual culprit. It's a fragile connector that takes a lot of strain from cable insertion and accidental knocks.\n\n## What causes HDMI port damage?\n\n- Forcing the cable in the wrong way\n- Knocking the console while a cable is plugged in\n- Wear and tear over time\n- Power surges\n\n## How we fix it\n\nWe completely remove the damaged HDMI port and solder a genuine replacement onto the motherboard using a hot-air rework station. The repair takes 1–3 days and comes with a warranty.\n\n## Cost\n\nPS5 HDMI port repair is typically £89–£149 depending on whether there's additional board damage.\n\nBook your PS5 repair online or call +44 7777 200175.",
+        content: "If your PlayStation 5 powers on but shows 'No Signal' on your TV, the HDMI port is the usual culprit. It's a fragile connector that takes a lot of strain from cable insertion and accidental knocks.\n\n## What causes HDMI port damage?\n\n- Forcing the cable in the wrong way\n- Knocking the console while a cable is plugged in\n- Wear and tear over time\n- Power surges\n\n## How we fix it\n\nWe completely remove the damaged HDMI port and solder a genuine replacement onto the motherboard using a hot-air rework station. The repair takes 1–3 days and is fully tested before return.\n\n## Cost\n\nPS5 HDMI port repair is typically £89–£149 depending on whether there's additional board damage.\n\nBook your PS5 repair online or call +44 7777 200175.",
         coverImage: "/images/why-choose-tech.jpg",
         category: "Repairs",
         tags: "PS5,console,HDMI,repair",
@@ -238,7 +252,7 @@ export async function POST(req: NextRequest) {
         slug: "custom-gaming-pc-build-guide",
         title: "Building a Custom Gaming PC: Where to Start",
         excerpt: "Thinking about a custom gaming PC build? Here's how to plan your budget and what to expect from Gadget Doctor.",
-        content: "A custom gaming PC is one of the most rewarding purchases you can make — but where do you start?\n\n## Set a budget\n\nGreat 1080p gaming PCs start around £899. For smooth 1440p gaming, budget £1,200–£1,600. For 4K and high-refresh-rate, expect £2,000+.\n\n## Pick your priorities\n\n- **FPS in your favourite games** — check benchmarks.\n- **Upgradability** — leave room for a better GPU later.\n- **Aesthetics** — RGB, cable management, case choice.\n- **Quiet / cool operation** — good fans and airflow.\n\n## Why have us build it?\n\nEvery Gadget Doctor custom build is:\n- Designed around your games and budget\n- Assembled and cable-managed by certified technicians\n- Stress-tested for 24 hours before delivery\n- Backed by a 2-year labour warranty\n\nGet a free quote — call +44 7777 200175 or book online.",
+        content: "A custom gaming PC is one of the most rewarding purchases you can make — but where do you start?\n\n## Set a budget\n\nGreat 1080p gaming PCs start around £899. For smooth 1440p gaming, budget £1,200–£1,600. For 4K and high-refresh-rate, expect £2,000+.\n\n## Pick your priorities\n\n- **FPS in your favourite games** — check benchmarks.\n- **Upgradability** — leave room for a better GPU later.\n- **Aesthetics** — RGB, cable management, case choice.\n- **Quiet / cool operation** — good fans and airflow.\n\n## Why have us build it?\n\nEvery Gadget Doctor custom build is:\n- Designed around your games and budget\n- Assembled and cable-managed by certified technicians\n- Stress-tested for 24 hours before delivery\n- Backed by our honest, no-quibble support\n\nGet a free quote — call +44 7777 200175 or book online.",
         coverImage: "/images/hero-workshop.jpg",
         category: "Guides",
         tags: "custom PC,gaming,build",

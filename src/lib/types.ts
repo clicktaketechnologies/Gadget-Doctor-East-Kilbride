@@ -8,7 +8,9 @@ export type ServiceCategory =
   | "computer"
   | "custom-computer"
   | "console"
-  | "apple-watch";
+  | "apple-watch"
+  | "ghd"
+  | "hair-dryer";
 
 export interface Service {
   id: string;

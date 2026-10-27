@@ -38,11 +38,6 @@ const WHY_FEATURES = [
     desc: "We use OEM-equivalent components, rigorously tested — never cheap knock-offs that fail in a month.",
   },
   {
-    icon: Award,
-    title: "12-month warranty",
-    desc: "Every repair is backed by a full year's warranty on parts and labour. No quibbles, no fine print.",
-  },
-  {
     icon: Zap,
     title: "Fast turnaround",
     desc: "Most fixes completed same-day. We respect your time and your device — you'll be back up and running fast.",
@@ -51,6 +46,11 @@ const WHY_FEATURES = [
     icon: Truck,
     title: "Doorstep collection",
     desc: "Too busy to drop off? We offer pickup & return across East Kilbride & nearby areas.",
+  },
+  {
+    icon: Award,
+    title: "Certified technicians",
+    desc: "12+ years of experience across phones, laptops, consoles & more — your device is in skilled hands.",
   },
 ];
 
@@ -346,7 +346,7 @@ export function ServiceDetail() {
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <ShieldCheck className="size-3.5 text-primary" />
-                  12-month warranty
+                  Certified technicians
                 </span>
                 {collectionEnabled && (
                   <span className="inline-flex items-center gap-1.5">
@@ -376,7 +376,7 @@ export function ServiceDetail() {
                 <ul className="mt-4 space-y-2.5">
                   {[
                     { icon: Award, label: `${BRAND.yearsExperience}+ years in business` },
-                    { icon: ShieldCheck, label: "12-month repair warranty" },
+                    { icon: ShieldCheck, label: "Certified technicians" },
                     { icon: Clock, label: "Same-day on most repairs" },
                     ...(collectionEnabled
                       ? [{ icon: Truck, label: "Doorstep collection" }]
@@ -472,7 +472,7 @@ export function ServiceDetail() {
             </h2>
             <p className="mt-2 text-sm text-muted-foreground sm:text-base">
               We&apos;ve earned our reputation by treating every device like
-              it&apos;s our own — and backing it up with a real warranty.
+              it&apos;s our own — with genuine-grade parts and honest pricing.
             </p>
           </div>
 
@@ -570,7 +570,7 @@ export function ServiceDetail() {
               </h2>
               <p className="mt-2 text-sm text-muted-foreground sm:text-base">
                 Explore our other repair categories — same fast service,
-                same warranty, same honest pricing.
+                same honest pricing.
               </p>
             </div>
             <Button
@@ -648,7 +648,7 @@ export function ServiceDetail() {
                   { n: `${BRAND.yearsExperience}+`, label: "Years experience" },
                   { n: "10,000+", label: "Devices repaired" },
                   { n: `${rating}★`, label: "Customer rating" },
-                  { n: "12 mo", label: "Repair warranty" },
+                  { n: "30 min", label: "Avg. turnaround" },
                 ].map((s) => (
                   <div
                     key={s.label}

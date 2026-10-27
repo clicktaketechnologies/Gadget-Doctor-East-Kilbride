@@ -16,7 +16,7 @@ export function generateMetadata(): Metadata {
   return {
     title: `${BRAND.fullName} | ${BRAND.tagline}`,
     description:
-      "Gadget Doctor East Kilbride repairs phones, tablets, laptops, MacBooks, computers, custom PCs, games consoles and Apple Watches. Same-day repairs, 12-month warranty, doorstep collection across East Kilbride & surrounding areas. Call +44 1355 458135.",
+      "Gadget Doctor East Kilbride repairs phones, tablets, laptops, MacBooks, computers, custom PCs, games consoles and Apple Watches. Same-day repairs, doorstep collection across East Kilbride & surrounding areas. Call +44 1355 458135.",
     alternates: { canonical: "/" },
     openGraph: {
       type: "website",
@@ -25,7 +25,7 @@ export function generateMetadata(): Metadata {
       siteName: BRAND.fullName,
       title: `${BRAND.fullName} | ${BRAND.tagline}`,
       description:
-        "Fast & reliable electronics repair in East Kilbride. Same-day service, 12-month warranty, doorstep collection.",
+        "Fast & reliable electronics repair in East Kilbride. Same-day service, doorstep collection.",
       images: [
         {
           url: `${BRAND.website}/gadget-doctor-logo.jpg`,
@@ -39,7 +39,7 @@ export function generateMetadata(): Metadata {
       card: "summary_large_image",
       title: `${BRAND.fullName} | ${BRAND.tagline}`,
       description:
-        "Fast & reliable electronics repair in East Kilbride. Same-day service, 12-month warranty, doorstep collection.",
+        "Fast & reliable electronics repair in East Kilbride. Same-day service, doorstep collection.",
       images: [`${BRAND.website}/gadget-doctor-logo.jpg`],
     },
   };

@@ -448,7 +448,7 @@ export function TrackSection() {
 
         <CtaBand
           title="Questions about your repair?"
-          subtitle="Call us for a status update, or book a new repair in under a minute — same-day service and a 12-month warranty on every fix."
+          subtitle="Call us for a status update, or book a new repair in under a minute — same-day service and certified technicians on every fix."
           bookLabel="Book a Repair"
         />
       </section>
@@ -588,7 +588,7 @@ export function TrackSection() {
 
       <CtaBand
         title="Questions about your repair?"
-        subtitle="Call us for a status update, or book a new repair in under a minute — same-day service and a 12-month warranty on every fix."
+        subtitle="Call us for a status update, or book a new repair in under a minute — same-day service and certified technicians on every fix."
         bookLabel="Book a Repair"
       />
     </section>

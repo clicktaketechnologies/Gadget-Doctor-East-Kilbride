@@ -104,12 +104,11 @@ export function Hero() {
 
             <p className="mt-5 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
               Phones, tablets, laptops, MacBooks, computers, custom PCs,
-              consoles &amp; Apple Watch — fixed by certified technicians with
-              honest pricing and a{" "}
+              consoles &amp; Apple Watch — fixed by{" "}
               <span className="font-semibold text-foreground">
-                12-month warranty
+                certified technicians
               </span>{" "}
-              on every repair.
+              using genuine-grade parts with honest pricing.
             </p>
 
             {/* CTAs */}

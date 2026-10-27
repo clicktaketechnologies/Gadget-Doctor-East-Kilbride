@@ -75,6 +75,24 @@
   </url>
 
   <url>
+    <loc>https://www.gadgetdoctorls.co.uk/services/ghd</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.gadgetdoctorls.co.uk/services/hair-dryer</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.gadgetdoctorls.co.uk/terms</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+  </url>
+
+  <url>
     <loc>https://www.gadgetdoctorls.co.uk/collection</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>

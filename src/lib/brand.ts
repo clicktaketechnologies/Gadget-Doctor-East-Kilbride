@@ -14,14 +14,17 @@ export const BRAND = {
   gmbProfile: "https://g.co/kgs/bRysLQB",
   rating: 4.6,
   reviewCount: 92,
-  yearsExperience: 12,
+  yearsExperience: 14,
   logoUrl: "/gadget-doctor-logo.jpg",
   primaryColor: "#E31E24",
   secondaryColor: "#4A90E2",
   hours: [
-    { day: "Monday – Thursday", time: "09:30 AM – 03:00 PM" },
-    { day: "Friday", time: "09:30 AM – 02:30 PM" },
-    { day: "Saturday", time: "10:00 AM – 02:00 PM" },
+    { day: "Monday", time: "10:00 AM – 05:00 PM" },
+    { day: "Tuesday", time: "10:00 AM – 05:00 PM" },
+    { day: "Wednesday", time: "10:00 AM – 05:00 PM" },
+    { day: "Thursday", time: "10:00 AM – 05:00 PM" },
+    { day: "Friday", time: "10:00 AM – 05:00 PM" },
+    { day: "Saturday", time: "11:00 AM – 03:00 PM" },
     { day: "Sunday", time: "Closed" },
   ],
   mapEmbed:
@@ -121,7 +124,7 @@ export const SERVICE_CATEGORIES: {
     icon: "Cpu",
     tagline: "Built to your spec",
     description:
-      "Bespoke gaming PCs, workstations and compact builds — designed, assembled, tested and delivered with a warranty.",
+      "Bespoke gaming PCs, workstations and compact builds — designed, assembled, tested and delivered.",
   },
   {
     value: "console",
@@ -140,6 +143,24 @@ export const SERVICE_CATEGORIES: {
     tagline: "Screen & battery",
     description:
       "Screen and glass replacements, battery service and charging repair for Apple Watch Series, SE and Ultra.",
+  },
+  {
+    value: "ghd",
+    label: "GHD Repair Service",
+    shortLabel: "GHD",
+    icon: "Zap",
+    tagline: "Hair straightener repair",
+    description:
+      "Professional GHD hair straightener repair — faulty cables, broken heaters, dead plates, power issues and more for all GHD models including Gold, Platinum, Curve and Helios.",
+  },
+  {
+    value: "hair-dryer",
+    label: "Hair Dryer Repair Service",
+    shortLabel: "Hair Dryer",
+    icon: "Wind",
+    tagline: "Dyson, ghd & all brands",
+    description:
+      "Hair dryer repair for Dyson, ghd, Parlux, BaByliss and all major brands — motor faults, heating element issues, cable damage and power problems fixed by certified technicians.",
   },
 ];
 
@@ -212,6 +233,22 @@ export const DEVICE_MODELS: Record<string, string[]> = {
     "Apple Watch Ultra",
     "Apple Watch Series 6 / 5 / 4",
     "Older Apple Watch",
+  ],
+  ghd: [
+    "GHD Gold Classic",
+    "GHD Platinum+",
+    "GHD Helios",
+    "GHD Curve (wand / tong)",
+    "GHD V / Max / Original",
+    "Other GHD Model",
+  ],
+  "hair-dryer": [
+    "Dyson Supersonic",
+    "ghd Helios Hair Dryer",
+    "Parlux (Advance / 385 / 2200)",
+    "BaByliss PRO",
+    "Elchim / Remington / Shark",
+    "Other Hair Dryer Brand",
   ],
 };
 

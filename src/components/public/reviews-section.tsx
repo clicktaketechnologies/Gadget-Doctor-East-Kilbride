@@ -236,7 +236,7 @@ export function ReviewsSection() {
     </section>
     <CtaBand
       title="Join 10,000+ happy customers"
-      subtitle="Book your repair today and find out why East Kilbride trusts us with their gadgets — same-day service, 12-month warranty, honest pricing."
+      subtitle="Book your repair today and find out why East Kilbride trusts us with their gadgets — same-day service, certified technicians, honest pricing."
       bookLabel="Book Your Repair"
     />
     </>

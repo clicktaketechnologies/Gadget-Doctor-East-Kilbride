@@ -20,7 +20,7 @@ interface CtaBandProps {
  */
 export function CtaBand({
   title = "Ready to get your gadget fixed?",
-  subtitle = "Book a repair in under 60 seconds — we'll handle the rest. Same-day service, 12-month warranty, honest pricing.",
+  subtitle = "Book a repair in under 60 seconds — we'll handle the rest. Same-day service, certified technicians, honest pricing.",
   bookLabel = "Book Your Repair",
 }: CtaBandProps) {
   const openBooking = useAppStore((s) => s.openBooking);
@@ -95,8 +95,6 @@ export function CtaBand({
             <span>{phone}</span>
             <span className="mx-1">·</span>
             <span>East Kilbride workshop</span>
-            <span className="mx-1">·</span>
-            <span>12-month warranty on every repair</span>
           </div>
         </motion.div>
       </div>

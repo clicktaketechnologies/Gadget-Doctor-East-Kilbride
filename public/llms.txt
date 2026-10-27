@@ -1,7 +1,7 @@
 # Gadget Doctor East Kilbride
 
 > Fast & reliable electronics repair in East Kilbride, Scotland.
-> 4.6★ rated (92+ Google reviews) · 12+ years experience · 12-month warranty on all repairs
+> 4.6★ rated (92+ Google reviews) · 12+ years experience · same-day repairs with genuine-grade parts
 
 ## Business Info
 
@@ -26,6 +26,8 @@
 6. **Custom Computer Builds** — Gaming PCs, workstations, budget PCs, ITX builds. Designed, assembled, stress-tested.
 7. **Game Console Repair** — PS5, PS4, Xbox Series X/S, Nintendo Switch. HDMI port, overheating, drive faults.
 8. **Apple Watch Repairs** — Series, SE, Ultra. Screen, battery, charging, water damage.
+9. **GHD Repair Service** — GHD Gold, Platinum, Helios, Curve. Cable, heater, plates, power, sensor repair.
+10. **Hair Dryer Repair Service** — Dyson Supersonic, ghd, Parlux, BaByliss. Motor, heating element, cable, switch repair.
 
 ## Additional Services
 
@@ -42,6 +44,9 @@
 - [Blog](https://www.gadgetdoctorls.co.uk/blog)
 - [Contact](https://www.gadgetdoctorls.co.uk/contact)
 - [Track Repair](https://www.gadgetdoctorls.co.uk/track)
+- [GHD Repair](https://www.gadgetdoctorls.co.uk/services/ghd)
+- [Hair Dryer Repair](https://www.gadgetdoctorls.co.uk/services/hair-dryer)
+- [Terms & Conditions](https://www.gadgetdoctorls.co.uk/terms)
 - [Sitemap](https://www.gadgetdoctorls.co.uk/sitemap.xml)
 
 ## Blog Posts

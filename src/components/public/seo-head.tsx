@@ -48,7 +48,7 @@ function getSeoForPage(
       return {
         title: `${BRAND.fullName} | ${BRAND.tagline}`,
         description:
-          "Gadget Doctor East Kilbride repairs phones, tablets, laptops, MacBooks, computers, custom PCs, games consoles and Apple Watches. Same-day repairs, 12-month warranty, doorstep collection across East Kilbride & surrounding areas. Call +44 1355 458135.",
+          "Gadget Doctor East Kilbride repairs phones, tablets, laptops, MacBooks, computers, custom PCs, games consoles and Apple Watches. Same-day repairs, doorstep collection across East Kilbride & surrounding areas. Call +44 1355 458135.",
         image: DEFAULT_IMAGE,
       };
 
@@ -56,7 +56,7 @@ function getSeoForPage(
       return {
         title: `Repair Services in East Kilbride | ${BRAND.fullName}`,
         description:
-          "Browse all electronics repair services at Gadget Doctor East Kilbride — phone, tablet, laptop, MacBook, computer, custom PC, games console and Apple Watch repairs. Same-day service, genuine-grade parts, 12-month warranty. Call +44 1355 458135.",
+          "Browse all electronics repair services at Gadget Doctor East Kilbride — phone, tablet, laptop, MacBook, computer, custom PC, games console and Apple Watch repairs. Same-day service, genuine-grade parts. Call +44 1355 458135.",
         image: `${SITE_URL}/images/services-grid.jpg`,
       };
 
@@ -64,14 +64,14 @@ function getSeoForPage(
       if (cat) {
         return {
           title: `${cat.label} in East Kilbride | ${BRAND.fullName}`,
-          description: `${cat.description} Same-day service, genuine-grade parts and a 12-month warranty from Gadget Doctor East Kilbride. Book online or call +44 1355 458135.`,
+          description: `${cat.description} Same-day service and genuine-grade parts from Gadget Doctor East Kilbride. Book online or call +44 1355 458135.`,
           image: `${SITE_URL}/images/services-grid.jpg`,
         };
       }
       return {
         title: `Repair Services in East Kilbride | ${BRAND.fullName}`,
         description:
-          "Electronics repair services at Gadget Doctor East Kilbride. Same-day service, 12-month warranty.",
+          "Electronics repair services at Gadget Doctor East Kilbride. Same-day service, certified technicians.",
         image: `${SITE_URL}/images/services-grid.jpg`,
       };
 
@@ -139,7 +139,7 @@ function getSeoForPage(
       return {
         title: `${BRAND.fullName} | ${BRAND.tagline}`,
         description:
-          "Fast & reliable electronics repair in East Kilbride. Same-day service, 12-month warranty.",
+          "Fast & reliable electronics repair in East Kilbride. Same-day service, certified technicians.",
         image: DEFAULT_IMAGE,
       };
   }

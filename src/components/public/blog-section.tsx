@@ -380,7 +380,7 @@ export function BlogSection() {
 
       <CtaBand
         title="Need a repair?"
-        subtitle="Our East Kilbride workshop fixes phones, tablets, laptops, MacBooks, computers, custom PCs, consoles and Apple Watches — same-day service, 12-month warranty."
+        subtitle="Our East Kilbride workshop fixes phones, tablets, laptops, MacBooks, computers, custom PCs, consoles and Apple Watches — same-day service, genuine-grade parts."
         bookLabel="Book Your Repair"
       />
     </section>

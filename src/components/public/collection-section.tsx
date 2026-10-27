@@ -37,7 +37,7 @@ const STEPS = [
     n: 3,
     icon: Wrench,
     title: "We Repair",
-    desc: "Certified technicians fix your device with genuine-grade parts & 12-month warranty.",
+    desc: "Certified technicians fix your device with genuine-grade parts.",
     color: "from-violet-500/20 to-violet-500/5",
   },
   {
@@ -52,7 +52,7 @@ const STEPS = [
 const TRUST = [
   { icon: ShieldCheck, label: "Fully insured collection" },
   { icon: Clock, label: "Same-day pickup available" },
-  { icon: Star, label: "12-month repair warranty" },
+  { icon: Star, label: "Certified technicians" },
 ];
 
 export function CollectionSection() {

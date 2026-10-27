@@ -519,8 +519,8 @@ export function BlogDetail() {
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
               East Kilbride&apos;s trusted electronics repair workshop — 12+
               years fixing phones, tablets, laptops, MacBooks, computers,
-              custom PCs, consoles and Apple Watches with a 12-month warranty
-              on every repair.
+              custom PCs, consoles and Apple Watches with certified
+              technicians and genuine-grade parts.
             </p>
             <button
               onClick={() => {
@@ -570,7 +570,7 @@ export function BlogDetail() {
 
       <CtaBand
         title="Got a gadget that needs fixing?"
-        subtitle="Our certified East Kilbride technicians can help — same-day service, genuine-grade parts and a 12-month warranty on every repair."
+        subtitle="Our certified East Kilbride technicians can help — same-day service and genuine-grade parts on every repair."
         bookLabel="Book Your Repair"
       />
     </article>

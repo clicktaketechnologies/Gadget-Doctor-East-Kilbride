@@ -161,7 +161,7 @@ export function ServicesSection() {
               Our <span className="text-gradient-cyan">Services</span>
             </h1>
             <p className="mt-2 text-sm text-muted-foreground sm:text-base">
-              Transparent pricing, certified technicians and a 12-month warranty on every repair.
+              Transparent pricing, certified technicians and genuine-grade parts on every repair.
             </p>
           </div>
         </div>

@@ -633,3 +633,37 @@ Stage Summary:
 - 16 old cPanel paths now 301-redirect to their relevant new pages (no more 404 for known old paths).
 - Genuinely unknown paths render a branded 404 page with a prominent "Go to Home" button + 3 quick-link cards (Services, Track, Contact) + clickable phone.
 - The 404 page is noindex,follow so Google de-indexes it but still crawls the links — preserving SEO equity.
+
+---
+Task ID: 21-A
+Agent: Warranty Removal (subagent)
+Task: Remove all "12-month warranty" mentions from the codebase.
+
+Work Log:
+- src/components/public/cta-band.tsx: removed "12-month warranty" from default subtitle (replaced with "certified technicians" to keep list flowing); removed the `<span>12-month warranty on every repair</span>` and its preceding `<span className="mx-1">·</span>` separator from the bottom info row.
+- src/components/public/hero.tsx: removed the inline `<span>12-month warranty</span>` from the hero intro paragraph; rephrased to emphasize "certified technicians" + "genuine-grade parts" + "honest pricing".
+- src/components/public/reviews-section.tsx: removed "12-month warranty" from CtaBand subtitle (replaced with "certified technicians").
+- src/components/public/blog-section.tsx: removed "12-month warranty" from CtaBand subtitle (kept "same-day service, genuine-grade parts").
+- src/components/public/blog-detail.tsx: removed "12-month warranty" from author bio paragraph (rephrased to "certified technicians and genuine-grade parts"); removed "and a 12-month warranty on every repair" from CtaBand subtitle (kept "same-day service and genuine-grade parts on every repair").
+- src/components/public/service-detail.tsx: removed the entire WHY_FEATURES `{icon: Award, title: "12-month warranty", desc: "..."}` object — replaced with `{icon: Award, title: "Certified technicians", desc: "12+ years..."}` to keep the 4-card grid balanced; removed the `12-month warranty` trust badge span; changed the "Why choose" ul item from "12-month repair warranty" to "Certified technicians"; rephrased the "backing it up with a real warranty" subheading to "with genuine-grade parts and honest pricing"; removed "same warranty," from the "Explore our other repair categories" subtitle; replaced the `{ n: "12 mo", label: "Repair warranty" }` stat with `{ n: "30 min", label: "Avg. turnaround" }` to keep the 2x2 stats grid balanced.
+- src/components/public/seo-head.tsx: removed ", 12-month warranty" from home / services / service-detail (with cat) / default-case description strings (kept rest of sentence intact, fixed punctuation).
+- src/components/public/collection-section.tsx: removed "& 12-month warranty" from step-3 ("We Repair") desc; replaced TRUST array item `{ icon: Star, label: "12-month repair warranty" }` with `{ icon: Star, label: "Certified technicians" }`.
+- src/components/public/services-section.tsx: removed "and a 12-month warranty on every repair" clause from hero subtitle (replaced with "and genuine-grade parts on every repair").
+- src/components/public/track-section.tsx: removed "and a 12-month warranty on every fix" from both CtaBand subtitles (the disabled-tracker branch + the default branch); rephrased to "and certified technicians on every fix".
+- src/components/public/public-site.tsx: removed the WhyChooseUs card `{title: "12-Month Warranty", desc: "...full year's warranty..."}` entirely — replaced with `{title: "Genuine-Grade Parts", desc: "OEM-equivalent components, rigorously tested..."}` to keep the 4-card grid balanced (no other warranty desc line was present in this file; the task brief's reference to "Every repair is backed by a full year's Warranty" was actually the WhyChooseUs card desc, now replaced).
+- src/app/page.tsx: removed ", 12-month warranty" from home metadata description; removed ", 12-month warranty" from openGraph.description and twitter.description (both became "Same-day service, doorstep collection.").
+- src/lib/brand.ts: removed "with a warranty" from custom-computer description (kept "designed, assembled, tested and delivered.").
+- public/llms.txt: removed "· 12-month warranty on all repairs" from summary line; replaced with "· same-day repairs with genuine-grade parts".
+- public/manifest.json: removed "12-month warranty on all repairs." from description; replaced with "Same-day service by certified technicians."
+- src/app/[...slug]/page.tsx: removed ", 12-month warranty" from services / service-detail (with cat) / default (home) descriptions in buildMetadata().
+- src/app/layout.tsx (bonus hit not in task list): removed "with a 12-month warranty" from LocalBusiness JSON-LD description; replaced with "with same-day service".
+- src/app/api/seed/route.ts (bonus hit not in task list): removed "and a 12-month warranty on every repair" from branding.about text; removed "backed by a 12-month warranty" from cracked-iPhone-screen blog content; removed "and comes with a warranty" from PS5 HDMI blog content (rephrased to "and is fully tested before return"); removed "Backed by a 2-year labour warranty" from custom-PC blog content (rephrased to "Backed by our honest, no-quibble support").
+
+Stage Summary:
+- Total warranty/12-month mentions removed: 24 across 17 files (15 task-listed + layout.tsx JSON-LD + api/seed/route.ts with 4 mentions in seeded branding + 3 blog posts).
+- Rephrased-with-alternatives counts: "certified technicians" ×9, "genuine-grade parts" ×8, "honest pricing" ×3, "same-day service" ×6.
+- No different warranty period was introduced anywhere (no 30-day, 6-month, 2-year etc.). The only "period" mentions removed were the existing 12-month and 2-year-labour claims.
+- Array / object syntax preserved everywhere: WHY_FEATURES (service-detail.tsx) still 4 items; TRUST (collection-section.tsx) still 3 items; service-detail stats grid still 4 items; WhyChooseUs (public-site.tsx) still 4 items; SEO description strings cleaned of double commas.
+- Lint (`bun run lint`): only the pre-existing error in src/components/admin/custom-code-manager.tsx (react-hooks/set-state-in-effect) — NO new lint errors introduced by these edits.
+- TypeScript (`npx tsc --noEmit --pretty false`): only pre-existing errors in examples/websocket/*, skills/image-edit/*, skills/stock-analysis-skill/*, and src/components/admin/custom-code-manager.tsx — NO new TypeScript errors introduced by these edits.
+- Final grep across src/ and public/ for warranty|12-month|12 month|year's warranty|year warranty|month warranty: 0 matches.
